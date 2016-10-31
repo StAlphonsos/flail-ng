@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.0.0pre1';
+$VERSION = '1.0.0';
 
 1;
 

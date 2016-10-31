@@ -3,18 +3,19 @@
 use ExtUtils::MakeMaker;
 do "./lib/Flail.pm";
 
-print STDERR "Welcome to flail $Flail::VERSION\n\n";
+print STDERR "Welcome to flail v.$Flail::VERSION\n\n";
 WriteMakefile(
     AUTHOR => 'attila <attila@stalphonsos.com>',
     ABSTRACT => 'Command-line MUA in Perl',
     NAME => 'flail',
     VERSION_FROM => 'lib/Flail.pm',
-    EXE_FILES => [ 'flail' ],
+    EXE_FILES => [ 'bin/flail' ],
     PREREQ_PM => {
 	'Mail::Box' => 0,
 	'Net::SMTP' => 0,
 	'App::Cmd' => 0,
 	'Devel::REPL' => 0,
+	'mup' => 0,
     },
     PM => {
 	'lib/Flail.pm' => '$(INST_LIBDIR)/Flail.pm',
