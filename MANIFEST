@@ -1,0 +1,13 @@
+flail
+lib/Devel/REPL/Plugin/AppCmd.pm
+lib/Flail.pm
+lib/Flail/App.pm
+lib/Flail/App/Command.pm
+lib/Flail/App/Command/repl.pm
+lib/Flail/App/Command/server.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+templates/template.pl
+templates/template.pm
