@@ -1,4 +1,4 @@
-flail
+bin/flail
 lib/Devel/REPL/Plugin/AppCmd.pm
 lib/Flail.pm
 lib/Flail/App.pm
