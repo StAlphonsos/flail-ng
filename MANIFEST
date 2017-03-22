@@ -1,4 +1,6 @@
 bin/flail
+dot.flailrc
+eg/sample.pl
 lib/Devel/REPL/Plugin/AppCmd.pm
 lib/Flail.pm
 lib/Flail/App.pm
