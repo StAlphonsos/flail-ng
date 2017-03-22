@@ -32,7 +32,6 @@ WriteMakefile(
     }
 );
 sub MY::postamble {
-    print STDERR "\nExamples will be installed somewhere like /usr/local/share/examples/flail\nThey are also in the eg/ subdirectory of this distribution.\n\n";
     return <<__MyTaRgEt__;
 \# dist checksum and signing fu
 
@@ -86,5 +85,15 @@ ripemd160: \$(RELEASETARBALL)
 
 asc: \$(RELEASETARBALL)
 	\$(GPGCMD) --sign --default-key \$(GPGKEYID) --detach --armor \$(RELEASETARBALL)
+
+# e.g. $ make search key=some_method
+search ::
+	\@find . \\( -perm -1 -a ! -type d \\) -o -name '*.pm' -o -name '*.t' -o -name '*.pl' | xargs grep -n \${grep_opts} \${key}
+
+reconf ::
+	\@make distclean; perl Makefile.PL
+
+smoke ::
+	\@make test TEST_FILES=t/000-mods-load.t
 __MyTaRgEt__
 }

@@ -4,10 +4,6 @@
 
 Flail - An MUA in Perl
 
-=head1 VERSION
-
-  2.0.0pre1
-
 =head1 SYNOPSIS
 
   use Flail;

@@ -1,15 +1,16 @@
 #!/usr/bin/perl
+# -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t -*-
 ##
 # filename.pl - brief purpose
 #
 # See the POD at EOF for documentation and license.
 ##
-use strict;
-use warnings;
+
+use Moose;
 use Pod::Usage;
 
 MAIN: {
-    exit(0);
+	exit(0);
 }
 
 __END__
@@ -54,17 +55,13 @@ man page.
 
 =head1 VERSION HISTORY
 
-B<Alice>: Well I must say I've never heard it that way before...
-
-B<Caterpillar>: I know, I have improved it. 
-
 Z<>
 
   0.1.0   ?? Feb ??    attila   Started
 
 =head1 LICENSE
 
-Copyright (C) 2015 by attila <attila@stalphonsos.com>
+Copyright (C) 1996-2017 by attila <attila@stalphonsos.com>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -80,14 +77,3 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 
 =cut
-
-##
-# Local variables:
-# mode: perl
-# tab-width: 4
-# perl-indent-level: 4
-# perl-continued-statement-offset: 4
-# indent-tabs-mode: nil
-# comment-column: 40
-# End:
-##

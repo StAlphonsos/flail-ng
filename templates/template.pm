@@ -1,4 +1,5 @@
 #! perl
+# -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t -*-
 
 =pod
 
@@ -15,53 +16,38 @@ Flail::module - brief description
 
 Describe the module with real words.
 
+
+=head1 LICENSE
+
+ISC/BSD; see LICENSE file in source distribution.
+
 =cut
 
 package Flail::module;
-use strict;
-use warnings;
+use Moose;
+
+# to initialize an instance after construction:
+sub BUILD {
+	my($self,$params) = @_;
+	# ... do stuff to $self
+}
+
+# to mung args on their way to the constructor:
+around BUILDARGS => sub {
+	my $orig = shift;
+	my $class = shift;
+	my $args;
+	if (@_ == 1 && ref($_[0]) eq 'HASH') {
+		$args = shift;
+	} else {
+		$args = { @_ };
+	}
+	# do something with args here
+	return $args;
+};
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
 __END__
-
-=pod
-
-=head1 SEE ALSO
-
-We live in splendid isolation.
-
-=head1 AUTHOR
-
-  attila <attila@stalphonsos.com>
-
-=head1 LICENSE
-
-Copyright (C) 2015 by attila <attila@stalphonsos.com>
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
-WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
-DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-
-=cut
-
-##
-# Local variables:
-# mode: perl
-# tab-width: 4
-# perl-indent-level: 4
-# cperl-indent-level: 4
-# cperl-continued-statement-offset: 4
-# indent-tabs-mode: nil
-# comment-column: 40
-# End:
-##
