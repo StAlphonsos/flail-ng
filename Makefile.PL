@@ -1,3 +1,5 @@
+# -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t;perl-continued-statement-offset:0 -*-
+
 ## flail, A command-line MUA in Perl
 
 use ExtUtils::MakeMaker;
@@ -9,27 +11,30 @@ sub PAIR { ( SRC(@_) => DST(@_) ) }
 
 print STDERR "Welcome to flail v.$Flail::VERSION\n\n";
 WriteMakefile(
-    AUTHOR => 'attila <attila@stalphonsos.com>',
-    ABSTRACT => 'Command-line MUA in Perl',
-    NAME => 'flail',
-    VERSION => $Flail::VERSION,
-    EXE_FILES => [ 'bin/flail' ],
-    PREREQ_PM => {
-	'Mail::Box' => 0,
-	'Net::SMTP' => 0,
-	'App::Cmd' => 0,
-	'Devel::REPL' => 0,
-	'Moose' => 0,
-	'mup' => 0,
-    },
-    PM => {
-	PAIR('Flail.pm'),
-	PAIR('Flail/App.pm'),
-	PAIR('Flail/App/Command.pm'),
-	PAIR('Flail/App/Command/repl.pm'),
-	PAIR('Flail/App/Command/server.pm'),
-	PAIR('Devel/REPL/Plugin/AppCmd.pm'),
-    }
+	AUTHOR => 'attila <attila@stalphonsos.com>',
+	ABSTRACT => 'Command-line MUA in Perl',
+	NAME => 'flail',
+	VERSION => $Flail::VERSION,
+	EXE_FILES => [ 'bin/flail' ],
+	PREREQ_PM => {
+		'Mail::Box' => 0,
+		'Net::SMTP' => 0,
+		'App::Cmd' => 0,
+		'Devel::REPL' => 0,
+		'Moose' => 0,
+		'mup' => 0,
+	},
+	PM => {
+		PAIR('Flail.pm'),
+		PAIR('Flail/App.pm'),
+		PAIR('Flail/App/Command.pm'),
+		PAIR('Flail/App/Command/ls.pm'),
+		PAIR('Flail/App/Command/repl.pm'),
+		PAIR('Flail/App/Command/server.pm'),
+		PAIR('Flail/Config.pm'),
+		PAIR('Flail/Sink.pm'),
+		PAIR('Devel/REPL/Plugin/AppCmd.pm'),
+	}
 );
 sub MY::postamble {
     return <<__MyTaRgEt__;
@@ -94,6 +99,6 @@ reconf ::
 	\@make distclean; perl Makefile.PL
 
 smoke ::
-	\@make test TEST_FILES=t/000-mods-load.t
+	\@make test TEST_FILES=t/000-load-everything.t
 __MyTaRgEt__
 }

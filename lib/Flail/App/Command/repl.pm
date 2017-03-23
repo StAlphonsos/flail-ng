@@ -31,11 +31,18 @@ use Devel::REPL;
 sub execute {
 	my($self,$opt,$args) = @_;
 	my $repl = Devel::REPL->new;
-	$repl->prompt('flail> ');
-	$repl->load_plugin('History');
-	$repl->load_plugin('AppCmd');
+	$ENV{"FLAIL_LEVEL"} ||= 0;
+	my $lvl = $ENV{"FLAIL_LEVEL"};
+	++$ENV{"FLAIL_LEVEL"};
+	my $prompt = "flail";
+	$prompt .= "[$lvl]" if $lvl;
+	$prompt .= "> ";
+	$repl->prompt($prompt);
+	$repl->load_plugin("History");
+	$repl->load_plugin("AppCmd");
 	$repl->app_cmd($self->app);
 	$repl->run;
+	--$ENV{"FLAIL_LEVEL"};
 }
 
 1;

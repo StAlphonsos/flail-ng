@@ -16,7 +16,6 @@ Flail::App::Command - base class for commands
 
 Describe the module with real words.
 
-
 =head1 LICENSE
 
 ISC/BSD; see LICENSE file in source distribution.
@@ -25,11 +24,25 @@ ISC/BSD; see LICENSE file in source distribution.
 
 package Flail::App::Command;
 use App::Cmd::Setup -command;
+use Moose;
+use Flail::Sink;
+use Flail::Config;
 
-sub emit {
-	shift if ref($_[0]);
-	print "[emit] @_\n";
+has "sink" => (
+	is => "rw", isa => "Object", default => sub { Flail::Sink->Default });
+has "configuration" => (
+	is => "rw", isa => "Object", default => sub { Flail::Config->Default});
+
+sub opt_spec {
+	my($class,$app) = @_;
+	return ( [ "verbose|v" => "crank up verbosity in output" ],
+		 [ "config|C=s" => "use config in given file (def ~/.flailrc)",
+		   { default => join("/",$ENV{"HOME"},".flailrc") } ],
+		 $class->options($app) );
 }
+
+sub emit { shift->sink->write(@_) }
+sub conf { shift->configuration->get(@_) }
 
 1;
 
