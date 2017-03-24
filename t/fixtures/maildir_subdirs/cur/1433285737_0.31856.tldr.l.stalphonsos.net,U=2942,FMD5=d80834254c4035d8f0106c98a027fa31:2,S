@@ -1,0 +1,71 @@
+Return-Path: <owner-ports+M73466=attila=stalphonsos.com@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 36464 invoked from network); 2 Jun 2015 14:53:22 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 14:53:22 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52EqufT012691
+	for <attila@stalphonsos.com>; Tue, 2 Jun 2015 08:52:59 -0600 (MDT)
+Received: from mail.bas3.de (mail.bas3.de [217.197.91.156])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52EqmCT008326
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Tue, 2 Jun 2015 08:52:49 -0600 (MDT)
+Message-ID: <556DC33C.50800@pappanoa.de>
+Date: Tue, 02 Jun 2015 16:52:44 +0200
+From: Guenther Niess <niess@pappanoa.de>
+MIME-Version: 1.0
+To: ports@openbsd.org
+CC: Pascal Stumpf <Pascal.Stumpf@cubes.de>
+Subject: Re: OpenMP in GCC
+References: <556DBB96.10800@pappanoa.de> <3077633673826098990.enqueue@perseus.local.ilion.de>
+In-Reply-To: <3077633673826098990.enqueue@perseus.local.ilion.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+On 06/02/15 16:27, Pascal Stumpf wrote:
+> On Tue, 02 Jun 2015 16:20:06 +0200, Guenther Niess wrote:
+>> Hi,
+>> I wanted to compile and run a small simulation with OpenMP and applied
+>> the patch below to compile gcc 4.9 with libgomp. It seems very
+>> straightforward so I'm wondering why it is disabled in ports?
+>>
+>> I run a make test and what I can see the openmp test seems to have no
+>> problem..
+>>
+>> Running
+>> /home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/format/format.exp
+>> ...
+>> Running
+>> /home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/gomp/gomp.exp ...
+>> Running
+>> /home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/graphite/graphite.exp
+>> ...
+>> Running
+>> /home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/guality/guality.exp
+>> ...
+> 
+> Thanks; this was on my to-do list.  I'll test and commit as time
+> permits.
+> Meanwhile: Have you verified that this really only works on amd64
+> and i386?  In any case, omp.h should move to PFRAG.GOMP-main, and the
+> library version should start at 0.
+> 
+
+I didn't do a lot of testing. I wrote to the list, because I thought I'm
+missing something obvious. I will test some more the next days with my
+small program on my amd64 systems but my pandaboard got broken a few
+month ago and I don't have any other hardware to test.
+I also plan to make a rebuild of my desktop system (base and ports) with
+an up to date -CURRENT tree and will report if something brakes.
+
+Regards
+

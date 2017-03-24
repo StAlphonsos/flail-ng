@@ -1,0 +1,256 @@
+Return-Path: <gnupg-devel-bounces@gnupg.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 61042 invoked from network); 22 May 2015 04:35:51 -0000
+Received: from unknown (HELO lists.gnupg.org) (217.69.76.57)
+  by x.stalphonsos.net with SMTP; 22 May 2015 04:35:51 -0000
+Received: from localhost ([127.0.0.1] helo=trithemius.gnupg.org)
+	by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+	id 1YveaY-0004eY-Dp; Fri, 22 May 2015 06:29:38 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on trithemius.gnupg.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI
+ autolearn=ham version=3.3.2
+Received: from kerckhoffs.g10code.com ([217.69.77.222])
+ by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+ id 1YveaS-0004d2-E7
+ for <mm.gnupg-devel@lists.gnupg.org>; Fri, 22 May 2015 06:29:32 +0200
+Received: from fencepost.gnu.org ([208.118.235.10] ident=Debian-exim)
+ by kerckhoffs.g10code.com with esmtps (Exim 4.80 #2 (Debian))
+ id 1Yvefk-0002CA-Gt
+ for <gnupg-devel@gnupg.org>; Fri, 22 May 2015 06:35:00 +0200
+Received: from du-a.org ([219.94.251.20]:50785 helo=localhost.localdomain)
+ by fencepost.gnu.org with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ueno@gnu.org>) id 1Yvdqd-0003zz-NP
+ for gnupg-devel@gnupg.org; Thu, 21 May 2015 23:42:12 -0400
+Message-ID: <m3d21t46sw.fsf-ueno@gnu.org>
+From: Daiki Ueno <ueno@gnu.org>
+To: gnupg-devel@gnupg.org
+Subject: [PATCH] gpg: Allow setting of temporary pinentry program
+Date: Fri, 22 May 2015 12:42:07 +0900
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.0.50 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-=-="
+X-BeenThere: gnupg-devel@gnupg.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+List-Id: GnuPG development <gnupg-devel.gnupg.org>
+List-Unsubscribe: <http://lists.gnupg.org/mailman/options/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=unsubscribe>
+List-Archive: </pipermail/>
+List-Post: <mailto:gnupg-devel@gnupg.org>
+List-Help: <mailto:gnupg-devel-request@gnupg.org?subject=help>
+List-Subscribe: <http://lists.gnupg.org/mailman/listinfo/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=subscribe>
+Errors-To: gnupg-devel-bounces@gnupg.org
+Sender: "Gnupg-devel" <gnupg-devel-bounces@gnupg.org>
+
+--=-=-=
+Content-Type: text/plain
+
+Hello,
+
+Related to https://bugs.gnupg.org/gnupg/issue1976, where I was
+originally requesting to fix a behavior of --pinentry-mode=loopback for
+Emacs.  However using the option is seemingly not the the preferred way
+and NIIBE-san suggested to write a pinentry wrapper instead.
+
+Unfortunately, it is not an option for Emacs.  We want to use the custom
+pinentry program only temporarily, and continue to use the default
+pinentry program for other use-cases (e.g. calling gpg from
+gnome-terminal).  This is currently not possible.
+
+So, the attached patch adds --pinentry-program option to gpg, which will
+be passed to gpg-agent:
+
+  $ ./g10/gpg2 --symmetric --pinentry-program '/usr/bin/pinentry-gnome3' \
+               -o /dev/null < README
+
+To be honest, I doubt this change is acceptable, and I prefer that the
+loopback behavior is eventually fixed, regardless of the original intent
+of that option.
+
+Regards,
+-- 
+Daiki Ueno
+
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: inline;
+ filename=0001-gpg-Allow-setting-of-temporary-pinentry-program.patch
+
+From 7890aa22dc2b7a91d767ae5e38d71506257db763 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <ueno@gnu.org>
+Date: Fri, 22 May 2015 12:07:37 +0900
+Subject: [PATCH] gpg: Allow setting of temporary pinentry program
+
+* g10/gpg.c (oPinentryProgram): New.
+(opts): Add --pinentry-program.
+(main): Handle --pinentry-program.
+* g10/call-agent.c (start_agent): Pass on the overriding pinentry
+program to agent.
+* agent/gpg-agent.c (agent_deinit_default_ctrl): Free
+ctrl->pinentry_program.
+* agent/command.c (option_handler): Set ctrl->pinentry_program
+upon OPTION command.
+* agent/call-pinentry.c (start_pinentry): Respect
+ctrl->pinentry_program over opt.pinentry_program.
+* agent/agent.h (struct server_control_s): Add new member
+PINENTRY_PROGRAM.
+---
+ agent/agent.h         |  5 +++++
+ agent/call-pinentry.c |  4 +++-
+ agent/command.c       |  8 ++++++++
+ agent/gpg-agent.c     |  2 ++
+ g10/call-agent.c      | 15 +++++++++++++++
+ g10/gpg.c             |  5 +++++
+ g10/options.h         |  1 +
+ 7 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/agent/agent.h b/agent/agent.h
+index dbbf689..a7d7ef0 100644
+--- a/agent/agent.h
++++ b/agent/agent.h
+@@ -201,6 +201,11 @@ struct server_control_s
+   /* The current pinentry mode.  */
+   pinentry_mode_t pinentry_mode;
+ 
++  /* Filename of the program to start as pinentry.  This will be set
++     by gpg through Assuan OPTION command and takes precedence over
++     --pinentry-program option.  */
++  char *pinentry_program;
++
+   /* The TTL used for the --preset option of certain commands.  */
+   int cache_ttl_opt_preset;
+ 
+diff --git a/agent/call-pinentry.c b/agent/call-pinentry.c
+index 018a609..ea3269e 100644
+--- a/agent/call-pinentry.c
++++ b/agent/call-pinentry.c
+@@ -286,7 +286,9 @@ start_pinentry (ctrl_t ctrl)
+ #endif
+     }
+ 
+-  full_pgmname = opt.pinentry_program;
++  full_pgmname = ctrl->pinentry_program;
++  if (!full_pgmname || !*full_pgmname)
++    full_pgmname = opt.pinentry_program;
+   if (!full_pgmname || !*full_pgmname)
+     full_pgmname = gnupg_module_name (GNUPG_MODULE_NAME_PINENTRY);
+   if ( !(pgmname = strrchr (full_pgmname, '/')))
+diff --git a/agent/command.c b/agent/command.c
+index f71325d..9e84ca4 100644
+--- a/agent/command.c
++++ b/agent/command.c
+@@ -2966,6 +2966,14 @@ option_handler (assuan_context_t ctx, const char *key, const char *value)
+       else
+         ctrl->pinentry_mode = tmp;
+     }
++  else if (!strcmp (key, "pinentry-program"))
++    {
++      if (ctrl->pinentry_program)
++	xfree (ctrl->pinentry_program);
++      ctrl->pinentry_program = xtrystrdup (value);
++      if (!ctrl->pinentry_program)
++        return out_of_core ();
++    }
+   else if (!strcmp (key, "cache-ttl-opt-preset"))
+     {
+       ctrl->cache_ttl_opt_preset = *value? atoi (value) : 0;
+diff --git a/agent/gpg-agent.c b/agent/gpg-agent.c
+index 659aa2c..c0a9b53 100644
+--- a/agent/gpg-agent.c
++++ b/agent/gpg-agent.c
+@@ -1419,6 +1419,8 @@ agent_deinit_default_ctrl (ctrl_t ctrl)
+     xfree (ctrl->lc_ctype);
+   if (ctrl->lc_messages)
+     xfree (ctrl->lc_messages);
++  if (ctrl->pinentry_program)
++    xfree (ctrl->pinentry_program);
+ }
+ 
+ 
+diff --git a/g10/call-agent.c b/g10/call-agent.c
+index edee66e..0ccbb19 100644
+--- a/g10/call-agent.c
++++ b/g10/call-agent.c
+@@ -318,6 +318,21 @@ start_agent (ctrl_t ctrl, int for_card)
+                            str_pinentry_mode (opt.pinentry_mode),
+                            gpg_strerror (rc));
+             }
++          /* Pass on the overriding pinentry program.  */
++          if (opt.pinentry_program)
++            {
++	      char *pgmname = percent_plus_escape (opt.pinentry_program);
++              char *tmp = xasprintf ("OPTION pinentry-program=%s",
++                                     pgmname);
++	      xfree (pgmname);
++              rc = assuan_transact (agent_ctx, tmp,
++                               NULL, NULL, NULL, NULL, NULL, NULL);
++              xfree (tmp);
++              if (rc)
++                log_error ("setting pinentry program '%s' failed: %s\n",
++                           opt.pinentry_program,
++                           gpg_strerror (rc));
++            }
+ 
+           check_hijacking (agent_ctx);
+         }
+diff --git a/g10/gpg.c b/g10/gpg.c
+index 5a8a662..92e734b 100644
+--- a/g10/gpg.c
++++ b/g10/gpg.c
+@@ -229,6 +229,7 @@ enum cmd_and_opt_values
+     oPassphraseFile,
+     oPassphraseRepeat,
+     oPinentryMode,
++    oPinentryProgram,
+     oCommandFD,
+     oCommandFile,
+     oQuickRandom,
+@@ -633,6 +634,7 @@ static ARGPARSE_OPTS opts[] = {
+   ARGPARSE_s_s (oPassphraseFile,  "passphrase-file", "@"),
+   ARGPARSE_s_i (oPassphraseRepeat,"passphrase-repeat", "@"),
+   ARGPARSE_s_s (oPinentryMode,    "pinentry-mode", "@"),
++  ARGPARSE_s_s (oPinentryProgram, "pinentry-program", "@"),
+   ARGPARSE_s_i (oCommandFD, "command-fd", "@"),
+   ARGPARSE_s_s (oCommandFile, "command-file", "@"),
+   ARGPARSE_s_n (oQuickRandom, "debug-quick-random", "@"),
+@@ -2763,6 +2765,9 @@ main (int argc, char **argv)
+ 	    if (opt.pinentry_mode == -1)
+               log_error (_("invalid pinentry mode '%s'\n"), pargs.r.ret_str);
+ 	    break;
++          case oPinentryProgram:
++	    opt.pinentry_program = pargs.r.ret_str;
++	    break;
+ 
+ 	  case oCommandFD:
+             opt.command_fd = translate_sys2libc_fd_int (pargs.r.ret_int, 0);
+diff --git a/g10/options.h b/g10/options.h
+index 465c5b2..9e7c803 100644
+--- a/g10/options.h
++++ b/g10/options.h
+@@ -104,6 +104,7 @@ struct
+   const char *homedir;
+   const char *agent_program;
+   const char *dirmngr_program;
++  const char *pinentry_program;
+ 
+   /* Options to be passed to the gpg-agent */
+   session_env_t session_env;
+-- 
+2.1.0
+
+
+--=-=-=
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Gnupg-devel mailing list
+Gnupg-devel@gnupg.org
+http://lists.gnupg.org/mailman/listinfo/gnupg-devel
+
+--=-=-=--
+

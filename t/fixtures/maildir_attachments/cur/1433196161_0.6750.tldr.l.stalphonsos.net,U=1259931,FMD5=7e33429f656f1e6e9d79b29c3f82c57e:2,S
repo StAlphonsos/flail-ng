@@ -1,0 +1,70 @@
+Return-Path: <bounces+848413-96e3-attila=stalphonsos.com@sgmail.github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 98608 invoked from network); 28 May 2015 17:11:37 -0000
+Received: from unknown (HELO o5.sgmail.github.com) (192.254.113.10)
+  by x.stalphonsos.net with SMTP; 28 May 2015 17:11:37 -0000
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=github.com; 
+	h=from:reply-to:to:in-reply-to:references:subject:mime-version:content-type:content-transfer-encoding:list-id:list-archive:list-post:list-unsubscribe; 
+	s=s20150108; bh=GU6WaWsDsKKs1j+3r57l7jYB354=; b=eSVz7uPGN8giEuZs
+	I+OVwPg+aEkAuuX00Y5f7N3UEdVBpQnXOycfdnmYgdAHcNIy13+oWtNLxXPOyUEE
+	0X3snT58PUN0OtMu2d4HkNsaODIbajoVw6XrBcuDp1NoPf2zCKFJPMx183T9ctsA
+	OL5523bYse5wLq6uESDLZry5uXg=
+Received: by filter0494p1mdw1.sendgrid.net with SMTP id filter0494p1mdw1.15634.55674C4112
+        2015-05-28 17:11:32.155838231 +0000 UTC
+Received: from github-smtp2a-ext-cp1-prd.iad.github.net (github-smtp2a-ext-cp1-prd.iad.github.net [192.30.253.16])
+	by ismtpd-012 (SG) with ESMTP id 14d9b81e912.469b.64cd8b
+	for <attila@stalphonsos.com>; Thu, 28 May 2015 17:11:31 +0000 (UTC)
+Date: Thu, 28 May 2015 10:11:31 -0700
+From: "Dirk-Jan C. Binnema" <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874bce2dd2ffec4510139345bfb2f68e9e9a92bbe2ee92cf00000001117f0e4392a169ce04dcbc4c@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/pull/623/issue_event/316357202@github.com>
+In-Reply-To: <djcb/mu/pull/623@github.com>
+References: <djcb/mu/pull/623@github.com>
+Subject: Re: [mu] fix typo (#623)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_55674c43b54e3_635c3fed00ab92bc6467a";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: djcb
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874bce2dd2ffec4510139345bfb2f68e9e9a92bbe2ee92cf00000001117f0e4392a169ce04dcbc4c@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874bce2dd2ffec4510139345bfb2f68e9e9a92bbe2ee92cf00000001117f0e4392a169ce04dcbc4c@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS6hZSWRyq8SABRnPvuglW3WiTFDPks5oN0PDgaJpZM4EsTlB>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+X-SG-EID: qjQWc1ylAbm/hZFLRMwvvCpxtLJJDbaLxl9ZLGi1ddaEB4jHbHx6l9Iq1Has31o7PeAGBRAMf+SAZT
+ sr1drSK9Ngn+WmuGbGJM+erJaRsBkuXnE1hRs8kj/iFITFW24mjuuM79KYSIL+VrnHxZQ4iGWP37AS
+ zPiBKR1IHkSg1EmuD6n5HPHPHomSq/Ugfsoj
+
+----==_mimepart_55674c43b54e3_635c3fed00ab92bc6467a
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Merged #623.
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/pull/623#event-316357202
+----==_mimepart_55674c43b54e3_635c3fed00ab92bc6467a
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>Merged <a href="https://github.com/djcb/mu/pull/623" class="issue-link" title="fix typo">#623</a>.</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/pull/623#event-316357202">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HS0wop2S58z9qh1--NKr7O0XM9uZzks5oN0PDgaJpZM4EsTlB.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/pull/623#event-316357202"></link>
+    <meta itemprop="name" content="View Issue"></meta>
+  </div>
+  <meta itemprop="description" content="View this Issue on GitHub"></meta>
+</div>
+
+----==_mimepart_55674c43b54e3_635c3fed00ab92bc6467a--

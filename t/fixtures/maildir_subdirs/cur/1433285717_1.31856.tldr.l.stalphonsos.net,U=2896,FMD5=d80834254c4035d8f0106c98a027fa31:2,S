@@ -1,0 +1,164 @@
+Return-Path: <owner-ports+M73458=attila=stalphonsos.com@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 17609 invoked from network); 2 Jun 2015 08:24:40 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 08:24:40 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t528OH4W029032
+	for <attila@stalphonsos.com>; Tue, 2 Jun 2015 02:24:22 -0600 (MDT)
+Received: from symphytum.spacehopper.org (symphytum.spacehopper.org [82.68.199.130])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t528O7nv009343
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Tue, 2 Jun 2015 02:24:08 -0600 (MDT)
+Received: from localhost (localhost [127.0.0.1])
+	by symphytum.spacehopper.org (Postfix) with ESMTP id 3m15xg0T84zBJK2;
+	Tue,  2 Jun 2015 09:24:07 +0100 (BST)
+X-Virus-Scanned: amavisd-new at spacehopper.org
+Received: from symphytum.spacehopper.org ([127.0.0.1])
+	by localhost (symphytum.spacehopper.org [127.0.0.1]) (amavisd-new, port 10026)
+	with LMTP id ieTxFJKDZc-q; Tue,  2 Jun 2015 09:24:06 +0100 (BST)
+Received: by symphytum.spacehopper.org (Postfix, from userid 1000)
+	id 3m15xf3TgJzBJKB; Tue,  2 Jun 2015 09:24:06 +0100 (BST)
+Date: Tue, 2 Jun 2015 09:24:06 +0100
+From: Stuart Henderson <sthen@openbsd.org>
+To: Adam Wolk <adam.wolk@tintagel.pl>
+Cc: ports@openbsd.org
+Subject: Re: [UPDATE] otter-browser 0.9.05 beta 5 => 0.9.06 beta 6
+Message-ID: <20150602082406.GI15218@symphytum.spacehopper.org>
+Mail-Followup-To: Adam Wolk <adam.wolk@tintagel.pl>, ports@openbsd.org
+References: <20150601230232.51768da7@napalm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20150601230232.51768da7@napalm>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+On 2015/06/01 23:02, Adam Wolk wrote:
+> Hi ports@,
+> 
+> Otter browser beta 6 has been released today and OpenBSD is the first
+> platform receiving an official package :)
+
+Updated diff following my email address change commit. I need to finish
+pkg_add -u and get gcc 4.9 installed before I can test.
+
+Index: Makefile
+===================================================================
+RCS file: /cvs/ports/www/otter-browser/Makefile,v
+retrieving revision 1.7
+diff -u -p -r1.7 Makefile
+--- Makefile	2 Jun 2015 08:16:20 -0000	1.7
++++ Makefile	2 Jun 2015 08:23:05 -0000
+@@ -5,28 +5,10 @@ COMMENT =		browser aiming to recreate cl
+ 
+ GH_ACCOUNT =		OtterBrowser
+ GH_PROJECT =		otter-browser
+-V =			0.9.05
+-REVISION =		1
+-#GH_TAGNAME =		v$V
+-# We were asked by upstream to release from the following commit
+-# as it contains fixes for crashes & serious issues
+-# - Adhere to cppcheck reports
+-# - #767 Browser isn't starting after "Toolbars > Reset to Defaults..."
+-# - Crash when cloning tab
+-# - #768 "Navigation Bar > Remove..." is not working
+-# - Escape ampersand for TabBarWidget
+-# - #769 Transfer completed notification was triggered on download stop
+-# - Fix check that could prevent configuration or removal of custom
+-#   toolbars
+-# - Small code refactorizations
+-# - Prevent crashes in modal dialog for cookie saving when more then
+-#   one is already stored
+-# - #779 build warning fixes (was not present in release code)
+-# - #190 Initial work for storing session data
+-# - Ensuring that bookmarks model always emits signals on modification
+-GH_COMMIT =		1ea5df13f908495df4ccccad9d634d997f6fd4c9
++V =			0.9.06
++GH_TAGNAME =		v$V
+ 
+-DISTNAME =		${GH_PROJECT}-$Vpl0
++DISTNAME =		${GH_PROJECT}-$V
+ 
+ CATEGORIES =		www
+ 
+@@ -37,7 +19,7 @@ MAINTAINER =		Adam Wolk <adam.wolk@tinta
+ # License GPLv3+
+ PERMIT_PACKAGE_CDROM =	Yes
+ 
+-WANTLIB +=		c m pthread Qt5Core Qt5Gui Qt5Multimedia
++WANTLIB +=		c m pthread Qt5Core Qt5Dbus Qt5Gui Qt5Multimedia
+ WANTLIB +=		Qt5Network Qt5PrintSupport Qt5Script
+ WANTLIB +=		Qt5Sql Qt5WebKit Qt5WebKitWidgets Qt5Widgets
+ 
+Index: distinfo
+===================================================================
+RCS file: /cvs/ports/www/otter-browser/distinfo,v
+retrieving revision 1.4
+diff -u -p -r1.4 distinfo
+--- distinfo	5 Apr 2015 14:35:57 -0000	1.4
++++ distinfo	2 Jun 2015 08:23:05 -0000
+@@ -1,2 +1,2 @@
+-SHA256 (otter-browser-0.9.05pl0.tar.gz) = biN8KBDS+XzAhg6WLEciNBwMtP2RXq7XZKatcIlgZvE=
+-SIZE (otter-browser-0.9.05pl0.tar.gz) = 2304783
++SHA256 (otter-browser-0.9.06.tar.gz) = Ba1kMp5yyaagmKFy6AYHhrno7l8kkJpnFPj2ZdwJfSI=
++SIZE (otter-browser-0.9.06.tar.gz) = 2484916
+Index: patches/patch-CMakeLists_txt
+===================================================================
+RCS file: /cvs/ports/www/otter-browser/patches/patch-CMakeLists_txt,v
+retrieving revision 1.2
+diff -u -p -r1.2 patch-CMakeLists_txt
+--- patches/patch-CMakeLists_txt	5 Apr 2015 14:35:57 -0000	1.2
++++ patches/patch-CMakeLists_txt	2 Jun 2015 08:23:05 -0000
+@@ -1,19 +1,6 @@
+ $OpenBSD: patch-CMakeLists_txt,v 1.2 2015/04/05 14:35:57 sthen Exp $
+ --- CMakeLists.txt.orig	Sat Apr  4 19:07:35 2015
+ +++ CMakeLists.txt	Sun Apr  5 15:08:39 2015
+-@@ -12,9 +12,9 @@ project(otter-browser)
+- 
+- set(MAJOR_VERSION "0")
+- set(MINOR_VERSION "9")
+--set(PATCH_VERSION "06")
+--set(OTTER_VERSION_MAIN "0.9.06")
+--set(OTTER_VERSION_CONTEXT "-dev")
+-+set(PATCH_VERSION "05")
+-+set(OTTER_VERSION_MAIN "0.9.05")
+-+set(OTTER_VERSION_CONTEXT " beta 5")
+- 
+- if (EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+- 	include(InstallRequiredSystemLibraries)
+ @@ -312,5 +312,5 @@ install(FILES resources/icons/otter-browser-64.png DES
+  install(FILES resources/icons/otter-browser-128.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/128x128/apps/ RENAME otter-browser.png)
+  install(FILES resources/icons/otter-browser-256.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps/ RENAME otter-browser.png)
+Index: pkg/PLIST
+===================================================================
+RCS file: /cvs/ports/www/otter-browser/pkg/PLIST,v
+retrieving revision 1.2
+diff -u -p -r1.2 PLIST
+--- pkg/PLIST	5 Apr 2015 14:35:57 -0000	1.2
++++ pkg/PLIST	2 Jun 2015 08:23:05 -0000
+@@ -10,7 +10,6 @@ share/icons/hicolor/48x48/apps/otter-bro
+ share/icons/hicolor/64x64/apps/otter-browser.png
+ share/otter-browser/
+ share/otter-browser/locale/
+-share/otter-browser/locale/otter-browser_ca_ES.qm
+ share/otter-browser/locale/otter-browser_cs_CZ.qm
+ share/otter-browser/locale/otter-browser_da.qm
+ share/otter-browser/locale/otter-browser_de_DE.qm
+@@ -24,6 +23,7 @@ share/otter-browser/locale/otter-browser
+ share/otter-browser/locale/otter-browser_fi.qm
+ share/otter-browser/locale/otter-browser_fr_CA.qm
+ share/otter-browser/locale/otter-browser_fr_FR.qm
++share/otter-browser/locale/otter-browser_hr_HR.qm
+ share/otter-browser/locale/otter-browser_hu.qm
+ share/otter-browser/locale/otter-browser_id_ID.qm
+ share/otter-browser/locale/otter-browser_it_IT.qm
+

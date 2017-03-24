@@ -7,27 +7,48 @@ use warnings;
 use File::Path qw(make_path remove_tree);
 use Data::Dumper;
 use POSIX;
+use vars qw($NO_MAILDIR $SAMPLE_MAILDIR);
 
-sub ts { POSIX::strftime("%Y-%m-%dT%H:%M:%S%Z",localtime(time)) }
+$NO_MAILDIR ||= 0;
+$SAMPLE_MAILDIR ||= "maildir_simple";
+
+sub ts		{ POSIX::strftime("%Y-%m-%dT%H:%M:%S%Z",localtime(time)) }
+sub DD		{ Data::Dumper->new(\@_)->Terse(1)->Indent(0)->Dump; }
+sub verbose	{ $ENV{"TEST_VERBOSE"} }
 
 sub setup_testing_env {
 	my $tmpd = $ENV{"TMPDIR"} || "/tmp";
+	my $tstd;
 	if (exists($ENV{"FLAIL_TEST_TESTDIR"})) {
-		my $td = $ENV{"FLAIL_TEST_TESTDIR"};
-		die("you set FLAIL_TEST_TESTDIR=$td but it does not exist!")
-		    unless -d $td;
+		$tstd = $ENV{"FLAIL_TEST_TESTDIR"};
+		die("you set FLAIL_TEST_TESTDIR=$tstd but it does not exist!")
+		    unless -d $tstd;
 		$ENV{"FLAIL_TEST_TESTDIR_SET"} = 0;
 	} else {
-		my $outd = $tmpd . "/flail_test_outdir.$$";
-		die("setup_testing_env: $outd exists!")
-		    if (-d $outd || -f $outd);
-		make_path($outd)
-		    or die("setup_testing_env: mkdir $outd: $!");
-		$ENV{"FLAIL_TEST_TESTDIR"} = $outd;
+		$tstd = $tmpd . "/flail_test_dir.$$";
+		die("setup_testing_env: $tstd exists!")
+		    if (-d $tstd || -f $tstd);
+		make_path($tstd)
+		    or die("setup_testing_env: mkdir $tstd: $!");
+		$ENV{"FLAIL_TEST_TESTDIR"} = $tstd;
 		$ENV{"FLAIL_TEST_TESTDIR_SET"} = 1;
 	}
+	# tests that don't want a Maildir set up must BEGIN { $NO_MAILDIR=1 }
+	# c.f. 000-load-everything.t
+	unless ($NO_MAILDIR) {
+		my $md = join("/", $tstd, "Maildir");
+		die("setup_testing_env: $md exists!") if -d $md || -f $md;
+		make_path($md) or die("make_path($md): $!");
+		die("t/fixtures/${SAMPLE_MAILDIR} is missing")
+		    unless -d "t/fixtures/${SAMPLE_MAILDIR}";
+		my $tar = $ENV{'FLAIL_TEST_TAR'} || 'tar';
+		my $xf = verbose() ? 'xvf' : 'xf';
+		my $cmd = qq{sh -c '(cd t/fixtures/${SAMPLE_MAILDIR}; }.
+		    qq{${tar} -cf - .) | (cd $md; ${tar} -$xf -)'};
+		system($cmd) == 0 or die("seutp_testing_env: $cmd: $!");
+		$ENV{"MAILDIR"} = $md;
+	}
 }
-
 
 END {
 	if ($ENV{"FLAIL_TEST_TESTDIR"}) {
@@ -40,6 +61,6 @@ END {
 	}
 }
 
-setup_testing_env unless $ENV{"FLAIL_TEST_NO_SETUP"};
+setup_testing_env() unless $ENV{"FLAIL_TEST_NO_SETUP"};
 
 1;

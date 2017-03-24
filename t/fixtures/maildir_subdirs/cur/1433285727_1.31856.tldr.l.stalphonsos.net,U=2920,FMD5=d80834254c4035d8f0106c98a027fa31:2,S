@@ -1,0 +1,87 @@
+Return-Path: <owner-tech+M42332@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 26006 invoked from network); 2 Jun 2015 11:51:18 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 11:51:18 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52BowW9011758;
+	Tue, 2 Jun 2015 05:50:58 -0600 (MDT)
+Received: from igor.umaxx.net (igor.umaxx.net [85.214.232.249])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52BojDo017873
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=FAIL)
+	for <tech@openbsd.org>; Tue, 2 Jun 2015 05:50:47 -0600 (MDT)
+Received: from [192.168.100.112] (ip5b424a78.dynamic.kabel-deutschland.de [91.66.74.120])
+	(authenticated bits=0)
+	by igor.umaxx.net (8.14.8/8.14.7) with ESMTP id t52BoXmj002197
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO);
+	Tue, 2 Jun 2015 13:50:38 +0200 (CEST)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (1.0)
+Subject: Re: [Patch] httpd - don't leak fcgi file descriptors
+From: Joerg Jung <mail@umaxx.net>
+X-Mailer: iPad Mail (12F69)
+In-Reply-To: <A9933752-A883-4C1B-87D5-85ED20353C0F@opennet.ca>
+Date: Tue, 2 Jun 2015 13:50:35 +0200
+Cc: "tech@openbsd.org" <tech@openbsd.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <D05C4AF8-01F9-4A65-88E6-7AE6B4AE64D5@umaxx.net>
+References: <08F5A1E0-BBE1-469A-8175-2D130594810B@opennet.ca> <3E0EB6D7-F64C-46AB-AD3A-4005D8771DB6@umaxx.net> <A9933752-A883-4C1B-87D5-85ED20353C0F@opennet.ca>
+To: Todd Mortimer <todd@opennet.ca>
+X-milter-spamd: ham (-2.9/5.0 ALL_TRUSTED,BAYES_00)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <tech.openbsd.org>
+List-Owner: <mailto:owner-tech@openbsd.org>
+List-Post: <mailto:tech@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20tech>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20tech>
+X-Loop: tech@openbsd.org
+Precedence: list
+Sender: owner-tech@openbsd.org
+
+
+> Am 01.06.2015 um 01:25 schrieb Todd Mortimer <todd@opennet.ca>:
+> 
+> I agree that my patch is more of a workaround, and it would be
+> better to track down how it is that the client is being passed to
+> server_fcgi with an open socket. I was going this way when I started
+> looking at the source, but then I saw that clt->clt_srvevb and
+> clt->clt_srvbev get the same treatment (free if not null, then
+> reassign) at the same spot in server_fcgi(), and I figured if it
+> was good enough for clt_srvevb and clt_srvbev, why not for clt_fd?
+
+Yes, you are right. I think your proposed diff is correct.
+I would like to commit it, if anyone is willing to give OK.
+
+Thanks,
+Regards,
+Joerg
+
+> 
+> Index: server_fcgi.c
+> ===================================================================
+> RCS file: /cvs/src/usr.sbin/httpd/server_fcgi.c,v
+> retrieving revision 1.53
+> diff -u -p -u -p -r1.53 server_fcgi.c
+> --- server_fcgi.c    26 Mar 2015 09:01:51 -0000    1.53
+> +++ server_fcgi.c    31 May 2015 22:33:54 -0000
+> @@ -31,6 +31,7 @@
+> #include <stdio.h>
+> #include <time.h>
+> #include <ctype.h>
+> +#include <unistd.h>
+> #include <event.h>
+> 
+> #include "httpd.h"
+> @@ -152,6 +153,9 @@ server_fcgi(struct httpd *env, struct cl
+>        errstr = "failed to allocate evbuffer";
+>        goto fail;
+>    }
+> +
+> +    if(clt->clt_fd != -1)
+> +        close(clt->clt_fd);
+> 
+>    clt->clt_fd = fd;
+>    if (clt->clt_srvbev != NULL)
+> 
+

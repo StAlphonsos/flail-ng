@@ -1,0 +1,114 @@
+Return-Path: <noreply@github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 32265 invoked from network); 29 May 2015 14:44:20 -0000
+Received: from unknown (HELO github-smtp2b-ext-cp1-prd.iad.github.net) (192.30.252.193)
+  by x.stalphonsos.net with SMTP; 29 May 2015 14:44:20 -0000
+Date: Fri, 29 May 2015 07:44:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1432910656;
+	bh=SVjzz6AMrGSdgI9InZgU7W7fToYQIFmsVE3st6askls=;
+	h=From:Reply-To:To:Subject:List-ID:List-Archive:List-Post:
+	 List-Unsubscribe:From;
+	b=Qdc0tGXHToLJNmyCXut/vlfKzcW9HyjGhyFISHVdgwG4JwaAKxsWEe0GRYKQHT1vu
+	 ThMjfZATVr+hB/Ox+qZEnq2fiECgb0SKvTutmVXBKIGVjbB5bLMDZUflq0gSOb2U1f
+	 nPN+b7YnYeve8YKP/PfYkXD8x72t0OraeCl4aJCc=
+From: Thomas Beckmann <notifications@github.com>
+Reply-To: fletcher/MultiMarkdown-4 <reply+000e874be3ce4820220060acdcea08075f4aae0cba0dd7fd92cf0000000111803d4092a169ce04ea320e@reply.github.com>
+To: fletcher/MultiMarkdown-4 <MultiMarkdown-4@noreply.github.com>
+Message-ID: <fletcher/MultiMarkdown-4/pull/119@github.com>
+Subject: [MultiMarkdown-4] Cross-platform transclusion (#119)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_55687b40e330b_49713f8c703972b81001096";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: t-beckmann
+X-GitHub-Recipient: StAlphonsos
+List-ID: fletcher/MultiMarkdown-4 <MultiMarkdown-4.fletcher.github.com>
+List-Archive: https://github.com/fletcher/MultiMarkdown-4
+List-Post: <mailto:reply+000e874be3ce4820220060acdcea08075f4aae0cba0dd7fd92cf0000000111803d4092a169ce04ea320e@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874be3ce4820220060acdcea08075f4aae0cba0dd7fd92cf0000000111803d4092a169ce04ea320e@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS8Xd2iUOI4fu7sKGX0Z1M3_JkiP9ks5oOHLAgaJpZM4EvRkH>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+
+
+----==_mimepart_55687b40e330b_49713f8c703972b81001096
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Using relative paths the transclude feature works on Windows as well as on Linux only when using the native path separator characters. When writing markdown to be processed on both platforms however I'm facing the issue that mmd does not compute the transclusion base path correctly.
+
+The changes fix this and allow using forward as well as backward slashes on Windows platform. This way, one can use forward slashes for cross-platform markdown files including transclusions.
+
+Notice, Windows POSIX treats forward and backward slashes equal for compatibility reasons. The C library uses POSIX API under the hood and thus accepts both styles of separators.
+You can view, comment on, or merge this pull request online at:
+
+  https://github.com/fletcher/MultiMarkdown-4/pull/119
+
+-- Commit Summary --
+
+  * Windows POSIX treats forward and backward slashes equal for compatibility reasons,
+
+-- File Changes --
+
+    M transclude.c (35)
+
+-- Patch Links --
+
+https://github.com/fletcher/MultiMarkdown-4/pull/119.patch
+https://github.com/fletcher/MultiMarkdown-4/pull/119.diff
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/fletcher/MultiMarkdown-4/pull/119
+
+----==_mimepart_55687b40e330b_49713f8c703972b81001096
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>Using relative paths the transclude feature works on Windows as well as on Linux only when using the native path separator characters. When writing markdown to be processed on both platforms however I'm facing the issue that mmd does not compute the transclusion base path correctly.</p>
+
+<p>The changes fix this and allow using forward as well as backward slashes on Windows platform. This way, one can use forward slashes for cross-platform markdown files including transclusions.</p>
+
+<p>Notice, Windows POSIX treats forward and backward slashes equal for compatibility reasons. The C library uses POSIX API under the hood and thus accepts both styles of separators.</p>
+
+<hr>
+
+<h4>You can view, comment on, or merge this pull request online at:</h4>
+<p>&nbsp;&nbsp;<a href='https://github.com/fletcher/MultiMarkdown-4/pull/119'>https://github.com/fletcher/MultiMarkdown-4/pull/119</a></p>
+
+<h4>Commit Summary</h4>
+<ul>
+  <li>Windows POSIX treats forward and backward slashes equal for compatibility reasons,</li>
+</ul>
+
+<h4>File Changes</h4>
+<ul>
+  <li>
+    <strong>M</strong>
+    <a href="https://github.com/fletcher/MultiMarkdown-4/pull/119/files#diff-0">transclude.c</a>
+    (35)
+  </li>
+</ul>
+
+<h4>Patch Links:</h4>
+<ul>
+  <li><a href='https://github.com/fletcher/MultiMarkdown-4/pull/119.patch'>https://github.com/fletcher/MultiMarkdown-4/pull/119.patch</a></li>
+  <li><a href='https://github.com/fletcher/MultiMarkdown-4/pull/119.diff'>https://github.com/fletcher/MultiMarkdown-4/pull/119.diff</a></li>
+</ul>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/fletcher/MultiMarkdown-4/pull/119">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HSx5cAj7c6zEX3gCPDMBwYQoACWKFks5oOHLAgaJpZM4EvRkH.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/fletcher/MultiMarkdown-4/pull/119"></link>
+    <meta itemprop="name" content="View Pull Request"></meta>
+  </div>
+  <meta itemprop="description" content="View this Pull Request on GitHub"></meta>
+</div>
+
+
+----==_mimepart_55687b40e330b_49713f8c703972b81001096--

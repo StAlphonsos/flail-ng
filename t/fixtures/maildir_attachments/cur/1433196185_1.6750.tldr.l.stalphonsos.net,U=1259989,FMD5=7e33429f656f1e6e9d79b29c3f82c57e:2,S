@@ -1,0 +1,63 @@
+Return-Path: <noreply@github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 10977 invoked from network); 28 May 2015 23:56:37 -0000
+Received: from unknown (HELO github-smtp2a-ext-cp1-prd.iad.github.net) (192.30.252.192)
+  by x.stalphonsos.net with SMTP; 28 May 2015 23:56:37 -0000
+Date: Thu, 28 May 2015 16:32:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1432855962;
+	bh=Q5tXMLXjclGm0fM1MbWKdUQ3OpuCWrsh3jLu1AkPcWk=;
+	h=From:Reply-To:To:Subject:List-ID:List-Archive:List-Post:
+	 List-Unsubscribe:From;
+	b=R9AlZLNUN0LN2WIYiLmlLa1plYYO2ORfqrIUvGkhz5PXAEr8m8Imzf2NrDiXRmWEo
+	 bo7HhVOZnL1JZ3Fl+mlIPRoxTWs7Uhvo8mneOvAvuW8d/tj0BUd6ZzsaJ2I7zLAMRo
+	 zjOHlRLXNMZ/pDyF+vjPpFhlapbBedPOYkNL2Ufc=
+From: Stefan van der Walt <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874bafd77a9fb85c3de791a990a24a3859aa890c28c092cf00000001117f679a92a169ce04e5d2f2@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/issues/624@github.com>
+Subject: [mu] Forward message as-is (#624)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5567a59a24e58_372a3ff17fe832c020065f";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: stefanv
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874bafd77a9fb85c3de791a990a24a3859aa890c28c092cf00000001117f679a92a169ce04e5d2f2@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874bafd77a9fb85c3de791a990a24a3859aa890c28c092cf00000001117f679a92a169ce04e5d2f2@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS-GelVAoSuU7Pr-zO9OnSP18neQIks5oN50agaJpZM4EuSmH>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+
+
+----==_mimepart_5567a59a24e58_372a3ff17fe832c020065f
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+mu4e only allows capturing and forwarding a message as a .eml attachment.  Often, it is handy to be able to forward an HTML email "as is".
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/issues/624
+----==_mimepart_5567a59a24e58_372a3ff17fe832c020065f
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>mu4e only allows capturing and forwarding a message as a .eml attachment.  Often, it is handy to be able to forward an HTML email "as is".</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/issues/624">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HSwMb-JZGAAdCthGny9Kujc2DHBH9ks5oN50agaJpZM4EuSmH.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/issues/624"></link>
+    <meta itemprop="name" content="View Issue"></meta>
+  </div>
+  <meta itemprop="description" content="View this Issue on GitHub"></meta>
+</div>
+
+----==_mimepart_5567a59a24e58_372a3ff17fe832c020065f--

@@ -1,0 +1,65 @@
+Return-Path: <noreply@github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 98686 invoked from network); 28 May 2015 17:15:35 -0000
+Received: from unknown (HELO github-smtp2a-ext-cp1-prd.iad.github.net) (192.30.252.196)
+  by x.stalphonsos.net with SMTP; 28 May 2015 17:15:35 -0000
+Date: Thu, 28 May 2015 10:15:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1432833334;
+	bh=hujG1wwv97tRPNOLiSLmwpY+/jDBT8DEfQtEis1p+2Y=;
+	h=From:Reply-To:To:In-Reply-To:References:Subject:List-ID:
+	 List-Archive:List-Post:List-Unsubscribe:From;
+	b=kPsa15EAgqSV3oDAKo1pSkon+Y3oR2DRwDkly0w3Zq+VaLGEj6EHKZ+sJa8f8Ibba
+	 efsXMZfOdcgI9a8+RRkfCVu6ynrkLnKJY6mLzAacYYtFb5eU0R9BX1t/DzJOoIKqV5
+	 20XJ6uVeBbpzTHN7UiEQPZyzIxyKAmHxVmiWzq/8=
+From: "Dirk-Jan C. Binnema" <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/issue/620/issue_event/316362867@github.com>
+In-Reply-To: <djcb/mu/issues/620@github.com>
+References: <djcb/mu/issues/620@github.com>
+Subject: Re: [mu] mu4e - upload package to MELPA?  (#620)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_55674d36ddb93_4c633facfb58329c1670d2";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: djcb
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HSxGfytxJpkAHnCiGqd5sS_JaWtlyks5oN0S2gaJpZM4EqKuu>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+
+
+----==_mimepart_55674d36ddb93_4c633facfb58329c1670d2
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Closed #620.
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/issues/620#event-316362867
+----==_mimepart_55674d36ddb93_4c633facfb58329c1670d2
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>Closed <a href="https://github.com/djcb/mu/issues/620" class="issue-link" title="mu4e - upload package to MELPA? ">#620</a>.</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/issues/620#event-316362867">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HS0HVd69erg4hTkyBmLyAT380bfp0ks5oN0S2gaJpZM4EqKuu.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/issues/620#event-316362867"></link>
+    <meta itemprop="name" content="View Issue"></meta>
+  </div>
+  <meta itemprop="description" content="View this Issue on GitHub"></meta>
+</div>
+
+----==_mimepart_55674d36ddb93_4c633facfb58329c1670d2--

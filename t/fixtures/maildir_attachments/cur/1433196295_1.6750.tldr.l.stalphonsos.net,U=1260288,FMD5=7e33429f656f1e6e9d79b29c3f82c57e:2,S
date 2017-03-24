@@ -1,0 +1,65 @@
+Return-Path: <noreply@github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 14478 invoked from network); 1 Jun 2015 15:26:30 -0000
+Received: from unknown (HELO github-smtp2a-ext-cp1-prd.iad.github.net) (192.30.252.196)
+  by x.stalphonsos.net with SMTP; 1 Jun 2015 15:26:30 -0000
+Date: Mon, 01 Jun 2015 08:26:30 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1433172390;
+	bh=+eKS5Y3yezCNG+ul8/D4ESa5S/4qZ9rujMIywcxBAYQ=;
+	h=From:Reply-To:To:In-Reply-To:References:Subject:List-ID:
+	 List-Archive:List-Post:List-Unsubscribe:From;
+	b=Trb7t6ocw4Ej387wXEHBIj16VtR9owzmrudEG+/LMqruab2UHz2KDVfw85bW5DMUh
+	 SZIP53AWgZVLCfRWFx8cKx0phUaUrITfAxSzl3echUcXRVrfQ3gZeSO3x5x8HPOthz
+	 5ftRGvuI1D7sA3RqMK51OdYbV/IQ0Mb3ihUQW68w=
+From: "Dirk-Jan C. Binnema" <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874bc5f52f4237c819660090497427ecac326d533b5892cf0000000111843ba692a169ce04f3b1d1@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/pull/625/c107582266@github.com>
+In-Reply-To: <djcb/mu/pull/625@github.com>
+References: <djcb/mu/pull/625@github.com>
+Subject: Re: [mu] minor NEWS missing bug correction (#625)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_556c79a64d20b_457e3faf368dd2c024512f";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: djcb
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874bc5f52f4237c819660090497427ecac326d533b5892cf0000000111843ba692a169ce04f3b1d1@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874bc5f52f4237c819660090497427ecac326d533b5892cf0000000111843ba692a169ce04f3b1d1@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS8h8cw9BowPnUNkHvw3pmK2pX1iqks5oPHEmgaJpZM4Exdtn>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+
+
+----==_mimepart_556c79a64d20b_457e3faf368dd2c024512f
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Oh, the problem was actually that the NEWS file was missing (renamed), so I have added it now. Thanks for bringing it to my attention :)
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/pull/625#issuecomment-107582266
+----==_mimepart_556c79a64d20b_457e3faf368dd2c024512f
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>Oh, the problem was actually that the NEWS file was missing (renamed), so I have added it now. Thanks for bringing it to my attention :)</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/pull/625#issuecomment-107582266">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HS2drTafQVAu8JnzzSC5Jgb5B2buNks5oPHEmgaJpZM4Exdtn.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/pull/625#issuecomment-107582266"></link>
+    <meta itemprop="name" content="View Pull Request"></meta>
+  </div>
+  <meta itemprop="description" content="View this Pull Request on GitHub"></meta>
+</div>
+
+----==_mimepart_556c79a64d20b_457e3faf368dd2c024512f--

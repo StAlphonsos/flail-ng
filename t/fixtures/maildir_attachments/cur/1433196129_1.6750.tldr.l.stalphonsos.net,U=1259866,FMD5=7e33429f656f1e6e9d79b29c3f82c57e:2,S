@@ -1,0 +1,1599 @@
+Return-Path: <gnupg-devel-bounces@gnupg.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 82116 invoked from network); 28 May 2015 10:04:05 -0000
+Received: from unknown (HELO lists.gnupg.org) (217.69.76.57)
+  by x.stalphonsos.net with SMTP; 28 May 2015 10:04:05 -0000
+Received: from localhost ([127.0.0.1] helo=trithemius.gnupg.org)
+	by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+	id 1Yxtdw-0008Nb-M5; Thu, 28 May 2015 10:58:24 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on trithemius.gnupg.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI
+ autolearn=ham version=3.3.2
+Received: from kerckhoffs.g10code.com ([217.69.77.222])
+ by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+ id 1Yxtdm-0008N4-Cj
+ for <mm.gnupg-devel@lists.gnupg.org>; Thu, 28 May 2015 10:58:14 +0200
+Received: from fencepost.gnu.org ([208.118.235.10] ident=Debian-exim)
+ by kerckhoffs.g10code.com with esmtps (Exim 4.80 #2 (Debian))
+ id 1YxtjD-0003ZO-Hl
+ for <gnupg-devel@gnupg.org>; Thu, 28 May 2015 11:03:52 +0200
+Received: from du-a.org ([219.94.251.20]:51394 helo=localhost.localdomain)
+ by fencepost.gnu.org with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ueno@gnu.org>) id 1Yxtj9-0000zs-M5
+ for gnupg-devel@gnupg.org; Thu, 28 May 2015 05:03:48 -0400
+Message-ID: <m3wpzthy4v.fsf_-_-ueno@gnu.org>
+From: Daiki Ueno <ueno@gnu.org>
+To: gnupg-devel@gnupg.org
+Subject: [PATCH] Add inside-Emacs mode to GUI pinentry programs
+References: <m3d21t46sw.fsf-ueno@gnu.org> <87y4kh5b9s.fsf@vigenere.g10code.de>
+ <m3382p3vax.fsf-ueno@gnu.org> <87k2w158ew.fsf@vigenere.g10code.de>
+ <m3wq012e6d.fsf-ueno@gnu.org> <878ucg6hek.fsf@vigenere.g10code.de>
+Date: Thu, 28 May 2015 18:03:44 +0900
+In-Reply-To: <878ucg6hek.fsf@vigenere.g10code.de> (Werner Koch's message of
+ "Fri, 22 May 2015 12:22:27 +0200")
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.0.50 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-=-="
+X-BeenThere: gnupg-devel@gnupg.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+List-Id: GnuPG development <gnupg-devel.gnupg.org>
+List-Unsubscribe: <http://lists.gnupg.org/mailman/options/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=unsubscribe>
+List-Archive: </pipermail/>
+List-Post: <mailto:gnupg-devel@gnupg.org>
+List-Help: <mailto:gnupg-devel-request@gnupg.org?subject=help>
+List-Subscribe: <http://lists.gnupg.org/mailman/listinfo/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=subscribe>
+Errors-To: gnupg-devel-bounces@gnupg.org
+Sender: "Gnupg-devel" <gnupg-devel-bounces@gnupg.org>
+
+--=-=-=
+Content-Type: text/plain
+
+Werner Koch <wk@gnupg.org> writes:
+
+> On Fri, 22 May 2015 10:45, ueno@gnu.org said:
+>
+>> Just to confirm your suggestion: would it be acceptable to add a hack in
+>> Pinentry (upstream, instead of a wrapper) to check INSIDE_EMACS envvar?
+>> http://www.gnu.org/software/emacs/manual/html_node/emacs/Interactive-Shell.html#Interactive-Shell
+>
+> Yes.
+
+Okay, here is a tentative patch in that direction.
+I'm also attaching a patch to Emacs, needed for testing.
+
+> To actually convey the variable to pinentry a small change to
+> GnuPG is required (common/session-env.c:stdenvnames).  Shall I do that
+> part?
+
+Sure, thanks.  Please also considier adding TMPDIR, since emacsclient
+looks for a socket file under "$TMPDIR/emacs$UID/server".
+
+Comments appreciated.
+
+Regards,
+-- 
+Daiki Ueno
+
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: inline;
+ filename=0001-Add-inside-Emacs-mode-to-GUI-pinentry-programs.patch
+
+From 542753985757d9ea1a94970b2d5ff34733a2ef54 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <ueno@gnu.org>
+Date: Wed, 27 May 2015 17:06:08 +0900
+Subject: [PATCH] Add inside-Emacs mode to GUI pinentry programs
+
+* configure.ac: Add --enable-pinentry-emacs and
+--enable-inside-emacs option.
+(BUILD_LIBPINENTRY_EMACS): New conditional.
+(BUILD_PINENTRY_EMACS): New conditional.
+(INSIDE_EMACS): New conditional.
+* Makefile.am (pinentry_emacs): New.
+(SUBDIRS): Add "emacs" subdir if PINENTRY_EMACS is set.
+
+* pinentry/pinentry.c: Define pinentry_utf8_to_local and
+pinentry_local_to_utf8 if INSIDE_EMACS is set.
+* pinentry/pinentry-emacs.h: New file.
+* pinentry/pinentry-emacs.c: New file.
+* pinentry/Makefile.am: New file.
+
+* emacs/pinentry-emacs.c: New file.
+* emacs/Makefile.am: New file.
+
+* qt4/Makefile.am (libemacs): New variable, set if the
+INSIDE_EMACS conditional is true.
+(pinentry_qt4_LDADD): Add $(libemacs).
+* qt4/main.cpp (main): Set pinentry_cmd_handler if
+the INSIDE_EMACS envvar is set and the socket is usable.
+
+* gnome3/Makefile.am (libemacs): New variable, set if the
+INSIDE_EMACS conditional is true.
+(LDADD): Add $(libemacs).
+* gnome3/pinentry-gnome3.c (main): Set pinentry_cmd_handler if
+the INSIDE_EMACS envvar is set and the socket is usable.
+
+* gtk+-2/Makefile.am (libemacs): New variable, set if the INSIDE_EMACS
+conditional is true.
+(LDADD): Add $(libemacs).
+* gtk+-2/pinentry-gtk-2.c (main): Set pinentry_cmd_handler if
+the INSIDE_EMACS envvar is set and the socket is usable.
+---
+ Makefile.am               |  10 +-
+ configure.ac              |  54 ++++
+ emacs/Makefile.am         |  29 ++
+ emacs/pinentry-emacs.c    |  47 +++
+ gnome3/Makefile.am        |   8 +-
+ gnome3/pinentry-gnome3.c  |  21 +-
+ gtk+-2/Makefile.am        |   8 +-
+ gtk+-2/pinentry-gtk-2.c   |  25 +-
+ pinentry/Makefile.am      |   9 +-
+ pinentry/pinentry-emacs.c | 774 ++++++++++++++++++++++++++++++++++++++++++++++
+ pinentry/pinentry-emacs.h |  41 +++
+ pinentry/pinentry.c       |   2 +-
+ qt4/Makefile.am           |   9 +-
+ qt4/main.cpp              |  93 +++---
+ 14 files changed, 1070 insertions(+), 60 deletions(-)
+ create mode 100644 emacs/Makefile.am
+ create mode 100644 emacs/pinentry-emacs.c
+ create mode 100644 pinentry/pinentry-emacs.c
+ create mode 100644 pinentry/pinentry-emacs.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 177f37e..388464e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -40,6 +40,12 @@ else
+ pinentry_tty =
+ endif
+ 
++if BUILD_PINENTRY_EMACS
++pinentry_emacs = emacs
++else
++pinentry_emacs =
++endif
++
+ if BUILD_PINENTRY_GTK_2
+ pinentry_gtk_2 = gtk+-2
+ else
+@@ -65,8 +71,8 @@ pinentry_w32 =
+ endif
+ 
+ SUBDIRS = assuan secmem pinentry ${pinentry_curses} ${pinentry_tty} \
+-	${pinentry_gtk_2} ${pinentry_gnome_3} ${pinentry_qt4} \
+-	${pinentry_w32} doc
++	${pinentry_emacs} ${pinentry_gtk_2} ${pinentry_gnome_3} \
++	${pinentry_qt4} ${pinentry_w32} doc
+ 
+ 
+ install-exec-local:
+diff --git a/configure.ac b/configure.ac
+index 9948d1f..f01c00f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -271,6 +271,57 @@ if test "$pinentry_curses" = "yes" \
+   fi
+ fi
+ 
++dnl
++dnl Check for emacs pinentry program.
++dnl
++AC_ARG_ENABLE(pinentry-emacs,
++            AC_HELP_STRING([--enable-pinentry-emacs], [build emacs pinentry]),
++            pinentry_emacs=$enableval, pinentry_emacs=maybe)
++AC_ARG_ENABLE(inside-emacs,
++            AC_HELP_STRING([--enable-inside-emacs], [include emacs hack]),
++            inside_emacs=$enableval, inside_emacs=maybe)
++
++if test "$pinentry_emacs" = "maybe"; then
++  AC_MSG_CHECKING([if Unix domain socket is supported])
++  AC_TRY_COMPILE([
++#include <sys/socket.h>
++#include <sys/un.h>
++],
++	         [int s = socket (AF_UNIX, SOCK_STREAM, 0);],
++		 [_unixsock_works=yes],
++		 [_unixsock_works=no])
++  AC_MSG_RESULT($_unixsock_works)
++  if test "$_unixsock_works" = "yes"; then
++    pinentry_emacs=yes
++  else
++    pinentry_emacs=no
++  fi
++fi
++
++if test "$inside_emacs" = "maybe"; then
++  if test "$pinentry_emacs" = "yes"; then
++    inside_emacs=yes
++  else
++    inside_emacs=no
++  fi
++fi
++
++AM_CONDITIONAL(BUILD_LIBPINENTRY_EMACS,
++              test "$pinentry_emacs" = "yes" -o "$inside_emacs" = "yes")
++AM_CONDITIONAL(BUILD_PINENTRY_EMACS, test "$pinentry_emacs" = "yes")
++AM_CONDITIONAL(INSIDE_EMACS, test "$inside_emacs" = "yes")
++
++if test "$pinentry_emacs" = "yes"; then
++  AC_DEFINE(PINENTRY_EMACS, 1,
++            [The Emacs version of Pinentry is to be build])
++fi
++
++if test "$inside_emacs" = "yes"; then
++  inside_emacs=yes
++  AC_DEFINE(INSIDE_EMACS, 1,
++            [The GUI pinentries should respect INSIDE_EMACS envvar.])
++fi
++
+ 
+ 
+ dnl
+@@ -512,6 +563,7 @@ secmem/Makefile
+ pinentry/Makefile
+ curses/Makefile
+ tty/Makefile
++emacs/Makefile
+ gtk+-2/Makefile
+ gnome3/Makefile
+ qt4/Makefile
+@@ -531,12 +583,14 @@ AC_MSG_NOTICE([
+ 
+ 	Curses Pinentry ..: $pinentry_curses
+ 	TTY Pinentry .....: $pinentry_tty
++	Emacs Pinentry ...: $pinentry_emacs
+ 	GTK+-2 Pinentry ..: $pinentry_gtk_2
+ 	GNOME 3 Pinentry .: $pinentry_gnome_3
+ 	Qt4 Pinentry .....: $pinentry_qt4 $pinentry_qt4_clip_msg
+ 	W32 Pinentry .....: $pinentry_w32
+ 
+ 	Fallback to Curses: $fallback_curses
++	Inside-EMACS mode : $inside_emacs
+ 
+ 	libsecret ........: $libsecret
+ 
+diff --git a/emacs/Makefile.am b/emacs/Makefile.am
+new file mode 100644
+index 0000000..a0bfe6c
+--- /dev/null
++++ b/emacs/Makefile.am
+@@ -0,0 +1,29 @@
++# Makefile.am - PIN entry emacs frontend.
++# Copyright (C) 2002, 2015 g10 Code GmbH
++#
++# This file is part of PINENTRY.
++#
++# PINENTRY is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# PINENTRY is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
++
++## Process this file with automake to produce Makefile.in
++
++bin_PROGRAMS = pinentry-emacs
++
++AM_CPPFLAGS = $(COMMON_CFLAGS) $(NEMACS_INCLUDE) -I$(top_srcdir)/pinentry
++LDADD = ../pinentry/libpinentry.a ../pinentry/libpinentry-emacs.a \
++	../assuan/libassuan.a ../secmem/libsecmem.a \
++	$(COMMON_LIBS) $(LIBCAP) $(LIBEMACS) $(LIBICONV)
++
++pinentry_emacs_SOURCES = pinentry-emacs.c
+diff --git a/emacs/pinentry-emacs.c b/emacs/pinentry-emacs.c
+new file mode 100644
+index 0000000..de4ca05
+--- /dev/null
++++ b/emacs/pinentry-emacs.c
+@@ -0,0 +1,47 @@
++/* pinentry-emacs.c - A secure emacs dialog for PIN entry, library version
++   Copyright (C) 2015 Daiki Ueno
++
++   This file is part of PINENTRY.
++
++   PINENTRY is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   PINENTRY is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.
++*/
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "pinentry.h"
++#include "pinentry-emacs.h"
++
++pinentry_cmd_handler_t pinentry_cmd_handler = emacs_cmd_handler;
++
++
++int
++main (int argc, char *argv[])
++{
++  pinentry_init ("pinentry-emacs");
++
++  if (!pinentry_emacs_init ())
++    return 1;
++
++  pinentry_parse_opts (argc, argv);
++
++  if (pinentry_loop ())
++    return 1;
++
++  return 0;
++}
+diff --git a/gnome3/Makefile.am b/gnome3/Makefile.am
+index 46639de..c8767df 100644
+--- a/gnome3/Makefile.am
++++ b/gnome3/Makefile.am
+@@ -29,10 +29,16 @@ ncurses_include =
+ libcurses =
+ endif
+ 
++if INSIDE_EMACS
++libemacs = ../pinentry/libpinentry-emacs.a
++else
++libemacs =
++endif
++
+ AM_CPPFLAGS = $(COMMON_CFLAGS) $(GNOME3CFLAGS) \
+ 	$(ncurses_include) -I$(top_srcdir)/assuan \
+ 	-I$(top_srcdir)/secmem -I$(top_srcdir)/pinentry
+ LDADD = ../pinentry/libpinentry.a ../assuan/libassuan.a ../secmem/libsecmem.a \
+-	$(COMMON_LIBS) $(LIBCAP) $(GNOME3LIBS) $(libcurses)
++	$(COMMON_LIBS) $(LIBCAP) $(GNOME3LIBS) $(libcurses) $(libemacs)
+ 
+ pinentry_gnome3_SOURCES = pinentry-gnome3.c
+diff --git a/gnome3/pinentry-gnome3.c b/gnome3/pinentry-gnome3.c
+index 74ec89c..113bde3 100644
+--- a/gnome3/pinentry-gnome3.c
++++ b/gnome3/pinentry-gnome3.c
+@@ -37,6 +37,10 @@
+ #include "pinentry-curses.h"
+ #endif
+ 
++#ifdef INSIDE_EMACS
++#include "pinentry-emacs.h"
++#endif
++
+ 
+ #define PGMNAME "pinentry-gnome3"
+ 
+@@ -253,14 +257,21 @@ main (int argc, char *argv[])
+ {
+   pinentry_init (PGMNAME);
+ 
+-#ifdef FALLBACK_CURSES
+-  if (pinentry_have_display (argc, argv))
+-    gtk_init (&argc, &argv);
++#ifdef INSIDE_EMACS
++  if (pinentry_inside_emacs () && pinentry_emacs_init ())
++    pinentry_cmd_handler = emacs_cmd_handler;
+   else
+-    pinentry_cmd_handler = curses_cmd_handler;
++#endif
++    {
++#ifdef FALLBACK_CURSES
++      if (pinentry_have_display (argc, argv))
++	gtk_init (&argc, &argv);
++      else
++	pinentry_cmd_handler = curses_cmd_handler;
+ #else
+-  gtk_init (&argc, &argv);
++      gtk_init (&argc, &argv);
+ #endif
++    }
+ 
+   pinentry_parse_opts (argc, argv);
+ 
+diff --git a/gtk+-2/Makefile.am b/gtk+-2/Makefile.am
+index 7e37469..8e7717e 100644
+--- a/gtk+-2/Makefile.am
++++ b/gtk+-2/Makefile.am
+@@ -29,10 +29,16 @@ ncurses_include =
+ libcurses =
+ endif
+ 
++if INSIDE_EMACS
++libemacs = ../pinentry/libpinentry-emacs.a $(LIBEMACS) $(LIBICONV)
++else
++libemacs =
++endif
++
+ AM_CPPFLAGS = $(COMMON_CFLAGS) $(GTK2CFLAGS) $(ncurses_include) \
+ 	-I$(top_srcdir)/secmem -I$(top_srcdir)/pinentry
+ LDADD = ../pinentry/libpinentry.a ../assuan/libassuan.a ../secmem/libsecmem.a \
+-	$(COMMON_LIBS) $(LIBCAP) $(GTK2LIBS) $(libcurses)
++	$(COMMON_LIBS) $(LIBCAP) $(GTK2LIBS) $(libcurses) $(libemacs)
+ 
+ pinentry_gtk_2_SOURCES = pinentry-gtk-2.c \
+ 	gtksecentry.c gtksecentry.h gseal-gtk-compat.h
+diff --git a/gtk+-2/pinentry-gtk-2.c b/gtk+-2/pinentry-gtk-2.c
+index 1a88e5a..7792046 100644
+--- a/gtk+-2/pinentry-gtk-2.c
++++ b/gtk+-2/pinentry-gtk-2.c
+@@ -52,6 +52,10 @@
+ #include "pinentry-curses.h"
+ #endif
+ 
++#ifdef INSIDE_EMACS
++#include "pinentry-emacs.h"
++#endif
++
+ 
+ #define PGMNAME "pinentry-gtk2"
+ 
+@@ -716,17 +720,24 @@ main (int argc, char *argv[])
+ 
+   pinentry_init (PGMNAME);
+ 
+-#ifdef FALLBACK_CURSES
+-  if (pinentry_have_display (argc, argv))
++#ifdef INSIDE_EMACS
++  if (pinentry_inside_emacs () && pinentry_emacs_init ())
++    pinentry_cmd_handler = emacs_cmd_handler;
++  else
++#endif
+     {
+-      if (! gtk_init_check (&argc, &argv))
++#ifdef FALLBACK_CURSES
++      if (pinentry_have_display (argc, argv))
++	{
++	  if (! gtk_init_check (&argc, &argv))
++	    pinentry_cmd_handler = curses_cmd_handler;
++	}
++      else
+ 	pinentry_cmd_handler = curses_cmd_handler;
+-    }
+-  else
+-    pinentry_cmd_handler = curses_cmd_handler;
+ #else
+-  gtk_init (&argc, &argv);
++      gtk_init (&argc, &argv);
+ #endif
++    }
+ 
+   pinentry_parse_opts (argc, argv);
+ 
+diff --git a/pinentry/Makefile.am b/pinentry/Makefile.am
+index 7fbbab6..e6e4ba6 100644
+--- a/pinentry/Makefile.am
++++ b/pinentry/Makefile.am
+@@ -27,7 +27,13 @@ else
+ pinentry_curses =
+ endif
+ 
+-noinst_LIBRARIES = libpinentry.a $(pinentry_curses)
++if BUILD_LIBPINENTRY_EMACS
++pinentry_emacs = libpinentry-emacs.a
++else
++pinentry_emacs =
++endif
++
++noinst_LIBRARIES = libpinentry.a $(pinentry_curses) $(pinentry_emacs)
+ 
+ LDADD = $(COMMON_LIBS)
+ AM_CPPFLAGS = $(COMMON_CFLAGS) -I$(top_srcdir)/assuan -I$(top_srcdir)/secmem
+@@ -35,3 +41,4 @@ AM_CPPFLAGS = $(COMMON_CFLAGS) -I$(top_srcdir)/assuan -I$(top_srcdir)/secmem
+ libpinentry_a_SOURCES = pinentry.h pinentry.c argparse.c argparse.h \
+ 	password-cache.h password-cache.c
+ libpinentry_curses_a_SOURCES = pinentry-curses.h pinentry-curses.c
++libpinentry_emacs_a_SOURCES = pinentry-emacs.h pinentry-emacs.c
+diff --git a/pinentry/pinentry-emacs.c b/pinentry/pinentry-emacs.c
+new file mode 100644
+index 0000000..424c402
+--- /dev/null
++++ b/pinentry/pinentry-emacs.c
+@@ -0,0 +1,774 @@
++/* pinentry-emacs.c - A secure emacs dialog for PIN entry, library version
++   Copyright (C) 2015 Daiki Ueno
++
++   This file is part of PINENTRY.
++
++   PINENTRY is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   PINENTRY is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.
++*/
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++#include <assert.h>
++#include <signal.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <errno.h>
++#include <time.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#ifdef HAVE_UTIME_H
++#include <utime.h>
++#endif /*HAVE_UTIME_H*/
++
++#include <memory.h>
++
++#include "pinentry.h"
++#include "assuan.h"
++
++/* Instead of spawning the emacsclient executable, we implement only a
++   small subset of it for the Pinentry needs.  The following
++   (potentially unsafe) features are not implemented:
++
++   - Connection over TCP
++   - Fallback to other user's socket, depending on USER and LOGNAME
++     envvar, to handle the case where a client is called from a 'su'
++     session
++   - Configuration file (~/.emacs.d/server)
++
++   The emacsclient protocol is defined in the documentation of
++   server-process-filter in server.el.
++
++   This implementation requires an Elisp function
++   epg-pinentry-callback defined in the server side.  It takes two
++   arguments: COMMAND and ARG.  COMMAND is a string corresponding to
++   the Assuan command name of Pinentry, such as SETPROMPT and GETPIN.
++   For SET* commands, the function returns t on success, and nil on
++   failure.  For GETPIN and CONFIRM commands, the function returns a
++   string on success, and nil on error or cancellation.
++*/
++
++#define SEND_BUFFER_SIZE 4096
++#define MIN(x, y) ((x) < (y) ? (x) : (y))
++
++#define INITIAL_TIMEOUT 60
++#define CALLBACK_NAME "epg-pinentry-callback"
++
++/* We need to keep an address rather than a socket, since the server
++   closes the client socket after receiving a newline.  */
++static struct sockaddr_un emacs_server_address;
++
++static char send_buffer[SEND_BUFFER_SIZE + 1];
++static int send_buffer_length; /* Fill pointer for the send buffer.  */
++
++#ifndef HAVE_DOSISH_SYSTEM
++static int timed_out;
++#endif
++
++/* In STR, insert a backslash before each double-quote, each newline,
++   and each backslash.  */
++static void
++quote_string (const char *str, char *result, size_t *lengthp)
++{
++  const char *p;
++  char *q;
++
++  p = str;
++  q = result;
++  while (*p)
++    {
++      if (*p == '"' || *p == '\\')
++	{
++	  *q++ = '\\';
++	  *q++ = *p;
++	  p++;
++	}
++      else if (*p == '\n')
++	{
++	  *q++ = '\\';
++	  *q++ = 'n';
++	  p++;
++	}
++      else
++	*q++ = *p++;
++   }
++  *lengthp = q - result;
++}
++
++/* The inverse of quote_string.  Removes quoting in string STR by
++   modifying the string in place.  */
++static int
++unquote_string (char *str, size_t *lengthp)
++{
++  char *p;
++  char *q;
++
++  p = str;
++  q = str;
++  while (*p)
++    {
++      if (*p == '\\')
++        {
++          p++;
++	  switch (*p)
++	    {
++	    case '\\':
++	      *p = '\\';
++	      break;
++	    case 'n':
++	      *p = '\n';
++	      break;
++	    case '"':
++	      *p = '"';
++	      break;
++	    default:
++	      fprintf (stderr, "unsupported escape sequence: \\%c\n",
++		       *p);
++	      return 0;
++	    }
++        }
++      *q++ = *p++;
++    }
++  *q = 0;
++  *lengthp = q - str;
++  return 1;
++}
++
++/* Returns 1 if PREFIX is a prefix of STRING. */
++static int
++strprefix (const char *prefix, const char *string)
++{
++  return !strncmp (prefix, string, strlen (prefix));
++}
++
++/* In STR, insert a & before each &, each space, each newline, and
++   any initial -.  Change spaces to underscores, too, so that the
++   return value never contains a space.  */
++static void
++quote_argument (const char *str, char *result, size_t *lengthp)
++{
++  const char *p;
++  char *q;
++
++  p = str;
++  q = result;
++  while (*p)
++    {
++      if (*p == ' ')
++	{
++	  *q++ = '&';
++	  *q++ = '_';
++	  p++;
++	}
++      else if (*p == '\n')
++	{
++	  *q++ = '&';
++	  *q++ = 'n';
++	  p++;
++	}
++      else
++	{
++	  if (*p == '&' || (*p == '-' && p == str))
++	    *q++ = '&';
++	  *q++ = *p++;
++	}
++    }
++  *q++ = 0;
++  *lengthp = q - result;
++}
++
++/* The inverse of quote_argument.  Removes quoting in string STR by
++   modifying the string in place.  */
++static void
++unquote_argument (char *str, size_t *lengthp)
++{
++  char *p, *q;
++
++  p = str;
++  q = str;
++  while (*p)
++    {
++      if (*p == '&')
++        {
++          p++;
++          if (*p == '&')
++            *p = '&';
++          else if (*p == '_')
++            *p = ' ';
++          else if (*p == 'n')
++            *p = '\n';
++          else if (*p == '-')
++            *p = '-';
++        }
++      *q++ = *p++;
++    }
++  *q = 0;
++  *lengthp = q - str;
++}
++
++static int
++set_socket_address (const char *socket_name)
++{
++  struct stat statbuf;
++  const char *tmpdir;
++  char *tmpdir_storage = NULL;
++  uid_t uid;
++
++  emacs_server_address.sun_family = AF_UNIX;
++
++  /* The socket address contains a UID, but POSIX doesn't define the
++     maximum of uid_t:
++     http://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xsh_chap02.html#tag_22_02_12_01
++     We only support 32-bit UIDs, which can be represented with 10
++     decimal digits.
++  */
++  uid = getuid ();
++  if (uid > 0x100000000)
++    {
++      fprintf (stderr, "UID is too large\n");
++      return 0;
++    }
++
++  tmpdir = getenv ("TMPDIR");
++  if (!tmpdir)
++    {
++#ifdef DARWIN_OS
++#ifndef _CS_DARWIN_USER_TEMP_DIR
++#define _CS_DARWIN_USER_TEMP_DIR 65537
++#endif
++      size_t n = confstr (_CS_DARWIN_USER_TEMP_DIR, NULL, (size_t) 0);
++      if (n > 0)
++	{
++	  tmpdir = tmpdir_storage = malloc (n);
++	  if (!tmpdir)
++	    {
++	      fprintf (stderr, "out of core\n");
++	      return 0;
++	    }
++	  confstr (_CS_DARWIN_USER_TEMP_DIR, tmpdir_storage, n);
++	}
++      else
++#endif
++	tmpdir = "/tmp";
++    }
++
++  if (strlen (tmpdir) + strlen (socket_name) + 10 + 2
++      >= sizeof (emacs_server_address.sun_path))
++    {
++      fprintf (stderr, "socket name is too long\n");
++      free (tmpdir_storage);
++      return 0;
++    }
++
++  sprintf (emacs_server_address.sun_path, "%s/emacs%lu/%s",
++	   tmpdir, (unsigned long) uid, socket_name);
++  free (tmpdir_storage);
++
++  /* See if the socket exists, and if it's owned by us. */
++  if (stat (emacs_server_address.sun_path, &statbuf) == -1)
++    {
++      perror ("stat");
++      return 0;
++    }
++
++  if (statbuf.st_uid != geteuid ())
++    {
++      fprintf (stderr, "socket is not owned by the same user\n");
++      return 0;
++    }
++
++  return 1;
++}
++
++static int
++connect_to_server (void)
++{
++  int s;
++
++  s = socket (AF_UNIX, SOCK_STREAM, 0);
++  if (s < 0)
++    {
++      perror ("socket");
++      return -1;
++    }
++
++  if (connect (s, (struct sockaddr *) &emacs_server_address,
++	       strlen (emacs_server_address.sun_path) + 2) < 0)
++    {
++      perror ("connect");
++      close (s);
++      return -1;
++    }
++  return s;
++}
++
++/* Let's send the data to Emacs when either
++   - the data ends in "\n", or
++   - the buffer is full (but this shouldn't happen)
++   Otherwise, we just accumulate it.  */
++static int
++send_to_emacs (int s, const char *data)
++{
++  size_t dlen;
++
++  if (!data)
++    return 0;
++
++  dlen = strlen (data);
++  while (*data)
++    {
++      size_t part = MIN (dlen, SEND_BUFFER_SIZE - send_buffer_length);
++      memcpy (&send_buffer[send_buffer_length], data, part);
++      data += part;
++      send_buffer_length += part;
++
++      if (send_buffer_length == SEND_BUFFER_SIZE
++	  || (send_buffer_length > 0
++	      && send_buffer[send_buffer_length-1] == '\n'))
++	{
++	  int sent = send (s, send_buffer, send_buffer_length, 0);
++	  if (sent < 0)
++	    {
++	      fprintf (stderr, "failed to send %d bytes to socket: %s\n",
++		       send_buffer_length, strerror (errno));
++	      return 0;
++	    }
++	  if (sent != send_buffer_length)
++	    memmove (send_buffer, &send_buffer[sent],
++		     send_buffer_length - sent);
++	  send_buffer_length -= sent;
++	}
++
++      dlen -= part;
++    }
++  return 1;
++}
++
++static int
++read_from_emacs (int s, int timeout, char *result, size_t *lengthp)
++{
++  struct timeval tv;
++  fd_set rfds;
++  int retval;
++  size_t capacity = *lengthp;
++  char *out_p = result;
++  int got_error = 0;
++
++  tv.tv_sec = timeout;
++  tv.tv_usec = 0;
++
++  FD_ZERO (&rfds);
++  FD_SET (s, &rfds);
++  retval = select (s + 1, &rfds, NULL, NULL, &tv);
++  if (retval == -1)
++    {
++      perror ("select");
++      return 0;
++    }
++  else if (retval == 0)
++    {
++      timed_out = 1;
++      return 0;
++    }
++
++  while (!got_error)
++    {
++      int rl = 0, needlf = 0;
++      char *p, *end_p;
++      char string[BUFSIZ+1];
++      do
++	{
++	  errno = 0;
++	  rl = recv (s, string, BUFSIZ, 0);
++	}
++      /* If we receive a signal (e.g. SIGWINCH, which we pass
++	 through to Emacs), on some OSes we get EINTR and must retry. */
++      while (rl < 0 && errno == EINTR);
++
++      if (rl < 0)
++	{
++	  perror ("recv");
++	  return 0;
++	}
++      if (rl == 0)
++	break;
++
++      string[rl] = '\0';
++
++      /* Loop over all NL-terminated messages.  */
++      for (end_p = p = string; end_p != NULL && *end_p != '\0'; p = end_p)
++	{
++	  char *str;
++	  size_t str_length;
++	  end_p = strchr (p, '\n');
++	  if (end_p != NULL)
++	    *end_p++ = '\0';
++	  if (strprefix ("-print ", p))
++	    {
++	      /* -print STRING: Print STRING on the terminal. */
++	      str = p + strlen ("-print ");
++	      unquote_argument (str, &str_length);
++	      if (capacity < !!needlf + str_length)
++		return 0;
++
++	      if (needlf)
++		{
++		  *out_p++ = '\n';
++		  capacity--;
++		}
++
++	      memcpy (out_p, str, str_length);
++	      out_p += str_length;
++	      capacity -= str_length;
++	      needlf = str[0] == '\0' ? needlf : str[strlen (str) - 1] != '\n';
++	    }
++	  else if (strprefix ("-print-nonl ", p))
++            {
++              /* -print-nonl STRING: Print STRING on the terminal.
++                 Used to continue a preceding -print command.  */
++	      str = p + strlen ("-print-nonl ");
++              unquote_argument (str, &str_length);
++	      if (capacity < str_length)
++		return 0;
++	      memcpy (out_p, str, str_length);
++	      out_p += str_length;
++	      capacity -= str_length;
++              needlf = str[0] == '\0' ? needlf : str[strlen (str) - 1] != '\n';
++            }
++          else if (strprefix ("-error ", p))
++            {
++              /* -error DESCRIPTION: Signal an error on the terminal. */
++	      got_error = 1;
++	      break;
++            }
++	}
++    }
++  *lengthp = out_p - result;
++  return 1;
++}
++
++/* If a touch has been registered, touch that file.  */
++static void
++do_touch_file (pinentry_t pinentry)
++{
++#ifdef HAVE_UTIME_H
++  struct stat st;
++  time_t tim;
++
++  if (!pinentry->touch_file || !*pinentry->touch_file)
++    return;
++
++  if (stat (pinentry->touch_file, &st))
++    return; /* Oops.  */
++
++  /* Make sure that we actually update the mtime.  */
++  while ( (tim = time (NULL)) == st.st_mtime )
++    sleep (1);
++
++  /* Update but ignore errors as we can't do anything in that case.
++     Printing error messages may even clubber the display further. */
++  utime (pinentry->touch_file, NULL);
++#endif /*HAVE_UTIME_H*/
++}
++
++#ifndef HAVE_DOSISH_SYSTEM
++static void
++catchsig (int sig)
++{
++  if (sig == SIGALRM)
++    timed_out = 1;
++}
++#endif
++
++char *
++build_command (const char *name, const char *value)
++{
++  char *command, *quoted_command, *quoted_value;
++  size_t command_length, quoted_command_length, quoted_value_length;
++  const char *nil = "nil";
++
++  if (value)
++    {
++      size_t length;
++
++      quoted_value = malloc (strlen (value) * 2 + 3);
++      if (!quoted_value)
++	{
++	  perror ("malloc");
++	  return NULL;
++	}
++
++      quoted_value[0] = '"';
++      quote_string (value, quoted_value + 1, &length);
++      quoted_value[++length] = '"';
++      quoted_value[++length] = '\0';
++      quoted_value_length = length;
++    }
++  else
++    {
++      quoted_value = (char *) nil;
++      quoted_value_length = strlen (nil);
++    }
++
++  command_length = strlen ("(" CALLBACK_NAME " \"\" )")
++    + strlen (name) + quoted_value_length;
++
++  command = malloc (command_length + 1);
++  if (!command)
++    {
++      perror ("malloc");
++      return NULL;
++    }
++
++  sprintf (command, "(" CALLBACK_NAME " \"%s\" %s)",
++	   name, quoted_value);
++  if (quoted_value != nil)
++    free (quoted_value);
++
++  quoted_command = malloc (command_length * 2 + 1);
++  quote_argument (command, quoted_command, &quoted_command_length);
++  free (command);
++
++  return quoted_command;
++}
++
++int
++set_value (pinentry_t pe, const char *name, const char *value)
++{
++  char buffer[16], *quoted_command, *local_value = value;
++  size_t length;
++  int s, success;
++
++  if (value)
++    {
++      local_value = pinentry_utf8_to_local (pe->lc_ctype, value);
++      if (!local_value)
++	return 0;
++    }
++
++  quoted_command = build_command (name, local_value);
++  if (local_value != value)
++    free (local_value);
++  if (!quoted_command)
++    return 0;
++
++  s = connect_to_server ();
++  if (s < 0)
++    {
++      free (quoted_command);
++      return 0;
++    }
++
++  length = sizeof (buffer);
++  success = send_to_emacs (s, "-eval ")
++    && send_to_emacs (s, quoted_command)
++    && send_to_emacs (s, "\n")
++    && read_from_emacs (s, pe->timeout, buffer, &length)
++    && length == 1 && *buffer == 't';
++
++  free (quoted_command);
++  close (s);
++
++  return success;
++}
++
++int
++do_password (pinentry_t pe)
++{
++  char buffer[16], *quoted_command;
++  size_t length;
++  int s, success;
++
++  set_value (pe, "SETTITLE", pe->title);
++  set_value (pe, "SETDESC", pe->description);
++  set_value (pe, "SETERROR", pe->error);
++  set_value (pe, "SETPROMPT", pe->prompt);
++
++  quoted_command = build_command ("GETPIN", NULL);
++  if (!quoted_command)
++    return 0;
++
++  s = connect_to_server ();
++  if (s < 0)
++    {
++      free (quoted_command);
++      return 0;
++    }
++
++  length = sizeof (buffer);
++  success = send_to_emacs (s, "-eval ")
++    && send_to_emacs (s, quoted_command)
++    && send_to_emacs (s, "\n")
++    && read_from_emacs (s, pe->timeout, buffer, &length);
++
++  free (quoted_command);
++  close (s);
++
++  if (success)
++    {
++      if (length > 1 && buffer[0] == '"' && buffer[length - 1] == '"')
++	{
++	  char *password, *password_utf8;
++
++	  password = &buffer[1];
++	  buffer[length - 1] = '\0';
++	  if (!unquote_string (password, &length))
++	    return -1;
++	  password[length] = '\0';
++
++	  pe->locale_err = 1;
++	  password_utf8 = pinentry_local_to_utf8 (pe->lc_ctype, password, 1);
++	  if (password_utf8)
++	    {
++	      pinentry_setbufferlen (pe, strlen (password_utf8) + 1);
++	      if (pe->pin)
++		strcpy (pe->pin, password_utf8);
++	      secmem_free (password_utf8);
++	      pe->locale_err = 0;
++	    }
++
++	  if (pe->repeat_passphrase)
++	    pe->repeat_okay = 1;
++
++	  /* FIXME: Should we return the length of PASSWORD_UTF8, as
++	     described in pinentry.h?  */
++	  return 1;
++	}
++      else if (length == 3 && strcmp (buffer, "nil") == 0)
++	{
++	  /* User cancelled the operation.  */
++	  pe->canceled = 1;
++	  return -1;
++	}
++      else
++	{
++	  pe->specific_err = ASSUAN_General_Error;
++	  return -1;
++	}
++    }
++
++  return -1;
++}
++
++int
++do_confirm (pinentry_t pe)
++{
++  char buffer[16], *quoted_command;
++  size_t length;
++  int s, success;
++
++  set_value (pe, "SETTITLE", pe->title);
++  set_value (pe, "SETDESC", pe->description);
++  set_value (pe, "SETERROR", pe->error);
++  set_value (pe, "SETPROMPT", pe->prompt);
++
++  quoted_command = build_command ("CONFIRM", NULL);
++  if (!quoted_command)
++    return 0;
++
++  s = connect_to_server ();
++  if (s < 0)
++    {
++      free (quoted_command);
++      return 0;
++    }
++
++  length = sizeof (buffer);
++  success = send_to_emacs (s, "-eval ")
++    && send_to_emacs (s, quoted_command)
++    && send_to_emacs (s, "\n")
++    && read_from_emacs (s, pe->timeout, buffer, &length)
++    && length == 1 && *buffer == 't';
++
++  free (quoted_command);
++  close (s);
++
++  return success;
++}
++
++int
++emacs_cmd_handler (pinentry_t pe)
++{
++  int rc;
++
++#ifndef HAVE_DOSISH_SYSTEM
++  timed_out = 0;
++
++  if (pe->timeout)
++    {
++      struct sigaction sa;
++
++      memset (&sa, 0, sizeof(sa));
++      sa.sa_handler = catchsig;
++      sigaction (SIGALRM, &sa, NULL);
++      alarm (pe->timeout);
++    }
++#endif
++
++  if (pe->pin)
++    rc = do_password (pe);
++  else
++    rc = do_confirm (pe);
++
++  do_touch_file (pe);
++  return rc;
++}
++
++int
++pinentry_inside_emacs (void)
++{
++  const char *envvar;
++
++  /* Check if INSIDE_EMACS envvar is set.  */
++  envvar = getenv ("INSIDE_EMACS");
++  if (!envvar || !*envvar)
++    return 0;
++
++  /* FIXME: Additional checks for the value.  */
++  return 1;
++}
++
++int
++pinentry_emacs_init (void)
++{
++  char buffer[256];
++  size_t length;
++  int s, success;
++
++  /* Check if the Emacs server socket exists.  */
++  if (!set_socket_address ("server"))
++    return 0;
++
++  /* Check if we can connect to the server socket.  */
++  s = connect_to_server ();
++  if (s < 0)
++    return 0;
++
++  /* Check if a required function is defined in the server side.  */
++  length = sizeof (buffer);
++  quote_argument ("(fboundp '" CALLBACK_NAME ")", buffer, &length);
++  success = send_to_emacs (s, "-eval ")
++    && send_to_emacs (s, buffer)
++    && send_to_emacs (s, "\n")
++    && read_from_emacs (s, INITIAL_TIMEOUT, buffer, &length)
++    && length == 1 && *buffer == 't';
++  close (s);
++
++  return success;
++}
+diff --git a/pinentry/pinentry-emacs.h b/pinentry/pinentry-emacs.h
+new file mode 100644
+index 0000000..732c0ac
+--- /dev/null
++++ b/pinentry/pinentry-emacs.h
+@@ -0,0 +1,41 @@
++/* pinentry-emacs.c - A secure emacs dialog for PIN entry, library version
++   Copyright (C) 2015 Daiki Ueno
++
++   This file is part of PINENTRY.
++
++   PINENTRY is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   PINENTRY is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.
++*/
++
++#ifndef PINENTRY_EMACS_H
++#define PINENTRY_EMACS_H
++
++#include "pinentry.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/* Return true if INSIDE_EMACS is set. */
++int pinentry_inside_emacs (void);
++
++/* Initialize the Emacs interface, return true if success.  */
++int pinentry_emacs_init (void);
++
++int emacs_cmd_handler (pinentry_t pinentry);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif	/* PINENTRY_EMACS_H */
+diff --git a/pinentry/pinentry.c b/pinentry/pinentry.c
+index 9a6a090..0187309 100644
+--- a/pinentry/pinentry.c
++++ b/pinentry/pinentry.c
+@@ -173,7 +173,7 @@ pinentry_assuan_reset_handler (ASSUAN_CONTEXT ctx)
+ 
+ static int lc_ctype_unknown_warning = 0;
+ 
+-#if defined FALLBACK_CURSES || defined PINENTRY_CURSES || defined PINENTRY_GTK
++#if defined FALLBACK_CURSES || defined INSIDE_EMACS || defined PINENTRY_CURSES || defined PINENTRY_GTK
+ char *
+ pinentry_utf8_to_local (const char *lc_ctype, const char *text)
+ {
+diff --git a/qt4/Makefile.am b/qt4/Makefile.am
+index 816aade..c2ee3c6 100644
+--- a/qt4/Makefile.am
++++ b/qt4/Makefile.am
+@@ -33,6 +33,12 @@ ncurses_include =
+ libcurses =
+ endif
+ 
++if INSIDE_EMACS
++libemacs = ../pinentry/libpinentry-emacs.a $(LIBEMACS) $(LIBICONV)
++else
++libemacs =
++endif
++
+ 
+ AM_CPPFLAGS = $(COMMON_CFLAGS) \
+ 	-I$(top_srcdir) -I$(top_srcdir)/assuan -I$(top_srcdir)/secmem \
+@@ -41,7 +47,8 @@ AM_CXXFLAGS = $(QT4_CORE_CFLAGS) $(QT4_GUI_CFLAGS)
+ pinentry_qt4_LDADD = \
+ 	../pinentry/libpinentry.a $(top_builddir)/assuan/libassuan.a \
+ 	$(top_builddir)/secmem/libsecmem.a \
+-	$(COMMON_LIBS) $(QT4_CORE_LIBS) $(QT4_GUI_LIBS) $(libcurses) $(LIBCAP)
++	$(COMMON_LIBS) $(QT4_CORE_LIBS) $(QT4_GUI_LIBS) \
++	$(libcurses) $(libemacs) $(LIBCAP)
+ 
+ BUILT_SOURCES = \
+ 	pinentryconfirm.moc qsecurelineedit.moc pinentrydialog.moc
+diff --git a/qt4/main.cpp b/qt4/main.cpp
+index 37b6e7b..bb682b3 100644
+--- a/qt4/main.cpp
++++ b/qt4/main.cpp
+@@ -50,6 +50,10 @@
+ #include <pinentry-curses.h>
+ #endif
+ 
++#ifdef INSIDE_EMACS
++#include "pinentry-emacs.h"
++#endif
++
+ static QString escape_accel( const QString & s ) {
+ 
+   QString result;
+@@ -263,51 +267,58 @@ main (int argc, char *argv[])
+ 
+   std::auto_ptr<QApplication> app;
+ 
+-#ifdef FALLBACK_CURSES
+-  if (!pinentry_have_display (argc, argv))
+-    pinentry_cmd_handler = curses_cmd_handler;
++#ifdef INSIDE_EMACS
++  if (pinentry_inside_emacs () && pinentry_emacs_init ())
++    pinentry_cmd_handler = emacs_cmd_handler;
+   else
+ #endif
+     {
+-      /* Qt does only understand -display but not --display; thus we
+-         are fixing that here.  The code is pretty simply and may get
+-         confused if an argument is called "--display". */
+-      char **new_argv, *p;
+-      size_t n;
+-      int i, done;
+-
+-      for (n=0,i=0; i < argc; i++)
+-        n += strlen (argv[i])+1;
+-      n++;
+-      new_argv = (char**)calloc (argc+1, sizeof *new_argv);
+-      if (new_argv)
+-        *new_argv = (char*)malloc (n);
+-      if (!new_argv || !*new_argv)
+-        {
+-          fprintf (stderr, "pinentry-qt4: can't fixup argument list: %s\n",
+-                   strerror (errno));
+-          exit (EXIT_FAILURE);
+-
+-        }
+-      for (done=0,p=*new_argv,i=0; i < argc; i++)
+-        if (!done && !strcmp (argv[i], "--display"))
+-          {
+-            new_argv[i] = strcpy (p, argv[i]+1);
+-            p += strlen (argv[i]+1) + 1;
+-            done = 1;
+-          }
+-        else
+-          {
+-            new_argv[i] = strcpy (p, argv[i]);
+-            p += strlen (argv[i]) + 1;
+-          }
++#ifdef FALLBACK_CURSES
++      if (!pinentry_have_display (argc, argv))
++	pinentry_cmd_handler = curses_cmd_handler;
++      else
++#endif
++	{
++	  /* Qt does only understand -display but not --display; thus we
++	     are fixing that here.  The code is pretty simply and may get
++	     confused if an argument is called "--display". */
++	  char **new_argv, *p;
++	  size_t n;
++	  int i, done;
++
++	  for (n=0,i=0; i < argc; i++)
++	    n += strlen (argv[i])+1;
++	  n++;
++	  new_argv = (char**)calloc (argc+1, sizeof *new_argv);
++	  if (new_argv)
++	    *new_argv = (char*)malloc (n);
++	  if (!new_argv || !*new_argv)
++	    {
++	      fprintf (stderr, "pinentry-qt4: can't fixup argument list: %s\n",
++		       strerror (errno));
++	      exit (EXIT_FAILURE);
+ 
+-      /* We use a modal dialog window, so we don't need the application
+-         window anymore.  */
+-      i = argc;
+-      app.reset (new QApplication (i, new_argv));
+-      const QIcon icon( QLatin1String( ":/document-encrypt.png" ) );
+-      app->setWindowIcon( icon );
++	    }
++	  for (done=0,p=*new_argv,i=0; i < argc; i++)
++	    if (!done && !strcmp (argv[i], "--display"))
++	      {
++		new_argv[i] = strcpy (p, argv[i]+1);
++		p += strlen (argv[i]+1) + 1;
++		done = 1;
++	      }
++	    else
++	      {
++		new_argv[i] = strcpy (p, argv[i]);
++		p += strlen (argv[i]) + 1;
++	      }
++
++	  /* We use a modal dialog window, so we don't need the application
++	     window anymore.  */
++	  i = argc;
++	  app.reset (new QApplication (i, new_argv));
++	  const QIcon icon( QLatin1String( ":/document-encrypt.png" ) );
++	  app->setWindowIcon( icon );
++	}
+     }
+ 
+ 
+-- 
+2.1.0
+
+
+--=-=-=
+Content-Type: text/x-patch
+Content-Disposition: inline;
+ filename=0001-epg-Support-external-pinentry-callback.patch
+
+From 970d5a174cb979f6e8d0fa54dba5776c26ab921e Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <ueno@gnu.org>
+Date: Thu, 28 May 2015 17:44:30 +0900
+Subject: [PATCH] epg: Support external pinentry callback
+
+* epg.el (epg--start): Set INSIDE_EMACS envvar.
+(epg--pinentry-prompt): New variable.
+(epg--pinentry-description): New variable.
+(epg--pinentry-title): New variable.
+(epg--pinentry-error): New variable.
+(epg-pinentry-callback): New function.
+---
+ lisp/epg.el | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/lisp/epg.el b/lisp/epg.el
+index 6015048..aa82418 100644
+--- a/lisp/epg.el
++++ b/lisp/epg.el
+@@ -602,6 +602,9 @@ callback data (if any)."
+       (setq process-environment
+ 	    (cons (concat "GPG_TTY=" terminal-name)
+ 		  (cons "TERM=xterm" process-environment))))
++    (setq process-environment
++          (cons (format "INSIDE_EMACS=%s,epg" emacs-version)
++                process-environment))
+     ;; Record modified time of gpg-agent socket to restore the Emacs
+     ;; frame on text terminal in `epg-wait-for-completion'.
+     ;; See
+@@ -2234,6 +2237,58 @@ Type names are resolved using `epg-dn-type-alist'."
+    alist
+    ", "))
+ 
++(defvar epg--pinentry-prompt nil)
++(defvar epg--pinentry-description nil)
++(defvar epg--pinentry-title nil)
++(defvar epg--pinentry-error nil)
++
++(defun epg-pinentry-callback (command arg)
++  "Handle a Pinentry protocol command COMMAND with an argument ARG.
++This function is called from Pinentry, through emacsclient."
++  (pcase command
++    ("SETPROMPT"
++     (setq epg--pinentry-prompt arg)
++     t)
++    ("SETDESC"
++     (setq epg--pinentry-description arg)
++     t)
++    ("SETTITLE"
++     (setq epg--pinentry-title arg)
++     t)
++    ("SETERROR"
++     (setq epg--pinentry-error arg)
++     t)
++    ("GETPIN"
++     (let ((prompt (or epg--pinentry-description epg--pinentry-prompt "")))
++       (if epg--pinentry-error
++           (setq prompt (concat "Error: "
++                                (propertize (copy-sequence epg--pinentry-error)
++                                            'face 'error)
++                                "\n"
++                                prompt)))
++       (if epg--pinentry-title
++           (setq prompt (format "[%s] %s" epg--pinentry-title prompt)))
++       (if (string-match ":?[ \n]*\\'" prompt)
++           (setq prompt (concat (substring prompt 0 (match-beginning 0)) ": ")))
++       (condition-case nil
++           (read-passwd prompt)
++         (quit))))
++    ("CONFIRM"
++     (let ((prompt (or epg--pinentry-description "")))
++       (if epg--pinentry-error
++           (setq prompt (concat "Error: "
++                                (propertize (copy-sequence epg--pinentry-error)
++                                            'face 'error)
++                                "\n"
++                                prompt)))
++       (if epg--pinentry-title
++           (setq prompt (format "[%s] %s" epg--pinentry-title prompt)))
++       (if (string-match "[ \n]*\\'" prompt)
++           (setq prompt (concat (substring prompt 0 (match-beginning 0)) " ")))
++       (condition-case nil
++           (y-or-n-p prompt)
++         (quit))))))
++
+ (provide 'epg)
+ 
+ ;;; epg.el ends here
+-- 
+2.1.0
+
+
+--=-=-=
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Gnupg-devel mailing list
+Gnupg-devel@gnupg.org
+http://lists.gnupg.org/mailman/listinfo/gnupg-devel
+
+--=-=-=--
+

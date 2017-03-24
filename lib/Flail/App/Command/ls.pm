@@ -50,10 +50,15 @@ sub execute {
 	$self->emit("folder '$folder':",scalar(@msgids),"messages");
 	@msgids = @msgids[0..$max] if $max;
 	foreach my $msgid (@msgids) {
+		next unless defined $msgid;
 		my $msg = $folder->messageId($msgid);
+		unless ($msg) {
+			$self->emit($msgid,"does not exist - skipped");
+			next;
+		}
 		my @from = $msg->from();
 		my @to = $msg->to();
-		my $date = $msg->head->date;
+		my $date = $msg->head->get('Date');
 		my $subj = $msg->study('subject');
 		my $from_str = shift(@from)->format(@from);
 		my $to_str = shift(@to)->format(@to);

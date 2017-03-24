@@ -1,0 +1,141 @@
+Return-Path: <bounces+848413-96e3-attila=stalphonsos.com@sgmail.github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 42329 invoked from network); 29 May 2015 18:05:18 -0000
+Received: from unknown (HELO o6.sgmail.github.com) (192.254.113.101)
+  by x.stalphonsos.net with SMTP; 29 May 2015 18:05:18 -0000
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=github.com; 
+	h=from:reply-to:to:in-reply-to:references:subject:mime-version:content-type:content-transfer-encoding:list-id:list-archive:list-post:list-unsubscribe; 
+	s=s20150108; bh=HiCv0H78ZavXJhjRzNfMUSS52a0=; b=wbskAaiAUuCSC7Ks
+	qzwh/wXSh0UtHMgcSY4R0ElQXijIPJ2Xry7axzG7ioDfvsV/SHHc7zm9MTcmM+bE
+	tTn+hJHHBBR6xRfaY3/Q0TBc8OIDuJQqHDCvlNDLh5vmfxz2IEeWh4YNcPQNl5OK
+	/OVUhS0su+l+hhi1q2xr/2jpyr0=
+Received: by filter0414p1mdw1.sendgrid.net with SMTP id filter0414p1mdw1.3612.5568AA5A2E
+        2015-05-29 18:05:15.003279934 +0000 UTC
+Received: from github-smtp2b-ext-cp1-prd.iad.github.net (github-smtp2b-ext-cp1-prd.iad.github.net [192.30.253.17])
+	by ismtpd-015 (SG) with ESMTP id 14da0d97338.672e.866d27
+	for <attila@stalphonsos.com>; Fri, 29 May 2015 18:05:14 +0000 (UTC)
+Date: Fri, 29 May 2015 11:05:14 -0700
+From: Titus von der Malsburg <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874bc8d610b05e633e38277ebf686e9688a836b223bf92cf0000000111806c5a92a169ce01ecbd2c@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/issues/417/106892002@github.com>
+In-Reply-To: <djcb/mu/issues/417@github.com>
+References: <djcb/mu/issues/417@github.com>
+Subject: Re: [mu] Attachments can't be opened when there's no headers view.
+ (#417)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5568aa5ac6af6_1c8e3fd3f39f129c9479b";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: tmalsburg
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874bc8d610b05e633e38277ebf686e9688a836b223bf92cf0000000111806c5a92a169ce01ecbd2c@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874bc8d610b05e633e38277ebf686e9688a836b223bf92cf0000000111806c5a92a169ce01ecbd2c@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HSwSxWSBvB1PbsRpMi9zhOEY_TlZzks5oOKHagaJpZM4B1wmI>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+X-SG-EID: qjQWc1ylAbm/hZFLRMwvvCpxtLJJDbaLxl9ZLGi1ddYN1IZ9acSI+DGlnA6Wd4DVKDdsPeNUq7SJBN
+ bIiNdjeTzxbWtsXErDxSxJGvW/yb1sQKV7tHlR9+aqX/so4Rv861gUgIimWVmfhMQn97bJVlIxTDZ/
+ 1S3hihKpySsDVm9g7F7VGCZfahN7VsDEwWq3
+
+----==_mimepart_5568aa5ac6af6_1c8e3fd3f39f129c9479b
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+I finally found the trigger for this problem.  The absence of the headers-v=
+iew is not the cause.  The problem occurs only when I open an email with `m=
+u4e-view-message-with-msgid` when a mu4e-view with another email already ex=
+ists.  Example:
+
+1. Open first email: `(mu4e-view-message-with-msgid "117ef7b57667fb678b73b4=
+0d5bbaf270@server.de")`
+2. Close mu4e-view.
+3. Open second email: `(mu4e-view-message-with-msgid "901A2D07-E0A9-4F4D-AE=
+E5-2F2F9507E1C6@posteo.de")`
+4. Open attachment =E2=86=92 no problem.
+
+But:
+
+1. Open first email: `(mu4e-view-message-with-msgid "117ef7b57667fb678b73b4=
+0d5bbaf270@server.de")`
+2. Do **not close** mu4e-view.
+3. Open second email: `(mu4e-view-message-with-msgid "901A2D07-E0A9-4F4D-AE=
+E5-2F2F9507E1C6@posteo.de")`
+4. Open attachment =E2=86=92 attachment not found or attachment from email =
+1 is opened.
+
+The problem is not only opening attachment but also replying and forwarding=
+.  When I reply to or forward email 2 in the second scenario, the text of t=
+he first email is quoted.
+=20
+This bug is really nasty because it can cause you to inadvertently disclose=
+ sensitive information to the recipient when forwarding or replying.
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/issues/417#issuecomment-106892002=
+
+----==_mimepart_5568aa5ac6af6_1c8e3fd3f39f129c9479b
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<p>I finally found the trigger for this problem.  The absence of the header=
+s-view is not the cause.  The problem occurs only when I open an email with=
+ <code>mu4e-view-message-with-msgid</code> when a mu4e-view with another em=
+ail already exists.  Example:</p>
+
+<ol>
+<li>Open first email: <code>(mu4e-view-message-with-msgid "117ef7b57667fb67=
+8b73b40d5bbaf270@server.de")</code>
+</li>
+<li>Close mu4e-view.</li>
+<li>Open second email: <code>(mu4e-view-message-with-msgid "901A2D07-E0A9-4=
+F4D-AEE5-2F2F9507E1C6@posteo.de")</code>
+</li>
+<li>Open attachment =E2=86=92 no problem.</li>
+</ol>
+
+<p>But:</p>
+
+<ol>
+<li>Open first email: <code>(mu4e-view-message-with-msgid "117ef7b57667fb67=
+8b73b40d5bbaf270@server.de")</code>
+</li>
+<li>Do <strong>not close</strong> mu4e-view.</li>
+<li>Open second email: <code>(mu4e-view-message-with-msgid "901A2D07-E0A9-4=
+F4D-AEE5-2F2F9507E1C6@posteo.de")</code>
+</li>
+<li>Open attachment =E2=86=92 attachment not found or attachment from email=
+ 1 is opened.</li>
+</ol>
+
+<p>The problem is not only opening attachment but also replying and forward=
+ing.  When I reply to or forward email 2 in the second scenario, the text o=
+f the first email is quoted.</p>
+
+<p>This bug is really nasty because it can cause you to inadvertently discl=
+ose sensitive information to the recipient when forwarding or replying.</p>
+
+<p style=3D"font-size:small;-webkit-text-size-adjust:none;color:#666;">&mda=
+sh;<br>Reply to this email directly or <a href=3D"https://github.com/djcb/m=
+u/issues/417#issuecomment-106892002">view it on GitHub</a>.<img alt=3D"" he=
+ight=3D"1" src=3D"https://github.com/notifications/beacon/AA6HS-K4w1NGgFt4m=
+0qIKrcGO5QgvAMkks5oOKHagaJpZM4B1wmI.gif" width=3D"1" /></p>
+<div itemscope itemtype=3D"http://schema.org/EmailMessage">
+  <div itemprop=3D"action" itemscope itemtype=3D"http://schema.org/ViewActi=
+on">
+    <link itemprop=3D"url" href=3D"https://github.com/djcb/mu/issues/417#is=
+suecomment-106892002"></link>
+    <meta itemprop=3D"name" content=3D"View Issue"></meta>
+  </div>
+  <meta itemprop=3D"description" content=3D"View this Issue on GitHub"></me=
+ta>
+</div>
+
+----==_mimepart_5568aa5ac6af6_1c8e3fd3f39f129c9479b--

@@ -1,0 +1,139 @@
+Return-Path: <noreply@github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 6108 invoked from network); 31 May 2015 12:30:36 -0000
+Received: from unknown (HELO github-smtp2a-ext-cp1-prd.iad.github.net) (192.30.252.196)
+  by x.stalphonsos.net with SMTP; 31 May 2015 12:30:36 -0000
+Date: Sun, 31 May 2015 05:30:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2014; t=1433075436;
+	bh=zSOaYP36FvXp2dFHhYfoDbjY993HOf4aa0xOWWEDgCM=;
+	h=From:Reply-To:To:Subject:List-ID:List-Archive:List-Post:
+	 List-Unsubscribe:From;
+	b=vQmU9Qqf0s1/rk56WHPWGqBz2JMy6H2Xo0kHFWAH9ZZ0qK51J+0sYRGShLe43r4Jb
+	 uwPpdQTsg64/rwLcz/KLxJReJEvoR+MGQmSEeMRmqohAdnhcYeUG8PEcZwPwodPQwj
+	 KCCXtrhK7rt/nux/N4RpdUHNd+N7iMLL6HTWgJWM=
+From: =?UTF-8?B?U8OpYmFzdGllbiBMZSBNYWd1ZXI=?= <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874b5f83c13206d37bf0321507f7d69747936a95bfef92cf000000011182c0ec92a169ce04f3b1d1@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/pull/625@github.com>
+Subject: [mu] minor NEWS missing bug correction (#625)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_556afeec728ec_78fd3fdce57412b86109a0";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: seblemaguer
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874b5f83c13206d37bf0321507f7d69747936a95bfef92cf000000011182c0ec92a169ce04f3b1d1@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874b5f83c13206d37bf0321507f7d69747936a95bfef92cf000000011182c0ec92a169ce04f3b1d1@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS0VY9I4V_Nz6RjUv0cTvopG2pTCpks5oOvZsgaJpZM4Exdtn>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+
+
+----==_mimepart_556afeec728ec_78fd3fdce57412b86109a0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+I am currently on ubuntu 15.04 with autoreconf 2.67, automake .1.14.1 and=
+ when I try to compile mu, I have this message
+```
+> $ autoreconf -i                                                        =
+           [=C2=B1master]
+Makefile.am: error: required file './NEWS' not found
+autoreconf: automake failed with exit status: 1
+```
+
+Adding foreign to AM_INIT_AUTOMAKE solve this issue
+You can view, comment on, or merge this pull request online at:
+
+  https://github.com/djcb/mu/pull/625
+
+-- Commit Summary --
+
+  * minor NEWS missing bug correction
+
+-- File Changes --
+
+    M configure.ac (2)
+
+-- Patch Links --
+
+https://github.com/djcb/mu/pull/625.patch
+https://github.com/djcb/mu/pull/625.diff
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/pull/625
+
+----==_mimepart_556afeec728ec_78fd3fdce57412b86109a0
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<p>Hello,</p>
+
+<p>I am currently on ubuntu 15.04 with autoreconf 2.67, automake .1.14.1 =
+and when I try to compile mu, I have this message</p>
+
+<pre><code>&gt; $ autoreconf -i                                          =
+                         [=C2=B1master]
+Makefile.am: error: required file './NEWS' not found
+autoreconf: automake failed with exit status: 1
+</code></pre>
+
+<p>Adding foreign to AM_INIT_AUTOMAKE solve this issue</p>
+
+<hr>
+
+<h4>You can view, comment on, or merge this pull request online at:</h4>
+<p>&nbsp;&nbsp;<a href=3D'https://github.com/djcb/mu/pull/625'>https://gi=
+thub.com/djcb/mu/pull/625</a></p>
+
+<h4>Commit Summary</h4>
+<ul>
+  <li>minor NEWS missing bug correction</li>
+</ul>
+
+<h4>File Changes</h4>
+<ul>
+  <li>
+    <strong>M</strong>
+    <a href=3D"https://github.com/djcb/mu/pull/625/files#diff-0">configur=
+e.ac</a>
+    (2)
+  </li>
+</ul>
+
+<h4>Patch Links:</h4>
+<ul>
+  <li><a href=3D'https://github.com/djcb/mu/pull/625.patch'>https://githu=
+b.com/djcb/mu/pull/625.patch</a></li>
+  <li><a href=3D'https://github.com/djcb/mu/pull/625.diff'>https://github=
+.com/djcb/mu/pull/625.diff</a></li>
+</ul>
+
+<p style=3D"font-size:small;-webkit-text-size-adjust:none;color:#666;">&m=
+dash;<br>Reply to this email directly or <a href=3D"https://github.com/dj=
+cb/mu/pull/625">view it on GitHub</a>.<img alt=3D"" height=3D"1" src=3D"h=
+ttps://github.com/notifications/beacon/AA6HS6Audo615k0Ki77G795cpRR5rTheks=
+5oOvZsgaJpZM4Exdtn.gif" width=3D"1" /></p>
+<div itemscope itemtype=3D"http://schema.org/EmailMessage">
+  <div itemprop=3D"action" itemscope itemtype=3D"http://schema.org/ViewAc=
+tion">
+    <link itemprop=3D"url" href=3D"https://github.com/djcb/mu/pull/625"><=
+/link>
+    <meta itemprop=3D"name" content=3D"View Pull Request"></meta>
+  </div>
+  <meta itemprop=3D"description" content=3D"View this Pull Request on Git=
+Hub"></meta>
+</div>
+
+
+----==_mimepart_556afeec728ec_78fd3fdce57412b86109a0--

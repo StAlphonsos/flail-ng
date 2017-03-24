@@ -1,0 +1,125 @@
+Return-Path: <gnupg-devel-bounces@gnupg.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 77173 invoked from network); 28 May 2015 08:24:23 -0000
+Received: from unknown (HELO lists.gnupg.org) (217.69.76.57)
+  by x.stalphonsos.net with SMTP; 28 May 2015 08:24:23 -0000
+Received: from localhost ([127.0.0.1] helo=trithemius.gnupg.org)
+	by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+	id 1Yxt09-0007EC-Gy; Thu, 28 May 2015 10:17:17 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on trithemius.gnupg.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI
+ autolearn=ham version=3.3.2
+Received: from kerckhoffs.g10code.com ([217.69.77.222])
+ by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+ id 1Yxt02-0007Dr-NI
+ for <mm.gnupg-devel@lists.gnupg.org>; Thu, 28 May 2015 10:17:10 +0200
+Received: from che.mayfirst.org ([209.234.253.108])
+ by kerckhoffs.g10code.com with esmtp (Exim 4.80 #2 (Debian))
+ id 1Yxt5T-0002a0-VW
+ for <gnupg-devel@gnupg.org>; Thu, 28 May 2015 10:22:48 +0200
+Received: from fifthhorseman.net (ool-6c3a0662.static.optonline.net
+ [108.58.6.98])
+ by che.mayfirst.org (Postfix) with ESMTPSA id 7AAA7F984;
+ Thu, 28 May 2015 04:22:43 -0400 (EDT)
+Received: by fifthhorseman.net (Postfix, from userid 1000)
+ id A7F9120026; Thu, 28 May 2015 04:22:27 -0400 (EDT)
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+To: "Neal H. Walfield" <neal@walfield.org>
+Subject: Re: gnome keyring & gpg agent: backport to gpg 2.0 done
+In-Reply-To: <87h9r8pu3b.wl-neal@walfield.org>
+References: <87twvg8l4r.fsf@alice.fifthhorseman.net>
+ <87bnhowa4x.wl-neal@walfield.org>
+ <CAK7xexm6bUQu4rLAnFvKd2AE+AJohdBmd23u3R_e5giP5g=Jow@mail.gmail.com>
+ <87twvfmnhx.fsf@vigenere.g10code.de> <87fv6z7032.fsf@alice.fifthhorseman.net>
+ <877fsbvwhr.wl-neal@walfield.org> <87h9r8pu3b.wl-neal@walfield.org>
+User-Agent: Notmuch/0.20~rc1 (http://notmuchmail.org) Emacs/24.4.1
+ (x86_64-pc-linux-gnu)
+Date: Thu, 28 May 2015 04:22:23 -0400
+Message-ID: <874mmxdscg.fsf@alice.fifthhorseman.net>
+MIME-Version: 1.0
+Cc: gnupg-devel@gnupg.org
+X-BeenThere: gnupg-devel@gnupg.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+List-Id: GnuPG development <gnupg-devel.gnupg.org>
+List-Unsubscribe: <http://lists.gnupg.org/mailman/options/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=unsubscribe>
+List-Archive: </pipermail/>
+List-Post: <mailto:gnupg-devel@gnupg.org>
+List-Help: <mailto:gnupg-devel-request@gnupg.org?subject=help>
+List-Subscribe: <http://lists.gnupg.org/mailman/listinfo/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1839062054=="
+Errors-To: gnupg-devel-bounces@gnupg.org
+Sender: "Gnupg-devel" <gnupg-devel-bounces@gnupg.org>
+
+--===============1839062054==
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Tue 2015-05-19 09:36:40 -0400, Neal H. Walfield wrote:
+> But, again, these items are primarily aesthetic: there is no reason
+> that distributions can't ship the new pinentry now and disable GNOME
+> Keyring's gpg agent proxy.
+
+I'm not inclined to ship the new GNOME3 pinentry if it's not part of a
+released version of pinentry.  I could do so with a beta release
+(e.g. in debian experimental), or i could invent a release of my own
+From=20git HEAD, but i'm wary about doing this unless you tell me as
+upstream that pinentry is in a good stopping place.
+
+(also, the common gnupg practice of shipping tarballs that differ
+significantly from the revision control system makes it more complicated
+for me to "cut a release" on my own as a distributor, since the release
+i cut is likely to be different from whatever you produce as upstream)
+
+I'd be happy to try to get something like pinentry-gnome3 into debian if
+it's ready, though.  Is it ready?
+
+Regards,
+
+  --dkg
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQJ8BAEBCgBmBQJVZtBAXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
+ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXRFQjk2OTEyODdBN0FEREUzNzU3RDkxMUVB
+NTI0MDFCMTFCRkRGQTVDAAoJEKUkAbEb/fpcUDwP/14AaYpZ0Qy2Ph/knlQwI7cY
+47qRIf9ARHW4Btik6SOpT6Lsx8GYYCZVu3G+JuhqncJvhWmR/n8OvZGtFMZNO/Nu
+DoXuhkNz06kFQ3IgeGT/4Cws1pRNeABZ+vu7rKkwnnYLRTnsUojSXkDlbBxxmrb0
+BrE+NbDFdzg7iPDmkz3RjkIPFWznWqZ3rpGIdOohfecFs7gpcoBHB7SjZDlezfGm
+qsJKqCn3FTaikx5Q0+pe1brlyNaa8z5r5SL7hfU3NQooz6Dk1j6J9I43w2sdQmdF
+uOKBFKP42QDmiFEVQQ5CIGWWUooGEpcDSoPiMw2vV6LNpBxnmRkjMpQOeIepWcus
+qW2wbIef1X3kZNHJz9c5TiiMqGonemdmN/JFdiTgR9i0UKLXlS3+6EtJ61b0WrqC
+addr0TUuvk/48IWeFNkgilfK+Xwj6NeSmGHuME9iQNpn7Cwdo4lN86G9Y1jkK5py
+K/D12sWuGuyVUjDwl0Sissi1g9gE/FNjNBQgZDzGvYVERKXfCUo6nSo1w8gBVwEd
+cceDEttBHUY2s+K7Rjx+0ZYXsaO8J6a74cQ/Cg+/Lw5U1Qg4fmcZjkXbhX8yUWVQ
+hoJsw8t4toPbqM8OlnVK6e0U2jtkUlIiHnvlFtKVKBRcCnAJ3wC0oLGLNzXg5sei
+YUVikdGp8aIH6jyWweDG
+=O7Zo
+-----END PGP SIGNATURE-----
+--=-=-=--
+
+
+--===============1839062054==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Gnupg-devel mailing list
+Gnupg-devel@gnupg.org
+http://lists.gnupg.org/mailman/listinfo/gnupg-devel
+
+--===============1839062054==--
+

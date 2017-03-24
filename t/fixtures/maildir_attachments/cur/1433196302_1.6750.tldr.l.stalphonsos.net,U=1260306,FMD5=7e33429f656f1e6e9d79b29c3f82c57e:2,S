@@ -1,0 +1,380 @@
+Return-Path: <tbb-dev-bounces@lists.torproject.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 31170 invoked from network); 1 Jun 2015 18:04:40 -0000
+Received: from unknown (HELO eugeni.torproject.org) (38.229.72.13)
+  by x.stalphonsos.net with SMTP; 1 Jun 2015 18:04:40 -0000
+Received: from eugeni.torproject.org (localhost [127.0.0.1])
+	by eugeni.torproject.org (Postfix) with ESMTP id E3C1335953;
+	Mon,  1 Jun 2015 18:04:39 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+ by eugeni.torproject.org (Postfix) with ESMTP id 91DFE35953
+ for <tbb-dev@lists.torproject.org>; Mon,  1 Jun 2015 18:04:36 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at 
+Received: from eugeni.torproject.org ([127.0.0.1])
+ by localhost (eugeni.torproject.org [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id V_UzWievhNGl for <tbb-dev@lists.torproject.org>;
+ Mon,  1 Jun 2015 18:04:36 +0000 (UTC)
+Received: from mx0.mars-attacks.org (mx0.mars-attacks.org
+ [IPv6:2001:4b98:dc0:43:216:3eff:fefd:2409])
+ by eugeni.torproject.org (Postfix) with ESMTP id 4A9F43593B
+ for <tbb-dev@lists.torproject.org>; Mon,  1 Jun 2015 18:04:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+ by mx0.mars-attacks.org (Postfix) with ESMTPS id 6E153BDF
+ for <tbb-dev@lists.torproject.org>; Mon,  1 Jun 2015 20:04:32 +0200 (CEST)
+Received: by wxy.mars-attacks.org (Postfix, from userid 1000)
+ id 20FCF1E00C3; Mon,  1 Jun 2015 20:04:31 +0200 (CEST)
+Date: Mon, 1 Jun 2015 20:04:31 +0200
+From: Nicolas Vigier <boklm@mars-attacks.org>
+To: tbb-dev@lists.torproject.org
+Message-ID: <20150601180431.GL2598@mars-attacks.org>
+References: <20150526173854.GI2598@mars-attacks.org>
+MIME-Version: 1.0
+In-Reply-To: <20150526173854.GI2598@mars-attacks.org>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Subject: Re: [tbb-dev] Using topic branches for Tor Browser patches
+X-BeenThere: tbb-dev@lists.torproject.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+Reply-To: discussion regarding Tor Browser Bundle development
+ <tbb-dev@lists.torproject.org>
+List-Id: discussion regarding Tor Browser Bundle development
+ <tbb-dev.lists.torproject.org>
+List-Unsubscribe: <https://lists.torproject.org/cgi-bin/mailman/options/tbb-dev>, 
+ <mailto:tbb-dev-request@lists.torproject.org?subject=unsubscribe>
+List-Archive: <http://lists.torproject.org/pipermail/tbb-dev/>
+List-Post: <mailto:tbb-dev@lists.torproject.org>
+List-Help: <mailto:tbb-dev-request@lists.torproject.org?subject=help>
+List-Subscribe: <https://lists.torproject.org/cgi-bin/mailman/listinfo/tbb-dev>, 
+ <mailto:tbb-dev-request@lists.torproject.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0081692057193312233=="
+Errors-To: tbb-dev-bounces@lists.torproject.org
+Sender: "tbb-dev" <tbb-dev-bounces@lists.torproject.org>
+
+
+--===============0081692057193312233==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="enLffk0M6cffIOOh"
+Content-Disposition: inline
+
+
+--enLffk0M6cffIOOh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, 26 May 2015, Nicolas Vigier wrote:
+
+>   =20
+> As an exemple, I have converted a few patches from tor-browser-31.7.0esr-=
+4.5-1
+> to this new naming in this git repository:
+> https://github.com/boklm/gecko-dev/branches/all
+>=20
+> With all topic branches merged to this tor-browser-31.7.0esr-4.5-1
+> branch:
+> https://github.com/boklm/gecko-dev/commits/tor-browser-31.7.0esr-4.5-1
+
+I have converted more patches from tor-browser-31.7.0esr-4.5-1 and
+submitted some of them to Mozilla Try.
+
+I'm planning to do the same on Arthur's esr38 branch this week.
+
+>=20
+> We could also have some helpers scripts to make management of all
+> those branches easier:
+>=20
+> - a script to merge / list all topic branches that have not yet been
+>   merged into their tor-browser-${firefox_version}-${tbb_version}-1
+>   branch.
+>=20
+> - a script to push / list all branches that need to be pushed for a
+>   firefox or tbb version to a remote git repository.
+>=20
+> - a script to rebase all patches from a previous firefox version to a
+>   new firefox version.
+
+I started a script to help doing this, in the tbgit branch of my
+tor-browser-bundle.git repo:
+https://gitweb.torproject.org/user/boklm/tor-browser-bundle.git/tree/tools/=
+tor-browser-git?h=3Dtbgit
+
+It has commands to merge topic branches into the main branch, pull /
+push topic branches to a remote repository, and list Mozilla Try URLs
+for all branches (stored using git notes).
+
+The tbgit command can be used from a tor-browser.git directory after
+adding tools/tor-browser-git to the PATH.
+
+  $ tbgit=20
+  tbgit <command> [args]
+
+  List of commands:
+
+    help          display help informations for a command
+    pull          pull topic branches from a remote repository
+    push          push topic branches to a remote repository
+    merge         merge topic branches into a version branch
+    try-push      submit topic branches to Mozilla Try server
+    try-results   display results from Mozilla Try
+
+  $ tbgit pull --help
+  tbgit pull [OPTIONS] <repository>
+
+  Pull topic branches from a remote git repository
+
+    Fetch a remote git repository and update local branches for a selected
+    firefox and Tor Browser version. The firefox and Tor Browser versions
+    are determined from the currently checked out branch.
+
+  options:
+
+   --yes      assume yes to all questions
+   --list     don't pull anything, but list what branches should be pulled
+   --no-fetch don't run git fetch before updating branches
+
+  $ tbgit push --help
+  tbgit push [OPTIONS] <repository>
+
+  Push topic branches to a remote git repository
+
+    Fetch a remote git repository, then push local branches that are not
+    up-to-date on the remote repository, for a selected firefox and Tor
+    Browser version. The firefox and Tor Browser versions are determined
+    from the currently checked out branch.
+
+  options:
+
+   --yes      assume yes to all questions
+   --list     don't push anything, but list what branches should be pushed
+   --no-fetch don't run git fetch before pushing branches
+
+  $ tbgit merge --help
+  tbgit merge [OPTIONS]
+
+  Merge topic branches into the current branch
+
+      The current branch should be named after the firefox and Tor Browser
+      versions. The program will exit if the versions cannot be determined
+      from the branch name.
+
+      If the branch cannot be merged because of a conflict, the program
+      will exits so you can fix the conflict and commit.
+
+  options:
+
+   --yes      assume yes to all questions
+   --list     don't merge anything, but list what needs to be merged
+   --no-edit  don't edit merge commit messages
+
+  $ tbgit try-push --help
+  tbgit try-push [OPTIONS]
+
+  Push topic branches to Mozilla Try server
+
+    In the future this command will push topic branches to Mozilla Try,
+    and use git-notes to store the results URL, but it is not implemented
+    yet.
+
+    Currently this command lists the branches that have not yet been
+    pushed to Mozilla Try.
+
+    The firefox and Tor Browser versions are determined from the currently
+    checked out branch.
+
+  options:
+
+   --yes      assume yes to all questions
+   --list     don't submit anything, but list what branches should be submi=
+tted
+
+  $ tbgit try-results --help
+  tbgit try-results
+
+  Display results from Mozilla Try servers
+
+    The firefox and Tor Browser versions are determined from the currently
+    checked out branch.
+
+    The results URLs are found using git notes from refs/notes/try-push.
+
+
+Some examples using a clone of https://github.com/boklm/gecko-dev/.
+
+Nothing to merge or push in the tor-browser-31.7.0esr-4.5-1 branch:
+
+  $ cat .git/HEAD=20
+  ref: refs/heads/tor-browser-31.7.0esr-4.5-1
+  $ tbgit merge --list
+  $ tbgit push --list origin
+
+Now we create a new topic branch, add a commit and use tbgit to check what
+we need to merge and push:
+
+  $ git branch 31.7.0esr/test-branch 31.7.0esr/base
+  $ git checkout 31.7.0esr/test-branch
+  $ echo test > test.txt
+  $ git add test.txt
+  $ git commit -m test
+  $ git checkout tor-browser-31.7.0esr-4.5-1
+  $ tbgit merge --list
+  31.7.0esr/test-branch
+  $ tbgit push --list origin
+  31.7.0esr/test-branch (new)
+
+The try-results command can be used to list Mozilla Try results URLs:
+
+  $ tbgit try-results
+  31.7.0esr/10819-Add-a-pref-privacy.thirdparty.isolate:
+    Not submitted yet
+
+  31.7.0esr/11641-change-TBB-directory-structure-to-be-more-like-Firefox:
+    Not submitted yet
+
+  31.7.0esr/12146-Make-the-CONNECT-Host-header-the-same-as-the-Request-URI:
+    Not submitted yet
+
+  31.7.0esr/12620-TorBrowser-regression-tests-folder:
+    Will not be submitted
+
+  31.7.0esr/13900-Remove-3rd-party-HTTP-auth-tokens:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3Ddde9427a5d6b
+
+  31.7.0esr/15502-Isolate-blob-URLs-to-first-party:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3Dfa0d343edca8
+
+  31.7.0esr/2176-Rebrand-Firefox-to-TorBrowser:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D0903e16cd57b
+
+  31.7.0esr/2872-Limit-the-number-of-fonts-per-document:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D4abfb45bba86
+
+  31.7.0esr/2874-Block-Components.interfaces-from-content:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D91cd13cf0ac7
+
+  31.7.0esr/2875-Limit-device-and-system-specific-CSS-Media-Queries:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D32244f089736
+
+  31.7.0esr/2949-Make-Intermediate-Cert-Store-memory-only:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D139538724d04
+
+  31.7.0esr/2950-Make-Permissions-Manager-memory-only:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D3f8cb0c1984e
+
+  31.7.0esr/3229-Make-content-pref-service-memory-only-clearable:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D344873ae1513
+
+  31.7.0esr/3547-Block-all-plugins-except-flash:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3Dc75fb4685994
+
+  31.7.0esr/3875-Use-Optimistic-Data-SOCKS-variant:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3Db22d40acd7d8
+
+  31.7.0esr/4755-Return-client-window-coordinates-for-mouse-event-screenX-Y:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D588ef3e16aca
+
+  31.7.0esr/5282-Randomize-HTTP-request-order-and-pipeline-depth:
+    Not submitted yet
+
+  31.7.0esr/5715-Make-nsICacheService.EvictEntries-synchronous:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D4347c535ef41
+
+  31.7.0esr/5741-Prevent-WebSocket-DNS-leak:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D155752f22aa0
+
+  31.7.0esr/5742-API-allows-you-to-get-the-url-bar-URI-for-a-channel-or-nsI=
+Document:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D7334c7aafc24
+
+  31.7.0esr/5856-Do-not-expose-physical-screen-info-via-window-window.scree=
+n:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D875cbad7b056
+
+  31.7.0esr/6253-Add-canvas-image-extraction-prompt:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D1dc12a786a61
+
+  31.7.0esr/6539-Isolate-the-Image-Cache-per-url-bar-domain:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D0e2601a370f6
+
+  31.7.0esr/6564-Isolate-DOM-storage-to-first-party-URI:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D9fb0ae49608b
+
+  31.7.0esr/6786-Do-not-expose-system-colors-to-CSS-or-canvas:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D6a15e63167d5
+
+  31.7.0esr/8312-Remove-This-plugin-is-disabled-barrier:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D17f9a6c28f68
+
+  31.7.0esr/9173-Change-the-default-Firefox-profile-directory-to-be-TBB-rel=
+ative:
+    Not submitted yet
+
+  31.7.0esr/9701-Prevent-ClipBoardCache-from-writing-to-disk:
+    Not submitted yet
+
+  31.7.0esr/9837-Disable-uninstall-helper.exe-on-Win32:
+    Will not be submitted
+
+  31.7.0esr/Omnibox-Add-DDG-Startpage-Disconnect-Youtube-Twitter-remove-Ama=
+zon-eBay-bing:
+    Not submitted yet
+
+  31.7.0esr/TB2-Provide-an-observer-event-to-close-persistent-connections:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D93af45d5111a
+
+  31.7.0esr/base:
+    https://treeherder.mozilla.org/#/jobs?repo=3Dtry&revision=3D5bbe47119ac0
+
+  31.7.0esr/enable-browser.ini:
+    Will not be submitted
+
+  31.7.0esr/enable-mochitest.ini:
+    Will not be submitted
+
+  31.7.0esr/mingw-fixes:
+    Not submitted yet
+
+  31.7.0esr/mozconfigs:
+    Will not be submitted
+
+  31.7.0esr/preference-overrides:
+    Not submitted yet
+
+  31.7.0esr/test-branch:
+    Not submitted yet
+
+
+--enLffk0M6cffIOOh
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVbJ6uAAoJECBnABsbZ4pjNRkQAIBR//khySc483+IByUzk+O/
+gWG2bEy3GAQqBn90sHwGRsphX5iis7f21vUtEMro+brdEYvfMTZXJKgkouIe/8Mk
+vyp5AvSoVlk2NnxcWuAzRe4AktMbWf2v0pPaaUIIHZSWCSaRj/nlCQZUGJHWCzax
+dl/36ejybOYUuUzcffCzw5d2p90NyyufbHE2zx0dUBbuk05FsI/gb0hhtolI7p+N
+mXoqDDgBRxiz3Yxv/w48lZA0HGeW+WZq8E0oCNZnBU8v+H6IQw088djO978+fv4y
+bo5TNoKe4oWLoq8b7YAQFRTLtLO8SuFRXraaYk1EevefE7B/EGV6X8s3UBAbCu66
+qVVN2uvpKojvp98ccgIUCiCZ6UR0HG9d4Ig8PkAf8lxoUvEAddMDMVMguQ2oHxdX
+KdHKXHjKxi87nlY61DzXpSerAfMw4twRwfAGHkVY1BYc36wpB/e4WiSjB9jPf0lL
+QfpCgayReQYniRZdqpQHnpgVqP9NDIdLx1qM2mLnEQBhoSnymFoCEzSTyj4UYku2
+zVifs+6lL0RyQn0cQlWLSB5w7x16YV6EfMzg3XKShcREbH5Ph3z1jEJOH7Zns/cq
+X9yl/LLUXRC8LBZktbRmAGMA+CinljnZYVR2eVKrq9M2S0n9fxecMEWayftqZTwh
+Vwb+gzUVM6cd+2Fm7Pqv
+=Tk02
+-----END PGP SIGNATURE-----
+
+--enLffk0M6cffIOOh--
+
+--===============0081692057193312233==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+tbb-dev mailing list
+tbb-dev@lists.torproject.org
+https://lists.torproject.org/cgi-bin/mailman/listinfo/tbb-dev
+
+--===============0081692057193312233==--

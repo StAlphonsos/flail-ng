@@ -1,0 +1,283 @@
+Return-Path: <owner-ports+M73402@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 65069 invoked from network); 28 May 2015 03:39:23 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 28 May 2015 03:39:23 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4S3dDnv001145;
+	Wed, 27 May 2015 21:39:13 -0600 (MDT)
+Received: from mail-ie0-f179.google.com (mail-ie0-f179.google.com [209.85.223.179])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4S3cutx018334
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES128-SHA bits=128 verify=FAIL)
+	for <ports@openbsd.org>; Wed, 27 May 2015 21:38:56 -0600 (MDT)
+Received: by iepj10 with SMTP id j10so28959023iep.3
+        for <ports@openbsd.org>; Wed, 27 May 2015 20:38:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=message-id:date:from:user-agent:mime-version:to:subject
+         :content-type;
+        bh=+mWNLaiQpFQYDP6VPgswpgH5BRU2sLACNDyXIh/tS8w=;
+        b=tLZOWoBpz2GvJvK5UxiRTxhUnGCgcGDLVUHfoYidPrqAZoR45fA+7QtdycAH5+UFht
+         P4VVwmkx67jbBi0LVjRaSZz9q0IOUytKoOnR6I39bMt/NsH82OyoA/3umeRspOsPwv+h
+         4MLo/OqufivUGGdAeM7FNJkF3LT7nTGkOjeOKbnhtMaa4tx19fOE6gy7ttQ+CJrXYxPa
+         LuBJxZpGRTGIGX93V9e7Ro5sAhQgnwiv8eHpT2/bgl9UPGSzyBxSDlPHn65d4q2hsuYd
+         HUDHUJPRhefejFOvirJwEqT3UiG5P/uBVXra8Icbk4CLWnglnpBKcNaFe7dSpPJ2hAWy
+         7mzQ==
+X-Received: by 10.107.28.146 with SMTP id c140mr786366ioc.67.1432784335866;
+        Wed, 27 May 2015 20:38:55 -0700 (PDT)
+Received: from sarah.mthl.co.uk ([108.63.185.58])
+        by mx.google.com with ESMTPSA id fs5sm12180405igb.0.2015.05.27.20.38.54
+        for <ports@openbsd.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 May 2015 20:38:55 -0700 (PDT)
+Message-ID: <55668DCD.2050004@gmail.com>
+Date: Wed, 27 May 2015 23:38:53 -0400
+From: Michael Lesniewski <lesniewskister@gmail.com>
+User-Agent: Mozilla/5.0 (X11; OpenBSD amd64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+MIME-Version: 1.0
+To: ports@openbsd.org
+Subject: UPDATE: net/synergy 1.6.2 => 1.7.3
+Content-Type: multipart/mixed;
+ boundary="------------090708000900060209040505"
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+This is a multi-part message in MIME format.
+--------------090708000900060209040505
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Hi ports,
+Attached is an update to the latest version of synergy.
+Dependency on cryptopp is dropped as upstream no longer uses it.
+Upstream also has changed the filename format of tarballs, comments on 
+how this has been implemented in the diff are welcome.
+Tested on amd64 to Win 7.
+Have tested to try and ensure diff applies correctly, fingers crossed I 
+did it ok this time.
+Any other comments/suggestions welcome.
+
+--------------090708000900060209040505
+Content-Type: text/x-patch;
+ name="synergy-1.7.3.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="synergy-1.7.3.diff"
+
+Index: Makefile
+===================================================================
+RCS file: /cvs/ports/net/synergy/Makefile,v
+retrieving revision 1.28
+diff -u -p -r1.28 Makefile
+--- Makefile	5 Apr 2015 13:31:14 -0000	1.28
++++ Makefile	28 May 2015 02:46:45 -0000
+@@ -3,12 +3,13 @@
+ COMMENT=		mouse and keyboard sharing utility
+ 
+ DISTNAME=		synergy-${GH_TAGNAME}
+-REVISION=		0
++PKGNAME=		synergy-${V}
+ CATEGORIES=		net x11
+ 
+ GH_ACCOUNT=		synergy
+ GH_PROJECT=		synergy
+-GH_TAGNAME=		1.6.2
++GH_TAGNAME=		v${V}-stable
++V=			1.7.3
+ 
+ HOMEPAGE=		http://synergy-foss.org/
+ 
+@@ -16,10 +17,9 @@ HOMEPAGE=		http://synergy-foss.org/
+ PERMIT_PACKAGE_CDROM=	Yes
+ 
+ WANTLIB=		ICE SM X11 Xext Xi Xinerama Xrandr Xtst \
+-			c cryptopp curl m pthread stdc++
++			c curl m pthread stdc++
+ 
+-LIB_DEPENDS=		devel/cryptopp \
+-			net/curl
++LIB_DEPENDS=		net/curl
+ 
+ MODULES=		devel/cmake
+ 
+Index: distinfo
+===================================================================
+RCS file: /cvs/ports/net/synergy/distinfo,v
+retrieving revision 1.11
+diff -u -p -r1.11 distinfo
+--- distinfo	3 Jan 2015 04:59:27 -0000	1.11
++++ distinfo	28 May 2015 01:58:30 -0000
+@@ -1,2 +1,2 @@
+-SHA256 (synergy-1.6.2.tar.gz) = NsCiyeocOhOmE0zh52rY3S9EIQDdYHXFPzGzmdJUO6M=
+-SIZE (synergy-1.6.2.tar.gz) = 4411385
++SHA256 (synergy-v1.7.3-stable.tar.gz) = a4effc3ddb0ef6de95f83fa62b5290e2909f8b76729b1bde89c5061e5d381e25
++SIZE (synergy-v1.7.3-stable.tar.gz) = 13661943
+Index: patches/patch-CMakeLists_txt
+===================================================================
+RCS file: /cvs/ports/net/synergy/patches/patch-CMakeLists_txt,v
+retrieving revision 1.7
+diff -u -p -r1.7 patch-CMakeLists_txt
+--- patches/patch-CMakeLists_txt	3 Jan 2015 04:59:27 -0000	1.7
++++ patches/patch-CMakeLists_txt	28 May 2015 01:58:30 -0000
+@@ -10,7 +10,7 @@ $OpenBSD: patch-CMakeLists_txt,v 1.7 201
+  
+  	# For config.h, detect the libraries, functions, etc.
+  	include(CheckIncludeFiles)
+-@@ -98,7 +98,7 @@ if (UNIX)
++@@ -102,7 +102,7 @@ if (UNIX)
+  	check_include_files(strings.h HAVE_STRINGS_H)
+  	check_include_files(string.h HAVE_STRING_H)
+  	check_include_files(sys/select.h HAVE_SYS_SELECT_H)
+@@ -19,7 +19,7 @@ $OpenBSD: patch-CMakeLists_txt,v 1.7 201
+  	check_include_files(sys/stat.h HAVE_SYS_STAT_H)
+  	check_include_files(sys/time.h HAVE_SYS_TIME_H)
+  	check_include_files(sys/utsname.h HAVE_SYS_UTSNAME_H)
+-@@ -109,7 +109,6 @@ if (UNIX)
++@@ -113,7 +113,6 @@ if (UNIX)
+  	check_function_exists(gmtime_r HAVE_GMTIME_R)
+  	check_function_exists(nanosleep HAVE_NANOSLEEP)
+  	check_function_exists(poll HAVE_POLL)
+@@ -27,7 +27,7 @@ $OpenBSD: patch-CMakeLists_txt,v 1.7 201
+  	check_function_exists(strftime HAVE_STRFTIME)
+  	check_function_exists(vsnprintf HAVE_VSNPRINTF)
+  	check_function_exists(inet_aton HAVE_INET_ATON)
+-@@ -152,6 +151,8 @@ if (UNIX)
++@@ -156,6 +155,8 @@ if (UNIX)
+  		message(FATAL_ERROR "Missing library: pthread")
+  	endif()
+  
+@@ -36,7 +36,7 @@ $OpenBSD: patch-CMakeLists_txt,v 1.7 201
+  	# curl is used on both Linux and Mac
+  	find_package(CURL)
+  	if (CURL_FOUND)
+-@@ -196,78 +197,60 @@ if (UNIX)
++@@ -200,78 +201,60 @@ if (UNIX)
+  
+  	else() # not-apple
+  
+@@ -151,11 +151,3 @@ $OpenBSD: patch-CMakeLists_txt,v 1.7 201
+  
+  	endif()
+  
+-@@ -319,7 +302,6 @@ else() # not-unix
+- endif()
+- 
+- add_subdirectory(src)
+--add_subdirectory(ext)
+- 
+- if (WIN32)
+- 	# TODO:	consider using /analyze to uncover potential bugs in the source code.
+Index: patches/patch-src_lib_arch_CMakeLists_txt
+===================================================================
+RCS file: patches/patch-src_lib_arch_CMakeLists_txt
+diff -N patches/patch-src_lib_arch_CMakeLists_txt
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ patches/patch-src_lib_arch_CMakeLists_txt	28 May 2015 01:58:30 -0000
+@@ -0,0 +1,8 @@
+++++ src/lib/arch/CMakeLists.txt      Wed May 27 18:13:50 2015
++@@ -50,5 +50,5 @@
++ add_library(arch STATIC ${sources})
++
++ if (UNIX)
++-       target_link_libraries(arch dl ${libs})
+++       target_link_libraries(arch ${libs})
++ endif()
+Index: patches/patch-src_lib_io_CryptoMode_cryptopp_h
+===================================================================
+RCS file: patches/patch-src_lib_io_CryptoMode_cryptopp_h
+diff -N patches/patch-src_lib_io_CryptoMode_cryptopp_h
+--- patches/patch-src_lib_io_CryptoMode_cryptopp_h	1 May 2014 14:46:53 -0000	1.1
++++ /dev/null	1 Jan 1970 00:00:00 -0000
+@@ -1,13 +0,0 @@
+-$OpenBSD: patch-src_lib_io_CryptoMode_cryptopp_h,v 1.1 2014/05/01 14:46:53 bcallah Exp $
+---- src/lib/io/CryptoMode_cryptopp.h.orig	Tue Apr 15 22:33:00 2014
+-+++ src/lib/io/CryptoMode_cryptopp.h	Tue Apr 15 22:33:25 2014
+-@@ -25,6 +25,6 @@
+- #	pragma GCC system_header
+- #endif 
+- 
+--#include <cryptopp562/gcm.h>
+--#include <cryptopp562/modes.h>
+--#include <cryptopp562/aes.h>
+-+#include <cryptopp/gcm.h>
+-+#include <cryptopp/modes.h>
+-+#include <cryptopp/aes.h>
+Index: patches/patch-src_lib_io_CryptoStream_cryptopp_h
+===================================================================
+RCS file: patches/patch-src_lib_io_CryptoStream_cryptopp_h
+diff -N patches/patch-src_lib_io_CryptoStream_cryptopp_h
+--- patches/patch-src_lib_io_CryptoStream_cryptopp_h	1 May 2014 14:46:53 -0000	1.1
++++ /dev/null	1 Jan 1970 00:00:00 -0000
+@@ -1,11 +0,0 @@
+-$OpenBSD: patch-src_lib_io_CryptoStream_cryptopp_h,v 1.1 2014/05/01 14:46:53 bcallah Exp $
+---- src/lib/io/CryptoStream_cryptopp.h.orig	Tue Apr 15 22:34:13 2014
+-+++ src/lib/io/CryptoStream_cryptopp.h	Tue Apr 15 22:34:21 2014
+-@@ -25,5 +25,5 @@
+- #	pragma GCC system_header
+- #endif
+- 
+--#include <cryptopp562/osrng.h>
+--#include <cryptopp562/sha.h>
+-+#include <cryptopp/osrng.h>
+-+#include <cryptopp/sha.h>
+Index: patches/patch-src_lib_server_ClientProxy1_4_cpp
+===================================================================
+RCS file: patches/patch-src_lib_server_ClientProxy1_4_cpp
+diff -N patches/patch-src_lib_server_ClientProxy1_4_cpp
+--- patches/patch-src_lib_server_ClientProxy1_4_cpp	3 Jan 2015 04:59:27 -0000	1.2
++++ /dev/null	1 Jan 1970 00:00:00 -0000
+@@ -1,15 +0,0 @@
+-$OpenBSD: patch-src_lib_server_ClientProxy1_4_cpp,v 1.2 2015/01/03 04:59:27 bcallah Exp $
+---- src/lib/server/ClientProxy1_4.cpp.orig	Mon Dec 22 16:18:26 2014
+-+++ src/lib/server/ClientProxy1_4.cpp	Mon Dec 22 16:19:16 2014
+-@@ -83,7 +83,11 @@ ClientProxy1_4::cryptoIv()
+- 	String data(reinterpret_cast<const char*>(iv), CRYPTO_IV_SIZE);
+- 
+- 	LOG((CLOG_DEBUG2 "send crypto iv change to \"%s\"", getName().c_str()));
+-+#if defined(__mips64__) || defined(__sparc64__) || defined(__hppa__)
+-+	ProtocolUtil::writef(static_cast<void*>(getStream()), static_cast<const char*>(kMsgDCryptoIv), &data);
+-+#else
+- 	ProtocolUtil::writef(getStream(), kMsgDCryptoIv, &data);
+-+#endif
+- 	
+- 	// change IV only after we've sent the current IV, otherwise
+- 	// the client won't be able to decrypt the new IV.
+Index: patches/patch-src_test_CMakeLists_txt
+===================================================================
+RCS file: patches/patch-src_test_CMakeLists_txt
+diff -N patches/patch-src_test_CMakeLists_txt
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ patches/patch-src_test_CMakeLists_txt	28 May 2015 01:58:30 -0000
+@@ -0,0 +1,22 @@
+++++ src/test/CMakeLists.txt
++@@ -14,20 +14,5 @@
++ # You should have received a copy of the GNU General Public License
++ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ 
++-include_directories(
++-	../../ext/gtest-1.6.0
++-	../../ext/gtest-1.6.0/include
++-	../../ext/gmock-1.6.0
++-	../../ext/gmock-1.6.0/include)
++-	
++-add_library(gtest STATIC ../../ext/gtest-1.6.0/src/gtest-all.cc)
++-add_library(gmock STATIC ../../ext/gmock-1.6.0/src/gmock-all.cc)
++-
++-if (UNIX)
++-	# ignore warnings in gtest and gmock
++-	set_target_properties(gtest PROPERTIES COMPILE_FLAGS "-w")
++-	set_target_properties(gmock PROPERTIES COMPILE_FLAGS "-w")
++-endif()
++-
++ add_subdirectory(integtests)
++ add_subdirectory(unittests)
+
+--------------090708000900060209040505--
+

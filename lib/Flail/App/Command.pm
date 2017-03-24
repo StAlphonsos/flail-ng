@@ -23,8 +23,8 @@ ISC/BSD; see LICENSE file in source distribution.
 =cut
 
 package Flail::App::Command;
-use App::Cmd::Setup -command;
 use Moose;
+use App::Cmd::Setup -command;
 use Flail::Sink;
 use Flail::Config;
 

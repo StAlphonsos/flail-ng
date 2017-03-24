@@ -1,0 +1,72 @@
+Return-Path: <owner-ports+M73459@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 21777 invoked from network); 2 Jun 2015 09:47:52 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 09:47:52 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t529kqB5019535;
+	Tue, 2 Jun 2015 03:46:52 -0600 (MDT)
+Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com [209.85.212.178])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t529kdAJ013223
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES128-SHA bits=128 verify=FAIL)
+	for <ports@openbsd.org>; Tue, 2 Jun 2015 03:46:40 -0600 (MDT)
+Received: by wiwd19 with SMTP id d19so13299377wiw.0
+        for <ports@openbsd.org>; Tue, 02 Jun 2015 02:46:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-type:content-disposition:in-reply-to:user-agent;
+        bh=9+bbmPHOLaycx5Yc8fiUh0eEywHyHPadoW1Srhxlu7E=;
+        b=vMtj5pEaMOXXB2eE3helbzNsNud2voih4ajhglSIBY/sVXT+jND/Q4uU0ru4prAc2e
+         e56mpmJhIob2G+xKmJvjuwWuGbq3JO5PRtAhJudbDBE5kLS6WIv/4M79x7KYvHqqZegs
+         /GbbDAG8G+NkNWqtDmvpVUzyjQIONSjspkxXsqT5mkhDreD0tZ7YEQlmm+gRUJB8pk7o
+         Z4feQRo+9N3ETGLx2hKKp3XcD4wxxC6mjIhuMA1YykwCIKch4h19WV8bWBGIwHcg4B2T
+         6065uTuS9rgOM3W1HHBm5RcH47y5/RzD5bia+itUSC6Ec/7AKFIq84SZR9JW7FBXsg5k
+         QVIA==
+X-Received: by 10.180.198.166 with SMTP id jd6mr28563818wic.48.1433238398847;
+        Tue, 02 Jun 2015 02:46:38 -0700 (PDT)
+Received: from e325.bedova.me ([37.122.176.176])
+        by mx.google.com with ESMTPSA id w11sm25943615wjr.48.2015.06.02.02.46.37
+        for <ports@openbsd.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Jun 2015 02:46:38 -0700 (PDT)
+Received: from localhost (e325.bedova.me [local])
+	by e325.bedova.me (OpenSMTPD) with ESMTPA id 6b810287
+	for <ports@openbsd.org>;
+	Tue, 2 Jun 2015 11:46:16 +0200 (CEST)
+Date: Tue, 2 Jun 2015 11:46:16 +0200
+From: "Dmitrij D. Czarkoff" <czarkoff@gmail.com>
+To: ports@openbsd.org
+Subject: Re: [NEW] devel/govet - lint like tool for lang/go
+Message-ID: <20150602094616.GB31966@e325.bedova.me>
+References: <20150522211956.28898847@napalm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20150522211956.28898847@napalm>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+Adam Wolk said:
+> Tested on amd64 -current snapshot from May 20. The package is based
+> on devel/gocover.
+
+I believe it should be called go-vet, not govet.  The actual tool is
+called "vet", and the "go" prefix denotes that it is installed to
+subdirectory of ${LOCALBASE}/go instead of ${LOCALBASE}/bin.  As
+evidenced in haskell, perl, python and ruby ports, we separate prefixes
+with dash.
+
+Same applied to gocover.
+
+-- 
+Dmitrij D. Czarkoff
+

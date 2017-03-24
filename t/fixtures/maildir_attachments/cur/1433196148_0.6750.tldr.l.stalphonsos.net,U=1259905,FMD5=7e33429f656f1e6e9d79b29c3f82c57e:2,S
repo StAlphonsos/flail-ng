@@ -1,0 +1,116 @@
+Return-Path: <owner-ports+M73412@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 91665 invoked from network); 28 May 2015 14:46:21 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 28 May 2015 14:46:21 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SEew9g027854;
+	Thu, 28 May 2015 08:40:58 -0600 (MDT)
+Received: from mail-ig0-f180.google.com (mail-ig0-f180.google.com [209.85.213.180])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SEelbo009410
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES128-SHA bits=128 verify=FAIL)
+	for <ports@openbsd.org>; Thu, 28 May 2015 08:40:48 -0600 (MDT)
+Received: by igbjd9 with SMTP id jd9so25638732igb.1
+        for <ports@openbsd.org>; Thu, 28 May 2015 07:40:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to
+         :content-type;
+        bh=yOY+BUDD1qBfT/efXy4ppLBmEsrZrlbDh24phfQlDhk=;
+        b=a4gfSOAQLBk1LQlMJQG9+/5gLONPiAqSkFDnwbpMJA/EPHdEnM3gKBLHKT7M7z4kt3
+         3SzipDtq594QZW6xq0B+8+6cMi9qSWuUaue6n/oWqWzqIEp6TyWzDJCQoZ5rkCJNUiTY
+         /bPd31FeNb6y9jxUNBBQ2pT4KL7FXPArhrG+P+Cwn4sDBhgxCw5yzZ5/MvJuHe0rbqfH
+         FuiZbyO+YikwCZ0ThigRaE5alOMjRGl6GY1/izNlCfZGIc5uBYaXMqznuZ45vFnxOqPQ
+         MV2LcM9EZFJzlAQ25UrJcPgwQjQTd1J8ihvU4O1Cq3ADYAe17gfRcxqUayyExHBJqvg1
+         x/UQ==
+X-Gm-Message-State: ALoCoQkYyNs8TsoYItZs326l44DDm0gN8v3WDmr8Elid7A2W4eznGuyrJlZkppLYWWQ4dGQVXCWJ
+MIME-Version: 1.0
+X-Received: by 10.50.109.138 with SMTP id hs10mr11773989igb.48.1432824047654;
+ Thu, 28 May 2015 07:40:47 -0700 (PDT)
+Received: by 10.64.121.99 with HTTP; Thu, 28 May 2015 07:40:47 -0700 (PDT)
+Date: Thu, 28 May 2015 07:40:47 -0700
+Message-ID: <CAOhL9ALzr3hZAqe14RicSUQrYYO2eTW0na+DOoUzbKpsyrhq6w@mail.gmail.com>
+Subject: [NEW] math/jags - Just Another Gibbs Sampler (Bayesian inference)
+From: Peter Schmiedeskamp <peter@thoughtspot.net>
+To: ports@openbsd.org
+Content-Type: multipart/mixed; boundary=089e0122e6aa637b060517255805
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+--089e0122e6aa637b060517255805
+Content-Type: text/plain; charset=UTF-8
+
+Hi all,
+
+Taking a crack at my second port--everything appears to be working,
+and I'd appreciate testing!
+
+I do have some questions about the ports fortran infrastructure
+though. There was a discussion several years ago about default fortran
+compilers, and whether g77 might be just a legacy holdover.
+http://marc.info/?l=openbsd-ports&m=132031647401170&w=2
+
+I was unable to build this with gfortran, apparently because of issues
+mixing gfortran with math/blas and math/lapack, which are compiled
+with g77. Is there a reason why the various fortran-using scientific
+ports haven't switched to gfortran?
+
+On a related note, make lib-depends-check on my port returns "Extra:
+g2c.8". I think this is a function of including the fortran module and
+requiring g77. Any thoughts on how / whether to clean that issue up?
+
+Best,
+Peter
+
+--089e0122e6aa637b060517255805
+Content-Type: application/x-gzip; name="jags.tgz"
+Content-Disposition: attachment; filename="jags.tgz"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ia8a2jdq0
+
+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
++B8AT/5eAFAAAA==
+--089e0122e6aa637b060517255805--
+

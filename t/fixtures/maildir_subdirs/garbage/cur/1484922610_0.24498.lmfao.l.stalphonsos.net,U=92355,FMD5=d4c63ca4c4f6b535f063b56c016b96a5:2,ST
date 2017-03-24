@@ -1,0 +1,172 @@
+Return-Path: george@ceetonetechnology.com
+Delivered-To: attila@stalphonsos.com
+Received: from feynman.konjz.org (mx1.konjz.org [64.147.119.39])
+	by mail.stalphonsos.net (OpenSMTPD) with ESMTP id f2ed26ea
+	for <attila@stalphonsos.com>;
+	Thu, 19 Jan 2017 11:34:22 -0500 (EST)
+Received: from [127.0.0.1] ([162.220.246.230])
+	(authenticated bits=0)
+	by feynman.konjz.org (8.14.7/8.14.4) with ESMTP id v0JGvYXm082823
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO);
+	Thu, 19 Jan 2017 11:57:37 -0500 (EST)
+	(envelope-from george@ceetonetechnology.com)
+To: Zeyd Rahman <zeyd_rahman@yahoo.com>, attila <attila@stalphonsos.com>
+Cc: Margaret McCaffery <mcmccaffery@gmail.com>
+From: George Rosamond <george@ceetonetechnology.com>
+Subject: Notes
+Message-ID: <5d1f10b2-f6cc-2100-943a-5b4d0363b1c5@ceetonetechnology.com>
+Date: Thu, 19 Jan 2017 16:34:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="4SR0s9AOpwxNLwHQmSnJp2VUXX9Jxvbb2"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4SR0s9AOpwxNLwHQmSnJp2VUXX9Jxvbb2
+Content-Type: multipart/mixed; boundary="wk9ScaTLODRgJQDGAxrikPGQkRFMMdmIe";
+ protected-headers="v1"
+From: George Rosamond <george@ceetonetechnology.com>
+To: Zeyd Rahman <zeyd_rahman@yahoo.com>, attila <attila@stalphonsos.com>
+Cc: Margaret McCaffery <mcmccaffery@gmail.com>
+Message-ID: <5d1f10b2-f6cc-2100-943a-5b4d0363b1c5@ceetonetechnology.com>
+Subject: Notes
+
+--wk9ScaTLODRgJQDGAxrikPGQkRFMMdmIe
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+These are the notes from last week's meeting.
+
+Zeyd: can you do next Thursday 1/26 10 AM for the next one?  Same place.
+
+Caroline is getting an OpenOPS domain, which allows us to start the
+infrastructure buildout, including email.
+
+Caroline is also working on the equity agreements.  Yes, she has a lot
+on her plate :)
+
+Comments/questions/changes from below appreciated...
+
+Topics of Discussion:
+
+=C2=B7      What we are (reporting entity, with other potential direction=
+s)
+
+=E2=80=9CWe collect data on the companies that collect data about users.=E2=
+=80=9D =E2=80=93
+Caroline=E2=80=99s tag line.
+
+
+
+=C2=B7      Our audience of =E2=80=9Cusers=E2=80=9D =E2=80=93 privacy pro=
+fessionals, sales team. Can see
+a scenario where a sales team associate sends a pdf of our report on thei=
+r
+own company to a potential customer as an attempt to show their security
+practices. It helps because then the sales team doesn=E2=80=99t have to w=
+ait for
+the big security questionnaire to come in and then work with engineers at=
+
+their company to fill it out.
+
+=C2=B7      Who is our customer and who are we selling to? Chief Privacy
+Officer? We sell to the commercial side.
+
+=C2=B7      The general approach:
+The general timeline (?) =E2=80=93 IAPP is where we should be selling. Th=
+ey have a
+big conference in April but that may be too quick to have a few customers=
+
+already using the product. Aim for their big conference in the Fall? Migh=
+t
+be better because it is their privacy & security conference. The icon we
+use is placed on any company we report on or who uses us but it is not a
+signal of being certified by us. On the contrary, we report on companies
+security practices. If they are missing an SSL cert, for example, we repo=
+rt
+on that, but we aren=E2=80=99t drawing any conclusions that this means th=
+ey are not
+secure.
+
+=C2=B7      Name =E2=80=93 what terms get us to a name:
+
+o   {privacy,policy}hound  # i mean either of those: privacyhound,
+policyhound
+{privacy,policy}sniff
+{privacy,policy}stance
+{privacy,policy}canary
+{privacy,policy}monitor
+{privacy,policy}vision
+{privacy,policy}view
+
+o   metacanary
+privacypol
+privpro
+privopticon             # perhaps a bit dystopian
+duedilligencer
+whodoyoutrust
+trustonomicon
+trustorbust
+
+o   PMR... privacy meta-report
+
+o   OpenOPS
+
+o   Data Reporting in Privacy and Security:  DRIPS (added post meeting)
+
+o   Disclose (added post meeting)
+
+=C2=B7      Z's contribution
+
+Make us market ready. Putting together something that tells who we are, w=
+ho
+we want to talk to and helping us take it to the market.
+
+
+
+Send George a security questionnaire
+
+
+
+George mentions the whitepaper we need to start working on =E2=80=9CPriva=
+cy
+Practice Assessments in Open Source Data=E2=80=9D =E2=80=93 would give us=
+ a lot of
+intellectual credibility
+
+
+OpenOPS =3D name for now. We will name it this for now, recognizing that =
+it
+may not be given as much credibility in the security community because of=
+
+its ties to opensource. The thought behind it was actually opensource
+because we are using public data (rather than public source code) to repo=
+rt
+on our customers/ businesses in general.
+
+
+--wk9ScaTLODRgJQDGAxrikPGQkRFMMdmIe--
+
+--4SR0s9AOpwxNLwHQmSnJp2VUXX9Jxvbb2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIyBAEBCgAdFiEE4SllHXHjEk+XHgKHSOBG7xboSCgFAliA6oUACgkQSOBG7xbo
+SCgvjA/2Ka2B9GVAls8ojCXPag/8CYrFsOQgeJcnQb9dFby8Mu4lVKtVddISKjMf
+CIJUhITm6ZcNC+cCPOYe12hYTXqAEEiVev/ErT3xPxXASqMAnZaHu8gfw969E5Vj
+SLqS/3gx63iikGbiFxA4KrX0ct8QRuDMxwleDnMz6/5uTQmz5tlnzVJDMXo3n/Gl
+Lay7ReH9ffSgnzFky/nKe1sm5MIKm5XSat7XYEr/Cj4xTL2kCpWq60FJnDu1YbBm
+uTfO0A2UmOucmsx5cXc0TtZVqMOKEPsNGX+yaXmJiYgfuHY3sCGyFNtPtL0ihPZi
+v47X/qMmm2gmv9Y4JCH4xVQzC9OEKITWJiXqyQBODm1u3lNJbJrfnu3G9UL2zsYx
+NASun0D1y3v1/QplDmCQJSvSmGday6LuGotG+7LEnWBSCBwSkJb7FuPuQXAknQhW
+4/F/a1nEaRCFCsU9h0MTQcjX7p6sVmVkXb1aEPcqLYUe7Bsxz+NDAoByXPepgq35
+4ri1HDdvnKURn5T96tLCtJS+fDNLpX8+CP8g0K2hGho1KA+smBpF0OiKlhA/9xxO
+KqNhx0QVb9Y0udDebYSkOiAMbfDl2Inpy+pxTS1G1xgpJbVYRdhYvpqke8jaMEA1
+5bqiboQj0No1UtQkKsUoCvPY8Jja1nbjoBgurw9XFbjzHxfoOg==
+=DA+f
+-----END PGP SIGNATURE-----
+
+--4SR0s9AOpwxNLwHQmSnJp2VUXX9Jxvbb2--

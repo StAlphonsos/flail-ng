@@ -1,0 +1,69 @@
+Return-Path: <bounces+848413-96e3-attila=stalphonsos.com@sgmail.github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 63598 invoked from network); 28 May 2015 02:51:00 -0000
+Received: from unknown (HELO o3.sgmail.github.com) (192.254.112.98)
+  by x.stalphonsos.net with SMTP; 28 May 2015 02:51:00 -0000
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=github.com; 
+	h=from:reply-to:to:subject:mime-version:content-type:content-transfer-encoding:list-id:list-archive:list-post:list-unsubscribe; 
+	s=s20150108; bh=SMdkxfD2vj+eLikZdoM7mr0lgHI=; b=ZQWRbeFs2m/dQuTI
+	K2ZqnyV3fASgIBWydKKvBbpcpqE2gEskC7+lSnRJNVx8HvqXp4zhn/519R6ZNGLx
+	9h4q0lQBhqmlDOj6gTpyWyzLaU8yu7jHPz4THc4thvoYjOxSK+IG2f5s1JOyIvQm
+	PfxGJ8k5e6mdfnD5BCrdZIkqMPc=
+Received: by filter0344p1mdw1.sendgrid.net with SMTP id filter0344p1mdw1.19651.556609C313
+        2015-05-27 18:15:32.052981107 +0000 UTC
+Received: from github-smtp2a-ext-cp1-prd.iad.github.net (github-smtp2a-ext-cp1-prd.iad.github.net [192.30.253.16])
+	by ismtpd-052 (SG) with ESMTP id 14d9696253c.3628.6bc8b0
+	for <attila@stalphonsos.com>; Wed, 27 May 2015 18:15:31 +0000 (UTC)
+Date: Wed, 27 May 2015 11:15:26 -0700
+From: Prashant Sachdeva <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874bc4466bf2e82910ad9152d60b392e0767c83dfaec92cf00000001117dcbbe92a169ce04dc87f2@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/issues/622@github.com>
+Subject: [mu] offlineimap failed due to bad certificate; no report from mu4e
+ (#622)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_556609bebc6a3_59503fd13944f29c212642";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: sachdevaprash
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874bc4466bf2e82910ad9152d60b392e0767c83dfaec92cf00000001117dcbbe92a169ce04dc87f2@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874bc4466bf2e82910ad9152d60b392e0767c83dfaec92cf00000001117dcbbe92a169ce04dc87f2@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HS5b4mMyZoUHt4e4WYoH6mcR-fDg2ks5oNgE-gaJpZM4EsQws>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+X-SG-EID: qjQWc1ylAbm/hZFLRMwvvCpxtLJJDbaLxl9ZLGi1ddYzm/Pecof1ZzvxRx7Ar2zdZ3NxCt9Wit4cpH
+ EOsuHdmok4EzRTRpy0LGozvlZ/ILNIl4RRo9Cw1zTdNIJZo46vbyFHFHIoU6fnO0Ra1B4TeAr3Zh+w
+ V+H9wz6QfpQ4nDnHYyaaLccc0XcEmN7eT65B
+
+----==_mimepart_556609bebc6a3_59503fd13944f29c212642
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+If offlineimap fails to update email, mu4e should report failure. To reproduce, just change the cert_fingerprint in .offlineimaprc and try to run update in mu4e: mu4e does not return error, even though offlineimap failed.
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/issues/622
+----==_mimepart_556609bebc6a3_59503fd13944f29c212642
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>If offlineimap fails to update email, mu4e should report failure. To reproduce, just change the cert_fingerprint in .offlineimaprc and try to run update in mu4e: mu4e does not return error, even though offlineimap failed.</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/issues/622">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HS-QhwPJbFsuOp2xzyHuwgVOQ89VMks5oNgE-gaJpZM4EsQws.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/issues/622"></link>
+    <meta itemprop="name" content="View Issue"></meta>
+  </div>
+  <meta itemprop="description" content="View this Issue on GitHub"></meta>
+</div>
+
+----==_mimepart_556609bebc6a3_59503fd13944f29c212642--

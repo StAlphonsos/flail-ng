@@ -1,0 +1,85 @@
+Return-Path: <owner-ports+M73457@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 17238 invoked from network); 2 Jun 2015 08:19:07 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 08:19:07 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t528IJH0008706;
+	Tue, 2 Jun 2015 02:18:19 -0600 (MDT)
+Received: from symphytum.spacehopper.org (symphytum.spacehopper.org [82.68.199.130])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t528I7Sm004464
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Tue, 2 Jun 2015 02:18:08 -0600 (MDT)
+Received: from localhost (localhost [127.0.0.1])
+	by symphytum.spacehopper.org (Postfix) with ESMTP id 3m15pk6c4SzBJJy;
+	Tue,  2 Jun 2015 09:18:06 +0100 (BST)
+X-Virus-Scanned: amavisd-new at spacehopper.org
+Received: from symphytum.spacehopper.org ([127.0.0.1])
+	by localhost (symphytum.spacehopper.org [127.0.0.1]) (amavisd-new, port 10026)
+	with LMTP id h9769ERyBD19; Tue,  2 Jun 2015 09:18:01 +0100 (BST)
+Received: by symphytum.spacehopper.org (Postfix, from userid 1000)
+	id 3m15pd1mG9zBJJt; Tue,  2 Jun 2015 09:18:01 +0100 (BST)
+Date: Tue, 2 Jun 2015 09:18:01 +0100
+From: Stuart Henderson <sthen@openbsd.org>
+To: Adam Wolk <adam.wolk@tintagel.pl>
+Cc: ports@openbsd.org, "Dmitrij D. Czarkoff" <czarkoff@gmail.com>
+Subject: Re: [NEW] devel/govet - lint like tool for lang/go
+Message-ID: <20150602081801.GH15218@symphytum.spacehopper.org>
+Mail-Followup-To: Adam Wolk <adam.wolk@tintagel.pl>, ports@openbsd.org,
+	"Dmitrij D. Czarkoff" <czarkoff@gmail.com>
+References: <20150522211956.28898847@napalm>
+ <20150526081215.GC15218@symphytum.spacehopper.org>
+ <20150602011040.14983976@inferno>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20150602011040.14983976@inferno>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+On 2015/06/02 01:10, Adam Wolk wrote:
+> On Tue, 26 May 2015 09:12:15 +0100
+> Stuart Henderson <sthen@openbsd.org> wrote:
+> 
+> > On 2015/05/22 21:19, Adam Wolk wrote:
+> > > Hi ports@,
+> > > 
+> > > $ cat
+> > > govet/pkg/DESCR Vet examines Go source code and reports suspicious
+> > > constructs, such as Printf calls whose arguments do not align with
+> > > the format string.
+> > > 
+> > > Vet uses heuristics that do not guarantee all reports are genuine
+> > > problems, but it can find errors not caught by the compilers.
+> > 
+> > This is OK sthen@ to import.
+> > 
+> > > I would also like to ask anyone that has the time to update
+> > > MAINTAINER on my other ports
+> > >  - www/otter-browser
+> > >  - devel/gocover
+> > > 
+> > > an email address change from adam.wolk@koparo.com to
+> > > adam.wolk@tintagel.pl which is my private email address.
+> > 
+> > I'm not at a machine I can commit from atm, if I forget and nobody
+> > else has done it, please drop me a reminder.
+> 
+> Ping.
+
+Ah sorry I forgot; now committed.
+
+> Including Dmitrij in CC as he is working on things related to lang/go
+> based ports hence committing the port as is might impact his WIP.
+
+I'm happy to import govet and then we can make any changes to adapt
+to go.port.mk changes as necessary.
+

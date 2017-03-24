@@ -1,0 +1,148 @@
+Return-Path: <owner-ports+M73463@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 34928 invoked from network); 2 Jun 2015 14:20:57 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 14:20:57 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52EKOlM022165;
+	Tue, 2 Jun 2015 08:20:24 -0600 (MDT)
+Received: from mail.bas3.de (mail.bas3.de [217.197.91.156])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t52EKAJC005338
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Tue, 2 Jun 2015 08:20:12 -0600 (MDT)
+Message-ID: <556DBB96.10800@pappanoa.de>
+Date: Tue, 02 Jun 2015 16:20:06 +0200
+From: Guenther Niess <niess@pappanoa.de>
+MIME-Version: 1.0
+To: ports@openbsd.org
+Subject: OpenMP in GCC
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+Hi,
+I wanted to compile and run a small simulation with OpenMP and applied
+the patch below to compile gcc 4.9 with libgomp. It seems very
+straightforward so I'm wondering why it is disabled in ports?
+
+I run a make test and what I can see the openmp test seems to have no
+problem..
+
+Running
+/home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/format/format.exp
+...
+Running
+/home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/gomp/gomp.exp ...
+Running
+/home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/graphite/graphite.exp
+...
+Running
+/home/ports/obj/gcc-4.9.2/gcc-4.9.2/gcc/testsuite/gcc.dg/guality/guality.exp
+...
+
+
+Regards
+
+
+Index: lang/gcc/4.9/Makefile
+===================================================================
+RCS file: /cvs/ports/lang/gcc/4.9/Makefile,v
+retrieving revision 1.13
+diff -u -p -r1.13 Makefile
+--- lang/gcc/4.9/Makefile	22 May 2015 11:31:16 -0000	1.13
++++ lang/gcc/4.9/Makefile	2 Jun 2015 14:03:13 -0000
+@@ -50,6 +50,7 @@ SHARED_LIBS =	estdc++		17.0 \
+ 		ssp		4.0 \
+ 		lto_plugin      3.0 \
+ 		go		3.0 \
++		gomp		1.0 \
+ 		itm		2.0 \
+ 		atomic		1.0 \
+ 		quadmath	1.0 \
+@@ -146,7 +147,6 @@ CONFIGURE_ARGS += \
+ 	--disable-nls  \
+ 	--with-system-zlib \
+ 	--disable-libmudflap \
+-	--disable-libgomp \
+ 	--disable-tls \
+ 	--with-as=/usr/bin/as \
+ 	--with-ld=/usr/bin/ld \
+@@ -189,6 +189,12 @@ PKG_ARGS += -D${MACHINE_ARCH}=1
+ PKG_ARGS += -DX86=1
+ .else
+ PKG_ARGS += -DX86=0
++.endif
++
++.if ${MACHINE_ARCH} == "amd64" || ${MACHINE_ARCH} == "i386"
++PKG_ARGS += -DGOMP=1
++.else
++PKG_ARGS +=-DGOMP=0
+ .endif
+
+ .if ${MACHINE_ARCH} == "alpha" || ${MACHINE_ARCH} == "arm" || \
+Index: lang/gcc/4.9/pkg/PFRAG.X86-main
+===================================================================
+RCS file: /cvs/ports/lang/gcc/4.9/pkg/PFRAG.X86-main,v
+retrieving revision 1.1.1.1
+diff -u -p -r1.1.1.1 PFRAG.X86-main
+--- lang/gcc/4.9/pkg/PFRAG.X86-main	26 Jun 2014 16:30:22 -0000	1.1.1.1
++++ lang/gcc/4.9/pkg/PFRAG.X86-main	2 Jun 2015 14:03:13 -0000
+@@ -25,6 +25,7 @@ lib/gcc/${CONFIG}/${V}/include/mm3dnow.h
+ lib/gcc/${CONFIG}/${V}/include/mm_malloc.h
+ lib/gcc/${CONFIG}/${V}/include/mmintrin.h
+ lib/gcc/${CONFIG}/${V}/include/nmmintrin.h
++lib/gcc/${CONFIG}/${V}/include/omp.h
+ lib/gcc/${CONFIG}/${V}/include/pmmintrin.h
+ lib/gcc/${CONFIG}/${V}/include/popcntintrin.h
+ lib/gcc/${CONFIG}/${V}/include/prfchwintrin.h
+Index: lang/gcc/4.9/pkg/PLIST-libs
+===================================================================
+RCS file: /cvs/ports/lang/gcc/4.9/pkg/PLIST-libs,v
+retrieving revision 1.2
+diff -u -p -r1.2 PLIST-libs
+--- lang/gcc/4.9/pkg/PLIST-libs	3 Feb 2015 20:32:12 -0000	1.2
++++ lang/gcc/4.9/pkg/PLIST-libs	2 Jun 2015 14:03:13 -0000
+@@ -6,5 +6,6 @@
+ @lib lib/libgfortran.so.${LIBgfortran_VERSION}
+ @lib lib/libobjc.so.${LIBobjc_VERSION}
+ %%CILKRTS%%
++%%GOMP%%
+ %%ITM%%
+ %%QUADMATH%%
+Index: lang/gcc/4.9/pkg/PLIST-main
+===================================================================
+RCS file: /cvs/ports/lang/gcc/4.9/pkg/PLIST-main,v
+retrieving revision 1.5
+diff -u -p -r1.5 PLIST-main
+--- lang/gcc/4.9/pkg/PLIST-main	10 Feb 2015 22:04:54 -0000	1.5
++++ lang/gcc/4.9/pkg/PLIST-main	2 Jun 2015 14:03:13 -0000
+@@ -255,6 +255,7 @@ lib/libssp_nonshared.la
+ %%sparc64%%
+ %%CILKRTS%%
+ %%X86%%
++%%GOMP%%
+ %%ITM%%
+ %%QUADMATH%%
+ libexec/gcc/
+--- /dev/null	Tue Jun  2 16:04:54 2015
++++ lang/gcc/4.9/pkg/PFRAG.GOMP-libs	Tue Jun  2 11:31:25 2015
+@@ -0,0 +1,2 @@
++@comment $OpenBSD$
++@lib lib/libgomp.so.${LIBgomp_VERSION}
+--- /dev/null	Tue Jun  2 16:05:02 2015
++++ lang/gcc/4.9/pkg/PFRAG.GOMP-main	Tue Jun  2 11:32:20 2015
+@@ -0,0 +1,5 @@
++@comment $OpenBSD$
++@info info/libgomp.info
++lib/libgomp.a
++lib/libgomp.la
++lib/libgomp.spec
+

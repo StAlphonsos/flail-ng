@@ -4,6 +4,9 @@
 use strict;
 use warnings;
 use Test::More tests => 4;
+use vars qw($NO_MAILDIR);
+
+BEGIN { $NO_MAILDIR = 1; }
 
 use t::lib;
 

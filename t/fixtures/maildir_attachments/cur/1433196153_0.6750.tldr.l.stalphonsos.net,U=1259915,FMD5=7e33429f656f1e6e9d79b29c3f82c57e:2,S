@@ -1,0 +1,124 @@
+Return-Path: <owner-ports+M73413=attila=stalphonsos.com@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 92090 invoked from network); 28 May 2015 14:52:53 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 28 May 2015 14:52:53 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SEqTTw009840
+	for <attila@stalphonsos.com>; Thu, 28 May 2015 08:52:33 -0600 (MDT)
+Received: from mail-ie0-f172.google.com (mail-ie0-f172.google.com [209.85.223.172])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SEqMIm013108
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES128-SHA bits=128 verify=FAIL)
+	for <ports@openbsd.org>; Thu, 28 May 2015 08:52:23 -0600 (MDT)
+Received: by iebgx4 with SMTP id gx4so40165669ieb.0
+        for <ports@openbsd.org>; Thu, 28 May 2015 07:52:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:mime-version:in-reply-to:references:date
+         :message-id:subject:from:to:content-type;
+        bh=8Jz+l/nphtaj9RGJBQ0ghZw+dITGPcNdzRFO3APVrTM=;
+        b=F55+G5q0alWuxZqS3lPNt2k60lrAejq+E/d27FJ013wnuav4KvYMCBv/kg8qTIdC1g
+         dVWwEJlSHsMmF28TVzep4A880iogrNSSNCb+4j+qc6FuL9vG5hSRq6+qPsvIdwmzeFUP
+         VJQ9VQGDPR+UfJ38U8lJ+CG8t1i1o32BjQ/1YabJiGg2U3mEsPfjwn1kdcKJ55ISUby9
+         TcOXU5Qi973BElHCJ0IOtuPImwFost0oQSuKDHDxneLaGQK+/QMX9Cmi2MgjEiJKH+LS
+         chUYtJ7O8LfK3Ub+pYmv8NMUumY/YNAMM7plasDu2NEWQhVduqjKI6/u0G+TXe+l6TFo
+         TSyA==
+X-Gm-Message-State: ALoCoQm9M2frgFeWsMTrc2cft6dK4aYt94r0g/b1qunT4I4uhGNzLxLl3nW/ux/OX0kVLZW8Y41g
+MIME-Version: 1.0
+X-Received: by 10.50.67.146 with SMTP id n18mr6061337igt.40.1432824742222;
+ Thu, 28 May 2015 07:52:22 -0700 (PDT)
+Received: by 10.64.121.99 with HTTP; Thu, 28 May 2015 07:52:22 -0700 (PDT)
+In-Reply-To: <20150528143403.GG15218@symphytum.spacehopper.org>
+References: <CAOhL9AL1RfnMLMhxPZkgMyjmKvs5ULyuin_W4MR=gYmE+H-b9Q@mail.gmail.com>
+	<20150528143403.GG15218@symphytum.spacehopper.org>
+Date: Thu, 28 May 2015 07:52:22 -0700
+Message-ID: <CAOhL9A+YGuSOJqP9-MCKLf6ZaB3zjdeVOWu2oc7wtNMZKXG2Nw@mail.gmail.com>
+Subject: Re: Follow-up osm2pgrouting - Ready for commit?
+From: Peter Schmiedeskamp <peter@thoughtspot.net>
+To: ports@openbsd.org
+Content-Type: multipart/mixed; boundary=047d7bd76734c96f4605172581ec
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+--047d7bd76734c96f4605172581ec
+Content-Type: text/plain; charset=UTF-8
+
+Many thanks for the additional comments. I'm learning... slowly!
+Conveniently, I had an analysis in progress that uses osm2pgrouting,
+and so I was able to make these changes, rebuild, and test the app.
+
+Attached is the updated port that incorporates these edits.
+
+On Thu, May 28, 2015 at 7:34 AM, Stuart Henderson <sthen@openbsd.org> wrote:
+> On 2015/05/27 12:37, Peter Schmiedeskamp wrote:
+>> I think this port is ready for commit, unless anyone has additional corrections!
+>
+> | # $OpenBSD: Makefile.template,v 1.72 2015/04/08 17:53:19 sthen Exp $
+> |
+> | COMMENT =             convert OSM data to PgRouting format
+> | DISTNAME =            osm2pgrouting-2.0.0
+> | CATEGORIES =          geo
+> |
+> | HOMEPAGE =            http://pgrouting.org
+> |
+> | # GPLv2 only
+> | PERMIT_PACKAGE_CDROM =        Yes
+>
+> As per Makefile.template and the majority of other ports,
+> WANTLIB usually goes here in the Makefile i.e. PERMIT_*, then
+> a blank line, then WANTLIB.
+>
+> | # Dependencies
+> | #
+>
+> No need for this ^^ comment
+>
+> | MODULES =             devel/cmake
+> | BUILD_DEPENDS =               devel/boost databases/postgresql
+> | RUN_DEPENDS =         geo/pgrouting
+> | WANTLIB +=            c expat m pq stdc++
+>
+> Looks like postgresql should be a LIB_DEPENDS not a BUILD_DEPENDS.
+> Common standard is to list dependencies one-per-line with \ for
+> continuation.
+>
+> |
+> | .include <bsd.port.mk>
+
+--047d7bd76734c96f4605172581ec
+Content-Type: application/x-gzip; name="osm2pgrouting.tgz"
+Content-Disposition: attachment; filename="osm2pgrouting.tgz"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ia8auamf0
+
+H4sIAAAAAAAAA+1YW3ObOBTua/Urzrh5cMY1RlzsrWezEwLUoeHiAO7thSG2YjMxhgK5dSf/fQXE
+iUlcpw+pu7vhswNG5wgdnYvySVEacvE0ic6zYDF99WvAsgLbE0V6Z3FPZPN7juW9+I05kcddThRZ
+nrZjrisKr8RfZE8F52nmJ3TImGQk2aB3OSNkvg2DtotoNf4dwz8jp8GcPO8YLGbZriD8MP49sbsS
+/7wdC3yP5svzmrEeLzz+b2DHisniwFH6sIw+k5EwnvsZeXsBmOlxwLFY7LBCh/0DcK8v8n38DtJs
+RhagXsWwg5BsGYZqurD3+vU4WlyQJAPLMWDiZz5kEQyndplgcBoloZ8hRXNcUzLUvEMlA9scwzIs
+kiVXHVi2pjq5xpRECB1ahjqUBkWXWZbF/U7nrhcTJVOE3sBgqF9wEC3m12io2obmekNJPqKdPFmx
+LYN2/UJShD5JpqtrB9DaA2ovkKvYzyCE+Bud1GTcaiE0OPQkWbZG5ZTipfl5+9C2Pqiy+8jyXOZK
+g+WsLsqJIMNSRno5jQm5IPPOOKReRgcjTVc8RR2qprIiPImiNEPUtoqIevHET0naial0mpD02xzZ
+I3NVh7ro3h0IISZYjOfnEwJ/nqQTJo6SjAnP/kKP41+t/0mQ0vtp9Lw5tlL/q3V/V/90Ucjrn35Y
+nuNv6x8L263/JIqyTXr/0/p3DiVO7EJzTRUy1DHM9Psu7MGBMgvcyyMcXB0LwSf9U+ZOv5xe+V+t
+uUDmnJ+2pHByKX+ctL4f7yFH+6o+9UKu2+XYNelYY8uo1n989is44Ar/W1v/t/yP62Ke54RuXv88
+TZDt8r8XWv+P4t9RVEe2n3WMJ9d/KivXfyyILC7Wf4y3zP9eaPxVPw3m1xCEOUeAnAo6WUJIZvgx
+NCmH2y1JXLCgNM6HOyYEdEGHJTGB8zRvooQQUCWfKPeL5ky9zP+L8bj+hzol5886xlP1z7PdZf1j
+3OuW9S/W9b8N7I+jMCSL7G4buIP2T4IF0L9OdX+TzvyEVNs6axtla/hFMwdrZTbxJyFhwslaaejH
+dPt4GkyZq3C+WcOjO0lv7Cdpofq7vfjfxYP697PxjKTPPMbP8j9a/9wt/xMwj2v+twWsjX95b8v5
+gZAepFnqZVcbnbMZT6z/WOzhB/HnWMz16vV/C7hf9tvtNtxHnKERZ6IkmL52Z+dg+NeABfrt81xf
+4IsDQdRqtR50eKjL9+mPQnd/H9rc2x608gt9uD1Fq54S7CL6PulI9QzN1IyR4dnq8UizVaX5UbUd
+zTIp6+xSJQQpyaB5q1scsHlDyT2Exs7fZaNjjWxZ9RTNvikP3BqwFK3o3+yidvEm51CyC21odM7T
+pLPmP09jF7Ue6hZqjcKg95qpLA8bm8PymM451mE5g90HKupnasCKNPcPfpc7qLjSR0lRPPWzKo9c
+6UBXq46ik3FsmZoPrmQPVNfTNfOIXg5sKT8zfaR8b9C90g1tL6xYaSqmopmOK+l6s3y1A1UW0Aaw
+R6arGSrQjaKrmZKbB2bVb5Q6NFDrB3qFECoDvdd01SkzpPdWoCmSX+ljVQ451gb4jlM0NihVqMVP
+KVYYRiOfOFSnQoOwzIWbPD02KjzKpt9d+DVq1KhRo0aNGjVq1Hhx+AdKN545ACgAAA==
+--047d7bd76734c96f4605172581ec--
+

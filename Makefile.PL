@@ -32,7 +32,12 @@ WriteMakefile(
 		PAIR('Flail/App/Command/repl.pm'),
 		PAIR('Flail/App/Command/server.pm'),
 		PAIR('Flail/Config.pm'),
+		PAIR('Flail/MessageSet.pm'),
+		PAIR('Flail/MessageSet/Handler.pm'),
+		PAIR('Flail/MessageSet/Maildir.pm'),
+		PAIR('Flail/MessageSet/Mu.pm'),
 		PAIR('Flail/Sink.pm'),
+		PAIR('Flail/Util.pm'),
 		PAIR('Devel/REPL/Plugin/AppCmd.pm'),
 	}
 );

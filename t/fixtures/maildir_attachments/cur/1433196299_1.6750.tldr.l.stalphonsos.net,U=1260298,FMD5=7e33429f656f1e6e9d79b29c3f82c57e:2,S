@@ -1,0 +1,75 @@
+Return-Path: <owner-ports+M73453@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 18548 invoked from network); 1 Jun 2015 16:16:22 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 1 Jun 2015 16:16:22 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t51GFlAb006528;
+	Mon, 1 Jun 2015 10:15:47 -0600 (MDT)
+Received: from twilight.rhaalovely.net (twilight.rhaalovely.net [212.85.158.27])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t51GFZG2005080
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Mon, 1 Jun 2015 10:15:37 -0600 (MDT)
+Received: from localhost (1000@localhost [local]);
+	by localhost (OpenSMTPD) with ESMTPA id 9b337c06;
+	for <ports@openbsd.org>;
+	Mon, 1 Jun 2015 18:15:34 +0200 (CEST)
+Date: Mon, 1 Jun 2015 18:15:34 +0200
+From: Landry Breuil <landry@rhaalovely.net>
+To: ports@openbsd.org
+Subject: Re: [patch] sysutils/collectd Bind9 plugin update
+Message-ID: <20150601161534.GS8753@twilight.rhaalovely.net>
+References: <556C5C9B.9050404@dim13.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Content-Disposition: inline
+In-Reply-To: <556C5C9B.9050404@dim13.org>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jun 01, 2015 at 03:22:35PM +0200, Dimitri Sokolyuk wrote:
+> Hi ports@
+>=20
+> here is a patch for collectd-5.4.1 bind plugin to support the new XML v3 =
+API
+>=20
+> Could please someone check it in?
+
+I'd rather have someone updating it to 5.4.2 or 5.5.0 which was recently
+released, and where most of our patches were merged upstream, see
+https://github.com/collectd/collectd/releases ....
+
+Landry
+
+--EVF5PPMfhYS0aIcm
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVbIUmAAoJELolt5gy8wRXSuMH/jCDXo7DjYvz62n3URbvjB74
++3pGvS3b/9bxg1UHZd4I/N7j31IJ5Pw+NbkCjGPo1cqGMQ2ok2bvrF4tzELomR6b
+XtygkLzNZv0h9upAj8yWCsxXtUdgwFGbCdHUaDDFAaQhRalR+4/e4qhrwjDcYUK/
+Cl+Gg37EjE2Cfgi6KZy6yt9OoRH2hlwIQO6Oe6Ue4jO0j9BwAGk5m6eArAeF3LBo
+Po4TpakPE2xdD+bDKM8XXXyx1Xj6YujApzYdgtJi5FrhBEPIBboffoWoPVD4YBh7
+SLTcXmymHKDwogBIGJe0jrBacg/29vKTi7SKnJ7sT6vFnlD+6jcA2ivOtaV5qqA=
+=hJBz
+-----END PGP SIGNATURE-----
+
+--EVF5PPMfhYS0aIcm--
+

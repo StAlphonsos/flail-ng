@@ -1,0 +1,121 @@
+Return-Path: <gnupg-devel-bounces@gnupg.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 5938 invoked from network); 2 Jun 2015 04:59:58 -0000
+Received: from unknown (HELO lists.gnupg.org) (217.69.76.57)
+  by x.stalphonsos.net with SMTP; 2 Jun 2015 04:59:58 -0000
+Received: from localhost ([127.0.0.1] helo=trithemius.gnupg.org)
+	by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+	id 1YzeC2-0003XT-61; Tue, 02 Jun 2015 06:52:50 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on trithemius.gnupg.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+ T_DKIM_INVALID autolearn=ham version=3.3.2
+Received: from kerckhoffs.g10code.com ([217.69.77.222])
+ by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+ id 1YzeBx-0003XJ-A3
+ for <mm.gnupg-devel@lists.gnupg.org>; Tue, 02 Jun 2015 06:52:45 +0200
+Received: from akagi.fsij.org ([217.70.189.144])
+ by kerckhoffs.g10code.com with esmtps (Exim 4.80 #2 (Debian))
+ id 1YzeHW-00053b-4T
+ for <gnupg-devel@gnupg.org>; Tue, 02 Jun 2015 06:58:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fsij.org;
+ s=main; 
+ h=Content-Transfer-Encoding:Content-Type:Subject:To:MIME-Version:From:Date:Message-ID;
+ bh=Tq7UqIHPiMcvUrscMi6b+Lrn5PnR57lzJ4hvnvhqHA0=; 
+ b=hULQd7AzbHfaIr5/IDg71sr1f12GszXEAeHihv50wb5peOcPw9YoWqUhwfKf+Z1YJnMXw5usnsjphwFTcAzmmtgDw3Pa1lclpOdgrcB3X60COwfD24r07mvuGK90XqmGUeqCaB+40oS1dFsg+H+cbdm5/XO/HjzDFLJ6+ZrA6goqT1plKWBE8heQveQqT7hXilVWRWa9d+dOMr4BNc/pfD+EkVSU6RphJFcth8rXdlR00NTg47KQz27ZbdpVl2SQQ08oaVzaCg8FD6Y1fURZk6l3bsYms9/oHV0F+nJDM+5U+T4T7RzFAflTfvJgB9Q+Y8sk3AUtQ6vGSeG22bolJQ==;
+Received: from 140.200.232.153.ap.dti.ne.jp ([153.232.200.140]
+ helo=[192.168.2.105])
+ by akagi.fsij.org with esmtpsa (TLS1.2:DHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.80) (envelope-from <gniibe@fsij.org>) id 1YzeFx-0002gW-53
+ for gnupg-devel@gnupg.org; Tue, 02 Jun 2015 13:56:53 +0900
+Message-ID: <556D37F0.80301@fsij.org>
+Date: Tue, 02 Jun 2015 13:58:24 +0900
+From: NIIBE Yutaka <gniibe@fsij.org>
+Organization: Free Software Initiative of Japan
+User-Agent: Mozilla/5.0 (X11; Linux i686;
+ rv:31.0) Gecko/20100101 Icedove/31.3.0
+MIME-Version: 1.0
+To: GnuPG Development List <gnupg-devel@gnupg.org>
+Subject: [PATCH] scd: do_decipher change for OpenPGPcard v3.0
+X-BeenThere: gnupg-devel@gnupg.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+List-Id: GnuPG development <gnupg-devel.gnupg.org>
+List-Unsubscribe: <http://lists.gnupg.org/mailman/options/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=unsubscribe>
+List-Archive: </pipermail/>
+List-Post: <mailto:gnupg-devel@gnupg.org>
+List-Help: <mailto:gnupg-devel-request@gnupg.org?subject=help>
+List-Subscribe: <http://lists.gnupg.org/mailman/listinfo/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Errors-To: gnupg-devel-bounces@gnupg.org
+Sender: "Gnupg-devel" <gnupg-devel-bounces@gnupg.org>
+
+Hello,
+
+This is the change required by current draft of OpenPGPcard v3.0
+specification.
+
+The decoration was not needed (for me), but, it would make sense,
+perhaps.
+
+I'm going to change Gnuk so that it will support both (w/ decoration
+or w/out decoration).
+
+diff --git a/scd/app-openpgp.c b/scd/app-openpgp.c
+index 8520231..0e751e0 100644
+--- a/scd/app-openpgp.c
++++ b/scd/app-openpgp.c
+@@ -4046,6 +4046,7 @@ do_decipher (app_t app, const char *keyidstr,
+   int exmode, le_value;
+   unsigned char *fixbuf = NULL;
+   int padind = 0;
++  int fixuplen = 0;
+
+   if (!keyidstr || !*keyidstr || !indatalen)
+     return gpg_error (GPG_ERR_INV_VALUE);
+@@ -4092,8 +4093,6 @@ do_decipher (app_t app, const char *keyidstr,
+
+   if (app->app_local->keyattr[1].key_type == KEY_TYPE_RSA)
+     {
+-      int fixuplen;
+-
+       /* We might encounter a couple of leading zeroes in the
+          cryptogram.  Due to internal use of MPIs these leading zeroes
+          are stripped.  However the OpenPGP card expects exactly 128
+@@ -4146,7 +4145,26 @@ do_decipher (app_t app, const char *keyidstr,
+         }
+     }
+   else if (app->app_local->keyattr[1].key_type == KEY_TYPE_ECC)
+-    padind = -1;
++    {
++      fixuplen = 7;
++      fixbuf = xtrymalloc (fixuplen + indatalen);
++      if (!fixbuf)
++        return gpg_error_from_syserror ();
++
++      /* Build 'Cipher DO' */
++      fixbuf[0] = '\xa6';
++      fixbuf[1] = (char)(indatalen+5);
++      fixbuf[2] = '\x7f';
++      fixbuf[3] = '\x49';
++      fixbuf[4] = (char)(indatalen+2);
++      fixbuf[5] = '\x86';
++      fixbuf[6] = (char)indatalen;
++      memcpy (fixbuf+fixuplen, indata, indatalen);
++      indata = fixbuf;
++      indatalen = fixuplen + indatalen;
++
++      padind = -1;
++    }
+   else
+     return gpg_error (GPG_ERR_INV_VALUE);
+
+-- 
+
+_______________________________________________
+Gnupg-devel mailing list
+Gnupg-devel@gnupg.org
+http://lists.gnupg.org/mailman/listinfo/gnupg-devel

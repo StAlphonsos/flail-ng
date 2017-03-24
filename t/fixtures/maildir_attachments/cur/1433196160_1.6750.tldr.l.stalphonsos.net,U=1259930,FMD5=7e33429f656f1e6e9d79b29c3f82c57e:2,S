@@ -1,0 +1,70 @@
+Return-Path: <bounces+848413-96e3-attila=stalphonsos.com@sgmail.github.com>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 98690 invoked from network); 28 May 2015 17:15:38 -0000
+Received: from unknown (HELO o1.sgmail.github.com) (192.254.114.176)
+  by x.stalphonsos.net with SMTP; 28 May 2015 17:15:38 -0000
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=github.com; 
+	h=from:reply-to:to:in-reply-to:references:subject:mime-version:content-type:content-transfer-encoding:list-id:list-archive:list-post:list-unsubscribe; 
+	s=s20150108; bh=gXR417PLlb8i1UrLgambhWg6/gQ=; b=RhjBCklWTkLm5OL2
+	rCQJ1McTC5gkHfGmbL/XH0Tta1w4CL+8KJYX03Ly7/0jqDLFn9Kz46HuSXxQs7go
+	2TpSU8LbBTqtSgBv6y91ObHicu2zybaAhyFTgLwfAA/jPSrUcGuBNVA7vNQ0dytk
+	jCH+/hV2SfGvQTB0kZTtC0lFDDQ=
+Received: by filter0531p1mdw1.sendgrid.net with SMTP id filter0531p1mdw1.30676.55674D351C
+        2015-05-28 17:15:34.882807648 +0000 UTC
+Received: from github-smtp2b-ext-cp1-prd.iad.github.net (github-smtp2b-ext-cp1-prd.iad.github.net [192.30.253.17])
+	by ismtpd-015 (SG) with ESMTP id 14d9b859e80.6721.2ae8cc
+	for <attila@stalphonsos.com>; Thu, 28 May 2015 17:15:34 +0000 (UTC)
+Date: Thu, 28 May 2015 10:15:34 -0700
+From: "Dirk-Jan C. Binnema" <notifications@github.com>
+Reply-To: djcb/mu <reply+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>
+To: djcb/mu <mu@noreply.github.com>
+Message-ID: <djcb/mu/issues/620/106499060@github.com>
+In-Reply-To: <djcb/mu/issues/620@github.com>
+References: <djcb/mu/issues/620@github.com>
+Subject: Re: [mu] mu4e - upload package to MELPA?  (#620)
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_55674d36c059c_67953fed00ab92bc93550";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Precedence: list
+X-GitHub-Sender: djcb
+X-GitHub-Recipient: StAlphonsos
+List-ID: djcb/mu <mu.djcb.github.com>
+List-Archive: https://github.com/djcb/mu
+List-Post: <mailto:reply+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>
+List-Unsubscribe: <mailto:unsub+000e874b0db1fde2504a74fae4b006256ece2de30211cde692cf00000001117f0f3692a169ce04d33853@reply.github.com>,
+ <https://github.com/notifications/unsubscribe/AA6HSxGfytxJpkAHnCiGqd5sS_JaWtlyks5oN0S2gaJpZM4EqKuu>
+X-Auto-Response-Suppress: All
+X-GitHub-Recipient-Address: attila@stalphonsos.com
+X-SG-EID: qjQWc1ylAbm/hZFLRMwvvCpxtLJJDbaLxl9ZLGi1ddYFuZevU9Wo9HkOhJcJTqoI7DXB4T+FqKJAPU
+ feQS7ZFW5PvgED7w3pSAJi9sbV6LLLBmWoHHrENq52skDeueUM3t5WyvEu+6UNdO1jrTzkC+fd6eKX
+ qmeG5XMAdnpk+mWkN5OLLFjAwXc8oY39g3Md
+
+----==_mimepart_55674d36c059c_67953fed00ab92bc93550
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Indeed... if mu4e were all lisp, it'd be nice to have it in melpa; however, mu4d depends on mu, and occasionally the protocol between the two changes; would be hard to do that if mu/mu4e were split up.
+
+---
+Reply to this email directly or view it on GitHub:
+https://github.com/djcb/mu/issues/620#issuecomment-106499060
+----==_mimepart_55674d36c059c_67953fed00ab92bc93550
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<p>Indeed... if mu4e were all lisp, it'd be nice to have it in melpa; however, mu4d depends on mu, and occasionally the protocol between the two changes; would be hard to do that if mu/mu4e were split up.</p>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">&mdash;<br>Reply to this email directly or <a href="https://github.com/djcb/mu/issues/620#issuecomment-106499060">view it on GitHub</a>.<img alt="" height="1" src="https://github.com/notifications/beacon/AA6HS0HVd69erg4hTkyBmLyAT380bfp0ks5oN0S2gaJpZM4EqKuu.gif" width="1" /></p>
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="action" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" href="https://github.com/djcb/mu/issues/620#issuecomment-106499060"></link>
+    <meta itemprop="name" content="View Issue"></meta>
+  </div>
+  <meta itemprop="description" content="View this Issue on GitHub"></meta>
+</div>
+
+----==_mimepart_55674d36c059c_67953fed00ab92bc93550--

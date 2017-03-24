@@ -1,0 +1,941 @@
+Return-Path: <gnupg-devel-bounces+attila=stalphonsos.com@gnupg.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 51997 invoked from network); 20 May 2015 13:36:21 -0000
+Received: from unknown (HELO lists.gnupg.org) (217.69.76.57)
+  by x.stalphonsos.net with SMTP; 20 May 2015 13:36:21 -0000
+Received: from localhost ([127.0.0.1] helo=trithemius.gnupg.org)
+	by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+	id 1Yv3xD-000382-Hi
+	for <attila@stalphonsos.com>; Wed, 20 May 2015 15:22:35 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.2 (2011-06-06) on trithemius.gnupg.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,HTML_MESSAGE,
+ RCVD_IN_DNSWL_HI,T_DKIM_INVALID autolearn=ham version=3.3.2
+Received: from kerckhoffs.g10code.com ([217.69.77.222])
+ by lists.gnupg.org with esmtp (Exim 4.80 #2 (Debian))
+ id 1Yv3wT-00037s-Ll
+ for <mm.gnupg-devel@lists.gnupg.org>; Wed, 20 May 2015 15:21:49 +0200
+Received: from mail.digiflak.com ([62.109.15.11])
+ by kerckhoffs.g10code.com with esmtps (Exim 4.80 #2 (Debian))
+ id 1Yv41j-0006HA-3c
+ for <gnupg-devel@gnupg.org>; Wed, 20 May 2015 15:27:15 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=digiflak.com;
+ s=mail1; 
+ h=Content-Type:Subject:To:MIME-Version:From:Date:Message-ID;
+ bh=Hb6Hli1XgL5jYnApnchpKQl185d2//CAWBxD56uUzAY=; 
+ b=d4IGxlDD2nNvE0or0XPUGGqIU3cFpUT/FYQ2E168MlPGVzH27Z1uCjZLGcGBfo+bpzmeQpitQN8yKBBZyN80R2Xuwtt2+W5teSuiaSJdw9bBZRXlxf28bWzphDD3tOKfNGK1xksnw7R479caZumCKmQnSC9Gn1WEzSR/kpSVe1k=;
+Received: from [94.140.196.194] (helo=[192.168.1.129])
+ by mail.digiflak.com with esmtpa (Exim 4.72)
+ (envelope-from <dfalko@digiflak.com>) id 1Yv41i-0000XB-B9
+ for gnupg-devel@gnupg.org; Wed, 20 May 2015 14:27:14 +0100
+Message-ID: <555C8BAF.1060202@digiflak.com>
+Date: Wed, 20 May 2015 16:27:11 +0300
+From: Dmitry Falko <dfalko@digiflak.com>
+Organization: DigiFLAK
+User-Agent: Mozilla/5.0 (X11; Linux x86_64;
+ rv:31.0) Gecko/20100101 Thunderbird/31.6.0
+MIME-Version: 1.0
+To: gnupg-devel@gnupg.org
+Subject: [PATCH] dirmngr_ldap: support ldap secure connection(ldaps)
+X-BeenThere: gnupg-devel@gnupg.org
+X-Mailman-Version: 2.1.15
+Precedence: list
+List-Id: GnuPG development <gnupg-devel.gnupg.org>
+List-Unsubscribe: <http://lists.gnupg.org/mailman/options/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=unsubscribe>
+List-Archive: </pipermail/>
+List-Post: <mailto:gnupg-devel@gnupg.org>
+List-Help: <mailto:gnupg-devel-request@gnupg.org?subject=help>
+List-Subscribe: <http://lists.gnupg.org/mailman/listinfo/gnupg-devel>,
+ <mailto:gnupg-devel-request@gnupg.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============2116227687=="
+Errors-To: gnupg-devel-bounces+attila=stalphonsos.com@gnupg.org
+Sender: "Gnupg-devel" <gnupg-devel-bounces+attila=stalphonsos.com@gnupg.org>
+
+This is a multi-part message in MIME format.
+--===============2116227687==
+Content-Type: multipart/alternative;
+ boundary="------------030205040500090705060407"
+
+This is a multi-part message in MIME format.
+--------------030205040500090705060407
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Hello!
+
+I encountered a problem connecting to the LDAP server via TLS and wrote 
+a small patch, send it as is.
+
+* dirmngr.h (ldap_server_s): add schema field
+* dirmngr_ldap.c (fetch_ldap): ldaps support
+* ldap.c (make_url, start_cert_fetch_ldap): add schema
+* ldapserver.c (ldapserver_parse_one): parse schema
+* server.c (lookup_cert_by_pattern): additional log info
+
+dirmngr_ldap can retrieve certificates from LDAP server
+by TLS(using ldaps protocol). Protocol can be set in
+dirmngr_ldapserver.conf:
+hostname:port:username:password:base_dn:schema
+If not set use ldap.By default dirmngr_ldap use
+/etc/ssl/CA(dirmngr_ldap.c CA_CERT_DEFAULT) CA certificate,
+user can set DIRMNGR_LDAP_CACERT env variable to
+override this value.
+---
+  dirmngr/dirmngr.h      |  1 +
+  dirmngr/dirmngr_ldap.c | 61 
++++++++++++++++++++++++++++++++++++++++++++++-----
+  dirmngr/ldap.c         | 24 +++++++++++++++-----
+  dirmngr/ldapserver.c   |  5 +++++
+  dirmngr/server.c       |  3 ++-
+  5 files changed, 81 insertions(+), 13 deletions(-)
+
+diff --git a/dirmngr/dirmngr.h b/dirmngr/dirmngr.h
+index 4f037e7..3406494 100644
+--- a/dirmngr/dirmngr.h
++++ b/dirmngr/dirmngr.h
+@@ -46,6 +46,7 @@ struct ldap_server_s
+    char *user;
+    char *pass;
+    char *base;
++  char *schema;
+  };
+  typedef struct ldap_server_s *ldap_server_t;
+
+diff --git a/dirmngr/dirmngr_ldap.c b/dirmngr/dirmngr_ldap.c
+index 61a7e39..8bb739c 100644
+--- a/dirmngr/dirmngr_ldap.c
++++ b/dirmngr/dirmngr_ldap.c
+@@ -46,6 +46,8 @@
+    /* For OpenLDAP, to enable the API that we're using. */
+  # define LDAP_DEPRECATED 1
+  # include <ldap.h>
++  /* FIXME: use configure script to set this define */
++# define CA_CERT_DEFAULT ("/etc/ssl/CA")
+  #endif
+
+
+@@ -571,9 +573,10 @@ fetch_ldap (my_opt_t myopt, const char *url, const 
+LDAPURLDesc *ludp)
+    LDAP *ld;
+    LDAPMessage *msg;
+    int rc = 0;
+-  char *host, *dn, *filter, *attrs[2], *attr;
++  char *host, *dn, *filter, *attrs[2], *attr, *ca_cert, *ldap_url;
+    int port;
+    int ret;
++  int err;
+
+    host     = myopt->host?   myopt->host   : ludp->lud_host;
+    port     = myopt->port?   myopt->port   : ludp->lud_port;
+@@ -583,6 +586,17 @@ fetch_ldap (my_opt_t myopt, const char *url, const 
+LDAPURLDesc *ludp)
+    attrs[1] = NULL;
+    attr = attrs[0];
+
++  ca_cert = getenv("DIRMNGR_LDAP_CACERT");
++  if(!ca_cert)
++    {
++      if (myopt->verbose)
++        {
++          log_info("Using default CA certificate");
++        }
++
++      ca_cert = CA_CERT_DEFAULT;
++    }
++
+    if (!port)
+      port = (ludp->lud_scheme && !strcmp (ludp->lud_scheme, "ldaps"))? 
+636:389;
+
+@@ -628,23 +642,58 @@ fetch_ldap (my_opt_t myopt, const char *url, const 
+LDAPURLDesc *ludp)
+
+
+    set_timeout (myopt);
++
++  ldap_url = alloca(4 + strlen(ludp->lud_scheme)
++                  + strlen(host)
++                  + 5); /* for port */
++  sprintf(ldap_url, "%s://%s:%d", ludp->lud_scheme, host, port);
++
+    npth_unprotect ();
+-  ld = my_ldap_init (host, port);
++  err = ldap_initialize(&ld, ldap_url) ;
+    npth_protect ();
+-  if (!ld)
++  if (err != LDAP_SUCCESS)
+      {
+-      log_error (_("LDAP init to '%s:%d' failed: %s\n"),
+-                 host, port, strerror (errno));
++      log_error (_("LDAP init to '%s' failed: %s\n"),
++                 ldap_url, ldap_err2string (errno));
+        return -1;
+      }
+    npth_unprotect ();
++
++  if(!strcmp (ludp->lud_scheme, "ldaps"))
++    {
++      /* Additional options for tls connection */
++      /*FIXME: LDAP_OPT_X_TLS_NEVER or LDAP_OPT_X_TLS_HARD, add option*/
++      int req_cert = LDAP_OPT_X_TLS_NEVER;
++
++      err = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
++                                ca_cert);
++      npth_protect ();
++      if(err != LDAP_SUCCESS)
++        {
++          log_error (_("setting ca-certificate failed: %s\n"),
++                 ldap_err2string (err));
++          return -1;
++        }
++      npth_unprotect ();
++      err=ldap_set_option(NULL, LDAP_OPT_X_TLS_REQUIRE_CERT,
++                                &req_cert);
++      npth_protect ();
++      if(err != LDAP_SUCCESS)
++        {
++          log_error (_("setting require certificate failed: %s\n"),
++                ldap_err2string (err));
++          return -1;
++        }
++      npth_unprotect ();
++    }
++
+    /* Fixme:  Can we use MYOPT->user or is it shared with other 
+theeads?.  */
+    ret = my_ldap_simple_bind_s (ld, myopt->user, myopt->pass);
+    npth_protect ();
+    if (ret)
+      {
+        log_error (_("binding to '%s:%d' failed: %s\n"),
+-                 host, port, strerror (errno));
++                 host, port, ldap_err2string (errno));
+        ldap_unbind (ld);
+        return -1;
+      }
+diff --git a/dirmngr/ldap.c b/dirmngr/ldap.c
+index e4c6aa2..d4e0730 100644
+--- a/dirmngr/ldap.c
++++ b/dirmngr/ldap.c
+@@ -423,10 +423,10 @@ escape4url (const char *string)
+     need the host and port because this will be specified using the
+     override options. */
+  static gpg_error_t
+-make_url (char **url, const char *dn, const char *filter)
++make_url (char **url, const char *dn, const char *filter, const char 
+*schema)
+  {
+    gpg_error_t err;
+-  char *u_dn, *u_filter;
++  char *u_dn, *u_filter, *u_schema;
+    char const attrs[] = (USERCERTIFICATE ","
+  /*                         USERSMIMECERTIFICATE "," */
+                          CACERTIFICATE ","
+@@ -434,6 +434,10 @@ make_url (char **url, const char *dn, const char 
+*filter)
+
+    *url = NULL;
+
++  u_schema = escape4url (schema);
++  if(!u_schema)
++    return gpg_error_from_errno (errno);
++
+    u_dn = escape4url (dn);
+    if (!u_dn)
+        return gpg_error_from_errno (errno);
+@@ -445,7 +449,8 @@ make_url (char **url, const char *dn, const char 
+*filter)
+        xfree (u_dn);
+        return err;
+      }
+-  *url = malloc ( 8 + strlen (u_dn)
++  *url = malloc ( 4 + strlen (schema)
++                     + strlen (u_dn)
+                   + 1 + strlen (attrs)
+                   + 5 + strlen (u_filter) + 1 );
+    if (!*url)
+@@ -456,12 +461,14 @@ make_url (char **url, const char *dn, const char 
+*filter)
+        return err;
+      }
+
+-  stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (*url, "ldap:///"),
++  stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy(*url, u_schema),
++                                                  ":///"),
+                                            u_dn),
+                                    "?"),
+                            attrs),
+                    "?sub?"),
+            u_filter);
++  xfree (u_schema);
+    xfree (u_dn);
+    xfree (u_filter);
+    return 0;
+@@ -525,6 +532,7 @@ start_cert_fetch_ldap (ctrl_t ctrl, 
+cert_fetch_context_t *context,
+    const char *user;
+    const char *pass;
+    const char *base;
++  const char *schema;
+    const char *argv[50];
+    int argc;
+    char portbuf[30], timeoutbuf[30];
+@@ -538,6 +546,7 @@ start_cert_fetch_ldap (ctrl_t ctrl, 
+cert_fetch_context_t *context,
+        user = server->user;
+        pass = server->pass;
+        base = server->base;
++      schema = server->schema;
+      }
+    else /* Use a default server. */
+      return gpg_error (GPG_ERR_NOT_IMPLEMENTED);
+@@ -545,6 +554,9 @@ start_cert_fetch_ldap (ctrl_t ctrl, 
+cert_fetch_context_t *context,
+    if (!base)
+      base = "";
+
++  if(!schema)
++    schema = "ldap";
++
+    argc = 0;
+    if (pass) /* Note: Must be the first item. */
+      {
+@@ -606,9 +618,9 @@ start_cert_fetch_ldap (ctrl_t ctrl, 
+cert_fetch_context_t *context,
+            return gpg_error (GPG_ERR_INV_USER_ID);
+          }
+        if ((sl->flags & 1))
+-        err = make_url (&url, sl->d, "objectClass=*");
++        err = make_url (&url, sl->d, "objectClass=*", schema);
+        else
+-        err = make_url (&url, base, sl->d);
++        err = make_url (&url, base, sl->d, schema);
+        free_strlist (sl);
+        if (err)
+          {
+diff --git a/dirmngr/ldapserver.c b/dirmngr/ldapserver.c
+index 16e13e2..87c8b47 100644
+--- a/dirmngr/ldapserver.c
++++ b/dirmngr/ldapserver.c
+@@ -115,6 +115,11 @@ ldapserver_parse_one (char *line,
+          server->base = xstrdup (p);
+        break;
+
++  case 6:
++    if (*p)
++      server->schema = xstrdup (p);
++    break;
++
+      default:
+        /* (We silently ignore extra fields.) */
+        break;
+diff --git a/dirmngr/server.c b/dirmngr/server.c
+index 1b7e9e9..bcf83f9 100644
+--- a/dirmngr/server.c
++++ b/dirmngr/server.c
+@@ -1259,7 +1259,8 @@ lookup_cert_by_pattern (assuan_context_t ctx, char 
+*line,
+        ldap_server_t ldapserver = ldapserver_iter.server;
+
+        if (DBG_LOOKUP)
+-        log_debug ("cmd_lookup: trying %s:%d base=%s\n",
++        log_debug ("cmd_lookup: trying %s://%s:%d base=%s\n",
++                   ldapserver->schema ? ldapserver->schema: "ldap",
+                     ldapserver->host, ldapserver->port,
+                     ldapserver->base?ldapserver->base : "[default]");
+
+-- 
+1.9.1
+
+
+-- 
+Best Regards!
+
+
+--------------030205040500090705060407
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  </head>
+  <body bgcolor="#FFFFFF" text="#000000">
+    <div class="moz-text-flowed" style="font-family: -moz-fixed;
+      font-size: 12px;" lang="x-unicode">Hello!
+      <br>
+      <br>
+      I encountered a problem connecting to the LDAP server via TLS and
+      wrote a small patch, send it as is.
+      <br>
+      <br>
+      * dirmngr.h (ldap_server_s): add schema field
+      <br>
+      * dirmngr_ldap.c (fetch_ldap): ldaps support
+      <br>
+      * ldap.c (make_url, start_cert_fetch_ldap): add schema
+      <br>
+      * ldapserver.c (ldapserver_parse_one): parse schema
+      <br>
+      * server.c (lookup_cert_by_pattern): additional log info
+      <br>
+      <br>
+      dirmngr_ldap can retrieve certificates from LDAP server
+      <br>
+      by TLS(using ldaps protocol). Protocol can be set in
+      <br>
+      dirmngr_ldapserver.conf:
+      <br>
+      hostname:port:username:password:base_dn:schema
+      <br>
+      If not set use ldap.By default dirmngr_ldap use
+      <br>
+      /etc/ssl/CA(dirmngr_ldap.c CA_CERT_DEFAULT) CA certificate,
+      <br>
+      user can set DIRMNGR_LDAP_CACERT env variable to
+      <br>
+      override this value.
+      <br>
+      ---
+      <br>
+       dirmngr/dirmngr.h      |  1 +
+      <br>
+       dirmngr/dirmngr_ldap.c | 61
+      +++++++++++++++++++++++++++++++++++++++++++++-----
+      <br>
+       dirmngr/ldap.c         | 24 +++++++++++++++-----
+      <br>
+       dirmngr/ldapserver.c   |  5 +++++
+      <br>
+       dirmngr/server.c       |  3 ++-
+      <br>
+       5 files changed, 81 insertions(+), 13 deletions(-)
+      <br>
+      <br>
+      diff --git a/dirmngr/dirmngr.h b/dirmngr/dirmngr.h
+      <br>
+      index 4f037e7..3406494 100644
+      <br>
+      --- a/dirmngr/dirmngr.h
+      <br>
+      +++ b/dirmngr/dirmngr.h
+      <br>
+      @@ -46,6 +46,7 @@ struct ldap_server_s
+      <br>
+         char *user;
+      <br>
+         char *pass;
+      <br>
+         char *base;
+      <br>
+      +  char *schema;
+      <br>
+       };
+      <br>
+       typedef struct ldap_server_s *ldap_server_t;
+      <br>
+      <br>
+      diff --git a/dirmngr/dirmngr_ldap.c b/dirmngr/dirmngr_ldap.c
+      <br>
+      index 61a7e39..8bb739c 100644
+      <br>
+      --- a/dirmngr/dirmngr_ldap.c
+      <br>
+      +++ b/dirmngr/dirmngr_ldap.c
+      <br>
+      @@ -46,6 +46,8 @@
+      <br>
+         /* For OpenLDAP, to enable the API that we're using. */
+      <br>
+       # define LDAP_DEPRECATED 1
+      <br>
+       # include &lt;ldap.h&gt;
+      <br>
+      +  /* FIXME: use configure script to set this define */
+      <br>
+      +# define CA_CERT_DEFAULT ("/etc/ssl/CA")
+      <br>
+       #endif
+      <br>
+      <br>
+      <br>
+      @@ -571,9 +573,10 @@ fetch_ldap (my_opt_t myopt, const char *url,
+      const LDAPURLDesc *ludp)
+      <br>
+         LDAP *ld;
+      <br>
+         LDAPMessage *msg;
+      <br>
+         int rc = 0;
+      <br>
+      -  char *host, *dn, *filter, *attrs[2], *attr;
+      <br>
+      +  char *host, *dn, *filter, *attrs[2], *attr, *ca_cert,
+      *ldap_url;
+      <br>
+         int port;
+      <br>
+         int ret;
+      <br>
+      +  int err;
+      <br>
+      <br>
+         host     = myopt-&gt;host?   myopt-&gt;host   :
+      ludp-&gt;lud_host;
+      <br>
+         port     = myopt-&gt;port?   myopt-&gt;port   :
+      ludp-&gt;lud_port;
+      <br>
+      @@ -583,6 +586,17 @@ fetch_ldap (my_opt_t myopt, const char *url,
+      const LDAPURLDesc *ludp)
+      <br>
+         attrs[1] = NULL;
+      <br>
+         attr = attrs[0];
+      <br>
+      <br>
+      +  ca_cert = getenv("DIRMNGR_LDAP_CACERT");
+      <br>
+      +  if(!ca_cert)
+      <br>
+      +    {
+      <br>
+      +      if (myopt-&gt;verbose)
+      <br>
+      +        {
+      <br>
+      +          log_info("Using default CA certificate");
+      <br>
+      +        }
+      <br>
+      +
+      <br>
+      +      ca_cert = CA_CERT_DEFAULT;
+      <br>
+      +    }
+      <br>
+      +
+      <br>
+         if (!port)
+      <br>
+           port = (ludp-&gt;lud_scheme &amp;&amp; !strcmp
+      (ludp-&gt;lud_scheme, "ldaps"))? 636:389;
+      <br>
+      <br>
+      @@ -628,23 +642,58 @@ fetch_ldap (my_opt_t myopt, const char *url,
+      const LDAPURLDesc *ludp)
+      <br>
+      <br>
+      <br>
+         set_timeout (myopt);
+      <br>
+      +
+      <br>
+      +  ldap_url = alloca(4 + strlen(ludp-&gt;lud_scheme)
+      <br>
+      +                  + strlen(host)
+      <br>
+      +                  + 5); /* for port */
+      <br>
+      +  sprintf(ldap_url, "%s://%s:%d", ludp-&gt;lud_scheme, host,
+      port);
+      <br>
+      +
+      <br>
+         npth_unprotect ();
+      <br>
+      -  ld = my_ldap_init (host, port);
+      <br>
+      +  err = ldap_initialize(&amp;ld, ldap_url) ;
+      <br>
+         npth_protect ();
+      <br>
+      -  if (!ld)
+      <br>
+      +  if (err != LDAP_SUCCESS)
+      <br>
+           {
+      <br>
+      -      log_error (_("LDAP init to '%s:%d' failed: %s\n"),
+      <br>
+      -                 host, port, strerror (errno));
+      <br>
+      +      log_error (_("LDAP init to '%s' failed: %s\n"),
+      <br>
+      +                 ldap_url, ldap_err2string (errno));
+      <br>
+             return -1;
+      <br>
+           }
+      <br>
+         npth_unprotect ();
+      <br>
+      +
+      <br>
+      +  if(!strcmp (ludp-&gt;lud_scheme, "ldaps"))
+      <br>
+      +    {
+      <br>
+      +      /* Additional options for tls connection */
+      <br>
+      +      /<b class="moz-txt-star"><span class="moz-txt-tag">*</span>FIXME:
+        LDAP_OPT_X_TLS_NEVER or LDAP_OPT_X_TLS_HARD, add option<span
+          class="moz-txt-tag">*</span></b>/
+      <br>
+      +      int req_cert = LDAP_OPT_X_TLS_NEVER;
+      <br>
+      +
+      <br>
+      +      err = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
+      <br>
+      +                                ca_cert);
+      <br>
+      +      npth_protect ();
+      <br>
+      +      if(err != LDAP_SUCCESS)
+      <br>
+      +        {
+      <br>
+      +          log_error (_("setting ca-certificate failed: %s\n"),
+      <br>
+      +                 ldap_err2string (err));
+      <br>
+      +          return -1;
+      <br>
+      +        }
+      <br>
+      +      npth_unprotect ();
+      <br>
+      +      err=ldap_set_option(NULL, LDAP_OPT_X_TLS_REQUIRE_CERT,
+      <br>
+      +                                &amp;req_cert);
+      <br>
+      +      npth_protect ();
+      <br>
+      +      if(err != LDAP_SUCCESS)
+      <br>
+      +        {
+      <br>
+      +          log_error (_("setting require certificate failed:
+      %s\n"),
+      <br>
+      +                ldap_err2string (err));
+      <br>
+      +          return -1;
+      <br>
+      +        }
+      <br>
+      +      npth_unprotect ();
+      <br>
+      +    }
+      <br>
+      +
+      <br>
+         /* Fixme:  Can we use MYOPT-&gt;user or is it shared with other
+      theeads?.  */
+      <br>
+         ret = my_ldap_simple_bind_s (ld, myopt-&gt;user,
+      myopt-&gt;pass);
+      <br>
+         npth_protect ();
+      <br>
+         if (ret)
+      <br>
+           {
+      <br>
+             log_error (_("binding to '%s:%d' failed: %s\n"),
+      <br>
+      -                 host, port, strerror (errno));
+      <br>
+      +                 host, port, ldap_err2string (errno));
+      <br>
+             ldap_unbind (ld);
+      <br>
+             return -1;
+      <br>
+           }
+      <br>
+      diff --git a/dirmngr/ldap.c b/dirmngr/ldap.c
+      <br>
+      index e4c6aa2..d4e0730 100644
+      <br>
+      --- a/dirmngr/ldap.c
+      <br>
+      +++ b/dirmngr/ldap.c
+      <br>
+      @@ -423,10 +423,10 @@ escape4url (const char *string)
+      <br>
+          need the host and port because this will be specified using
+      the
+      <br>
+          override options. */
+      <br>
+       static gpg_error_t
+      <br>
+      -make_url (char **url, const char *dn, const char *filter)
+      <br>
+      +make_url (char **url, const char *dn, const char *filter, const
+      char *schema)
+      <br>
+       {
+      <br>
+         gpg_error_t err;
+      <br>
+      -  char *u_dn, *u_filter;
+      <br>
+      +  char *u_dn, *u_filter, *u_schema;
+      <br>
+         char const attrs[] = (USERCERTIFICATE ","
+      <br>
+       /*                         USERSMIMECERTIFICATE "," */
+      <br>
+                               CACERTIFICATE ","
+      <br>
+      @@ -434,6 +434,10 @@ make_url (char **url, const char *dn, const
+      char *filter)
+      <br>
+      <br>
+         *url = NULL;
+      <br>
+      <br>
+      +  u_schema = escape4url (schema);
+      <br>
+      +  if(!u_schema)
+      <br>
+      +    return gpg_error_from_errno (errno);
+      <br>
+      +
+      <br>
+         u_dn = escape4url (dn);
+      <br>
+         if (!u_dn)
+      <br>
+             return gpg_error_from_errno (errno);
+      <br>
+      @@ -445,7 +449,8 @@ make_url (char **url, const char *dn, const
+      char *filter)
+      <br>
+             xfree (u_dn);
+      <br>
+             return err;
+      <br>
+           }
+      <br>
+      -  *url = malloc ( 8 + strlen (u_dn)
+      <br>
+      +  *url = malloc ( 4 + strlen (schema)
+      <br>
+      +                     + strlen (u_dn)
+      <br>
+                        + 1 + strlen (attrs)
+      <br>
+                        + 5 + strlen (u_filter) + 1 );
+      <br>
+         if (!*url)
+      <br>
+      @@ -456,12 +461,14 @@ make_url (char **url, const char *dn, const
+      char *filter)
+      <br>
+             return err;
+      <br>
+           }
+      <br>
+      <br>
+      -  stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (*url, <a
+        class="moz-txt-link-rfc2396E" href="ldap:///">"ldap:///"</a>),
+      <br>
+      +  stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy (stpcpy(*url,
+      u_schema),
+      <br>
+      +                                                  ":///"),
+      <br>
+                                                 u_dn),
+      <br>
+                                         "?"),
+      <br>
+                                 attrs),
+      <br>
+                         "?sub?"),
+      <br>
+                 u_filter);
+      <br>
+      +  xfree (u_schema);
+      <br>
+         xfree (u_dn);
+      <br>
+         xfree (u_filter);
+      <br>
+         return 0;
+      <br>
+      @@ -525,6 +532,7 @@ start_cert_fetch_ldap (ctrl_t ctrl,
+      cert_fetch_context_t *context,
+      <br>
+         const char *user;
+      <br>
+         const char *pass;
+      <br>
+         const char *base;
+      <br>
+      +  const char *schema;
+      <br>
+         const char *argv[50];
+      <br>
+         int argc;
+      <br>
+         char portbuf[30], timeoutbuf[30];
+      <br>
+      @@ -538,6 +546,7 @@ start_cert_fetch_ldap (ctrl_t ctrl,
+      cert_fetch_context_t *context,
+      <br>
+             user = server-&gt;user;
+      <br>
+             pass = server-&gt;pass;
+      <br>
+             base = server-&gt;base;
+      <br>
+      +      schema = server-&gt;schema;
+      <br>
+           }
+      <br>
+         else /* Use a default server. */
+      <br>
+           return gpg_error (GPG_ERR_NOT_IMPLEMENTED);
+      <br>
+      @@ -545,6 +554,9 @@ start_cert_fetch_ldap (ctrl_t ctrl,
+      cert_fetch_context_t *context,
+      <br>
+         if (!base)
+      <br>
+           base = "";
+      <br>
+      <br>
+      +  if(!schema)
+      <br>
+      +    schema = "ldap";
+      <br>
+      +
+      <br>
+         argc = 0;
+      <br>
+         if (pass) /* Note: Must be the first item. */
+      <br>
+           {
+      <br>
+      @@ -606,9 +618,9 @@ start_cert_fetch_ldap (ctrl_t ctrl,
+      cert_fetch_context_t *context,
+      <br>
+                 return gpg_error (GPG_ERR_INV_USER_ID);
+      <br>
+               }
+      <br>
+             if ((sl-&gt;flags &amp; 1))
+      <br>
+      -        err = make_url (&amp;url, sl-&gt;d, "objectClass=*");
+      <br>
+      +        err = make_url (&amp;url, sl-&gt;d, "objectClass=*",
+      schema);
+      <br>
+             else
+      <br>
+      -        err = make_url (&amp;url, base, sl-&gt;d);
+      <br>
+      +        err = make_url (&amp;url, base, sl-&gt;d, schema);
+      <br>
+             free_strlist (sl);
+      <br>
+             if (err)
+      <br>
+               {
+      <br>
+      diff --git a/dirmngr/ldapserver.c b/dirmngr/ldapserver.c
+      <br>
+      index 16e13e2..87c8b47 100644
+      <br>
+      --- a/dirmngr/ldapserver.c
+      <br>
+      +++ b/dirmngr/ldapserver.c
+      <br>
+      @@ -115,6 +115,11 @@ ldapserver_parse_one (char *line,
+      <br>
+               server-&gt;base = xstrdup (p);
+      <br>
+             break;
+      <br>
+      <br>
+      +  case 6:
+      <br>
+      +    if (*p)
+      <br>
+      +      server-&gt;schema = xstrdup (p);
+      <br>
+      +    break;
+      <br>
+      +
+      <br>
+           default:
+      <br>
+             /* (We silently ignore extra fields.) */
+      <br>
+             break;
+      <br>
+      diff --git a/dirmngr/server.c b/dirmngr/server.c
+      <br>
+      index 1b7e9e9..bcf83f9 100644
+      <br>
+      --- a/dirmngr/server.c
+      <br>
+      +++ b/dirmngr/server.c
+      <br>
+      @@ -1259,7 +1259,8 @@ lookup_cert_by_pattern (assuan_context_t
+      ctx, char *line,
+      <br>
+             ldap_server_t ldapserver = ldapserver_iter.server;
+      <br>
+      <br>
+             if (DBG_LOOKUP)
+      <br>
+      -        log_debug ("cmd_lookup: trying %s:%d base=%s\n",
+      <br>
+      +        log_debug ("cmd_lookup: trying %s://%s:%d base=%s\n",
+      <br>
+      +                   ldapserver-&gt;schema ? ldapserver-&gt;schema:
+      "ldap",
+      <br>
+                          ldapserver-&gt;host, ldapserver-&gt;port,
+      <br>
+                          ldapserver-&gt;base?ldapserver-&gt;base :
+      "[default]");
+      <br>
+      <br>
+      <div class="moz-txt-sig"><span class="moz-txt-tag">-- <br>
+        </span>1.9.1
+        <br>
+        <br>
+        <br>
+        -- <br>
+        Best Regards!
+        <br>
+        <br>
+      </div>
+    </div>
+  </body>
+</html>
+
+--------------030205040500090705060407--
+
+
+--===============2116227687==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Gnupg-devel mailing list
+Gnupg-devel@gnupg.org
+http://lists.gnupg.org/mailman/listinfo/gnupg-devel
+
+--===============2116227687==--
+

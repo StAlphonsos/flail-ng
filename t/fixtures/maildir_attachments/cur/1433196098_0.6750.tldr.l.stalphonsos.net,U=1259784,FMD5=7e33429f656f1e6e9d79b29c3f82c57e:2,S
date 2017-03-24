@@ -1,0 +1,140 @@
+Return-Path: <owner-ports+M73396@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 40515 invoked from network); 27 May 2015 19:40:22 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 27 May 2015 19:40:22 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4RJdVBa026071;
+	Wed, 27 May 2015 13:39:31 -0600 (MDT)
+Received: from mx.huldtgren.net (mx.huldtgren.net [206.162.240.99])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4RJdJB3002344
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=FAIL)
+	for <ports@openbsd.org>; Wed, 27 May 2015 13:39:20 -0600 (MDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mx.huldtgren.net (Postfix) with ESMTP id 54198CB4A;
+	Wed, 27 May 2015 12:39:19 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at huldtgren.net
+Received: from mx.huldtgren.net ([127.0.0.1])
+	by localhost (www.huldtgren.net [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id YMzZmsu-1jky; Wed, 27 May 2015 12:39:18 -0700 (PDT)
+Received: from rc.huldtgren.net (mx.huldtgren.net [206.162.240.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-CHACHA20-POLY1305 (256/0 bits))
+	(No client certificate requested)
+	by mx.huldtgren.net (Postfix) with ESMTPSA id 14CBFCB49;
+	Wed, 27 May 2015 12:39:18 -0700 (PDT)
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="=_1ae3915d289f787cc91577c7c9b41299"
+Date: Wed, 27 May 2015 15:39:17 -0400
+From: Johan Huldtgren <johan+openbsd-ports@huldtgren.com>
+To: Adam Wolk <adam.wolk@tintagel.pl>
+Cc: ports@openbsd.org
+Subject: Re: suspicious conflict in python ports
+In-Reply-To: <20150527173639.1dc86f58@inferno>
+References: <20150527141113.GB24289@lain.home>
+ <20150527170909.64afda1e@inferno> <20150527173639.1dc86f58@inferno>
+Message-ID: <2f63152e2af9af350dbcee6697f89c15@imap.huldtgren.com>
+X-Sender: johan+openbsd-ports@huldtgren.com
+User-Agent: Roundcube Webmail/1.1.1
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+--=_1ae3915d289f787cc91577c7c9b41299
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+
+On 2015-05-27 11:36, Adam Wolk wrote:
+
+> For net/py-oauth2 the __init__ file is empty.
+
+FWIW, removing those files will cause 'make test' to fail. That said
+currently the tests also fail, seems I missed that when I submitted
+this port. Some googling led me to this:
+
+http://lists.opensuse.org/archive/opensuse-commit/2013-04/msg01807.html
+
+where they simply patch away the offending tests. I'm not sure why
+this was the chosen path but the fact that upstream hasn't been
+touched in four years might be a clue. So I adapted a similar patch
+for the port and now 'make test' succeeds.
+
+This "fixes" the port but doesn't address the original issue raised.
+I'm not sure what the correct solution is here, however I will say
+that I submitted this port as a dependency for py-discogs-client.
+However once the current update gets commited py-oauth2 will cease to
+be a dependency, as it seems pretty dead upstream I would have no
+objections to it being removed at that time.
+
+thanks,
+
+.jh
+--=_1ae3915d289f787cc91577c7c9b41299
+Content-Transfer-Encoding: base64
+Content-Type: text/x-diff;
+ name=patch-tests_test_oauth_py
+Content-Disposition: attachment;
+ filename=patch-tests_test_oauth_py;
+ size=1681
+
+JE9wZW5CU0QkCi0tLSB0ZXN0cy90ZXN0X29hdXRoLnB5Lm9yaWcJVHVlIE1heSAyNiAwNTo0Nzoy
+NCAyMDE1CisrKyB0ZXN0cy90ZXN0X29hdXRoLnB5CVR1ZSBNYXkgMjYgMDU6NDM6MjEgMjAxNQpA
+QCAtMTE5Myw0MSArMTE5Myw2IEBAIGNsYXNzIFRlc3RDbGllbnQodW5pdHRlc3QuVGVzdENhc2Up
+OgogICAgICAgICBleGNlcHQgVmFsdWVFcnJvcjoKICAgICAgICAgICAgIHBhc3MKIAotICAgIGRl
+ZiB0ZXN0X2FjY2Vzc190b2tlbl9nZXQoc2VsZik6Ci0gICAgICAgICIiIlRlc3QgZ2V0dGluZyBh
+biBhY2Nlc3MgdG9rZW4gdmlhIEdFVC4iIiIKLSAgICAgICAgY2xpZW50ID0gb2F1dGguQ2xpZW50
+KHNlbGYuY29uc3VtZXIsIE5vbmUpCi0gICAgICAgIHJlc3AsIGNvbnRlbnQgPSBjbGllbnQucmVx
+dWVzdChzZWxmLl91cmkoJ3JlcXVlc3RfdG9rZW4nKSwgIkdFVCIpCi0KLSAgICAgICAgc2VsZi5h
+c3NlcnRFcXVhbHMoaW50KHJlc3BbJ3N0YXR1cyddKSwgMjAwKQotCi0gICAgZGVmIHRlc3RfYWNj
+ZXNzX3Rva2VuX3Bvc3Qoc2VsZik6Ci0gICAgICAgICIiIlRlc3QgZ2V0dGluZyBhbiBhY2Nlc3Mg
+dG9rZW4gdmlhIFBPU1QuIiIiCi0gICAgICAgIGNsaWVudCA9IG9hdXRoLkNsaWVudChzZWxmLmNv
+bnN1bWVyLCBOb25lKQotICAgICAgICByZXNwLCBjb250ZW50ID0gY2xpZW50LnJlcXVlc3Qoc2Vs
+Zi5fdXJpKCdyZXF1ZXN0X3Rva2VuJyksICJQT1NUIikKLQotICAgICAgICBzZWxmLmFzc2VydEVx
+dWFscyhpbnQocmVzcFsnc3RhdHVzJ10pLCAyMDApCi0KLSAgICAgICAgcmVzID0gZGljdChwYXJz
+ZV9xc2woY29udGVudCkpCi0gICAgICAgIHNlbGYuYXNzZXJ0VHJ1ZSgnb2F1dGhfdG9rZW4nIGlu
+IHJlcykKLSAgICAgICAgc2VsZi5hc3NlcnRUcnVlKCdvYXV0aF90b2tlbl9zZWNyZXQnIGluIHJl
+cykKLQotICAgIGRlZiBfdHdvX2xlZ2dlZChzZWxmLCBtZXRob2QpOgotICAgICAgICBjbGllbnQg
+PSBvYXV0aC5DbGllbnQoc2VsZi5jb25zdW1lciwgTm9uZSkKLQotICAgICAgICByZXR1cm4gY2xp
+ZW50LnJlcXVlc3Qoc2VsZi5fdXJpKCd0d29fbGVnZ2VkJyksIG1ldGhvZCwKLSAgICAgICAgICAg
+IGJvZHk9dXJsbGliLnVybGVuY29kZShzZWxmLmJvZHkpKQotCi0gICAgZGVmIHRlc3RfdHdvX2xl
+Z2dlZF9wb3N0KHNlbGYpOgotICAgICAgICAiIiJBIHRlc3Qgb2YgYSB0d28tbGVnZ2VkIE9BdXRo
+IFBPU1QgcmVxdWVzdC4iIiIKLSAgICAgICAgcmVzcCwgY29udGVudCA9IHNlbGYuX3R3b19sZWdn
+ZWQoIlBPU1QiKQotCi0gICAgICAgIHNlbGYuYXNzZXJ0RXF1YWxzKGludChyZXNwWydzdGF0dXMn
+XSksIDIwMCkKLQotICAgIGRlZiB0ZXN0X3R3b19sZWdnZWRfZ2V0KHNlbGYpOgotICAgICAgICAi
+IiJBIHRlc3Qgb2YgYSB0d28tbGVnZ2VkIE9BdXRoIEdFVCByZXF1ZXN0LiIiIgotICAgICAgICBy
+ZXNwLCBjb250ZW50ID0gc2VsZi5fdHdvX2xlZ2dlZCgiR0VUIikKLSAgICAgICAgc2VsZi5hc3Nl
+cnRFcXVhbHMoaW50KHJlc3BbJ3N0YXR1cyddKSwgMjAwKQotCiAgICAgQG1vY2sucGF0Y2goJ2h0
+dHBsaWIyLkh0dHAucmVxdWVzdCcpCiAgICAgZGVmIHRlc3RfbXVsdGlwYXJ0X3Bvc3RfZG9lc19u
+b3RfYWx0ZXJfYm9keShzZWxmLCBtb2NrSHR0cFJlcXVlc3QpOgogICAgICAgICByYW5kb21fcmVz
+dWx0ID0gcmFuZG9tLnJhbmRpbnQoMSwxMDApCg==
+--=_1ae3915d289f787cc91577c7c9b41299
+Content-Transfer-Encoding: base64
+Content-Type: text/x-diff;
+ name=py-oauth2.diff
+Content-Disposition: attachment;
+ filename=py-oauth2.diff;
+ size=749
+
+PyBweS1vYXV0aDIvcGF0Y2hlcwpJbmRleDogcHktb2F1dGgyL01ha2VmaWxlCj09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0K
+UkNTIGZpbGU6IC9jdnMvcG9ydHMvbmV0L3B5LW9hdXRoMi9NYWtlZmlsZSx2CnJldHJpZXZpbmcg
+cmV2aXNpb24gMS4yCmRpZmYgLXUgLXAgLXUgLXAgLXIxLjIgTWFrZWZpbGUKLS0tIHB5LW9hdXRo
+Mi9NYWtlZmlsZQkyIEFwciAyMDE1IDE0OjIxOjE2IC0wMDAwCTEuMgorKysgcHktb2F1dGgyL01h
+a2VmaWxlCTI3IE1heSAyMDE1IDE5OjI0OjIxIC0wMDAwCkBAIC01LDYgKzUsNyBAQCBDT01NRU5U
+ID0JUHl0aG9uIGxpYnJhcnkgZm9yIE9BdXRoCiBNT0RQWV9FR0dfVkVSU0lPTiA9IDEuNS4yMTEK
+IERJU1ROQU1FID0Jb2F1dGgyLSR7TU9EUFlfRUdHX1ZFUlNJT059CiBQS0dOQU1FID0JcHktJHtE
+SVNUTkFNRX0KK1JFVklTSU9OPQkxCiBDQVRFR09SSUVTID0JbmV0CiBNQUlOVEFJTkVSID0JSm9o
+YW4gSHVsZHRncmVuIDxqaHVsZHRncmVuQGdtYWlsLmNvbT4KIApAQCAtMTksNSArMjAsOSBAQCBN
+T0RVTEVTID0JbGFuZy9weXRob24KIE1PRFBZX1NFVFVQVE9PTFMgPSBZZXMKIAogUlVOX0RFUEVO
+RFMgPQl3d3cvcHktaHR0cGxpYjIKKworVEVTVF9ERVBFTkRTID0JZGV2ZWwvcHktbW9jayBcCisJ
+CWRldmVsL3B5LWNvdmVyYWdlIFwKKwkJJHtSVU5fREVQRU5EU30KIAogLmluY2x1ZGUgPGJzZC5w
+b3J0Lm1rPgo=
+--=_1ae3915d289f787cc91577c7c9b41299--
+

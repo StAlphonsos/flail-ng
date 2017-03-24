@@ -1,0 +1,88 @@
+Return-Path: <owner-ports+M73417@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 6825 invoked from network); 28 May 2015 21:23:20 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 28 May 2015 21:23:20 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SLMsJA001144;
+	Thu, 28 May 2015 15:22:54 -0600 (MDT)
+Received: from vmail.superblock.net (dualism.superblock.net [207.158.15.119])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4SLMgr8021256
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Thu, 28 May 2015 15:22:43 -0600 (MDT)
+Received: from vmail.superblock.net (localhost.superblock.net [127.0.0.1])
+	by vmail.superblock.net (Postfix) with ESMTP id 264CA39184;
+	Thu, 28 May 2015 16:22:42 -0500 (CDT)
+Received: from lolcathost (lolcathost [127.0.0.1]) 
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: yes)
+	by vmail.superblock.net (Postfix) with ESMTPSA id 9ADAF39181;
+	Thu, 28 May 2015 16:22:41 -0500 (CDT)
+Date: Thu, 28 May 2015 16:22:40 -0500
+From: joshua stein <jcs@openbsd.org>
+To: ports@openbsd.org
+Subject: new: sysutils/intel_backlight
+Message-ID: <20150528155654.6f738eb270@4c9d8809d64481a>
+Mail-Followup-To: ports@openbsd.org
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="ILTwQ1kFsidH4Bkt"
+Content-Disposition: inline
+X-No-Archive: yes
+X-PGP-Key: https://jcs.org/pgpkey.asc
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+
+--ILTwQ1kFsidH4Bkt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Intel has an intel-gpu-tools suite[0] which can do lots of things to
+their video chips from userland tools by directly manipulating PCI
+registers.  I was working on a port of this when I saw that someone
+extracted the intel_backlight utility for FreeBSD, so I ported it to
+OpenBSD and added Broadwell chip support.
+
+I have yet to find a Broadwell laptop that actually does anything in
+response to calling its ACPI methods to adjust screen brightness, so
+until inteldrm(4) gets full Broadwell support, this utility can
+help.
+
+To use this while X is running, you need to have the
+machdep.allowaperture sysctl set to 3 which requires -current.
+
+
+0. http://cgit.freedesktop.org/xorg/app/intel-gpu-tools/
+
+--ILTwQ1kFsidH4Bkt
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="intel_backlight.tar.gz"
+Content-Transfer-Encoding: base64
+
+H4sIAAAAAAAAA+2XbW/TMBDH93b+FJbYC5CgceIkLYiihTTbAm1TJR0M3lSp47be0qTE6bYO
+7btz2caAaDAeSiWEf1LkxLHv3Nyd+7fISp6OxjE7ScV0Vm79DQgxSdOyoCV60yJVC3f6dXvN
+lm5YVLebTUoM6Icn6LP+ympqLGUZF+DymMkfjjuTBdvEejaM+Db+Wi8+4ROR8nX6IDohtml+
+N/4Q9nr8TcOwt8g6F/E9/vP4P8A7wYJnL6PODkJBv/tutBeEIyd0D6L2djxPbBML2rIRcoNe
+z+sP29vLUqSiXOEyx3FyDJ8P32YPzjPsVwmFT0XCc8xmYiFhqjP09oPQ9yLc3pYrWVmA7p7j
+94dweWF7+ziXs2WMZclFhp9DLHZzWNVYJo28mL5A6AGGFaKBF/b84WjguK+dfW/kdsKg18bv
+OBjbPxg5rhsc9ofgA+ZXHYMweOW5VUcty0cTsFyNqH6UXw3gE9oaJ5OnjFJGzbFF+ZhSK2F2
+y2iNDd2mJptQi3HU8aNh3+l5MGfn4xcfzyLtyqimXT4xiG4Ry7AQSvInIoP8StNnCIb7/Wjo
+dLvVnP3Q6V3inY9vw9cvD/1u51KrLRHeDUJvzz+61MYiQ6ghMpYuE46fVx9lkRdlY37yAv1x
+/Ov1nwhZimySryG1brmv/g1yU/8moYZhXdU/Jaaq/w0QHTiGZeOHtTy4TeIGfJ3G9OIRhjpr
+XeSHETs4dLM4O794k5ZHe75wV3sf+sG547xyjt90368u3GLA2ijy33s/ZdXUm+Tpn+ex4veo
+1//iZLp2H7+m/+yq/qlhW0r/bYA74q91vMgN1+jjvv2f2vrn/d+goAWr/V/Xlf7bBHXZcS3p
+JC5n/CtddxqnS36nutNYXCQSj1coEQVnZbrCBY8TkU1xnCU35qqngevDmynIC17IBkJDcDCP
+2SzhiwYIpPwsXvCiXBYcg0IEOzc+51cCk+O4xCmP4d64Ep6McSmxlvBT7XzSsh+jytnnsbQa
+spQcn83gJIOPsJC4WGYZLKOh/mm+5a76H3RB5K7Rx331Tyyzvv+buqXqfxPssnw+51n51TFw
+Fw4cGK76kUSVjkKhUCgUCoVCoVAoFAqFQqFQ/EN8AjkkUOwAKAAA
+
+--ILTwQ1kFsidH4Bkt--
+

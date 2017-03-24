@@ -5,6 +5,9 @@ use strict;
 use warnings;
 use Test::More tests => 2;
 use IO::String;
+use vars qw($NO_MAILDIR);
+
+BEGIN { $NO_MAILDIR = 1; }
 
 use t::lib;
 

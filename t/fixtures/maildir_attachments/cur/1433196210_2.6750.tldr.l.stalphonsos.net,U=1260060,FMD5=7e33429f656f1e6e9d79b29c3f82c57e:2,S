@@ -1,0 +1,90 @@
+Return-Path: <owner-ports+M73428@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 30741 invoked from network); 29 May 2015 13:46:04 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 29 May 2015 13:46:04 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4TDjTuc011078;
+	Fri, 29 May 2015 07:45:29 -0600 (MDT)
+Received: from serv0.x61.com.ar (serv0.x61.com.ar [64.85.168.251])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4TDjFcV016966
+	(version=TLSv1/SSLv3 cipher=DHE-DSS-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <ports@openbsd.org>; Fri, 29 May 2015 07:45:16 -0600 (MDT)
+Received: from serv0.x61.com.ar (serv0.x61.com.ar [64.85.168.251]);
+	by serv0.x61.com.ar (OpenSMTPD) with ESMTPSA id 06c0d1cc;
+	TLS version=TLSv1/SSLv3 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256 verify=NO;
+	for <ports@openbsd.org>;
+	Fri, 29 May 2015 10:45:15 -0300 (ART)
+Date: Fri, 29 May 2015 10:45:13 -0300
+From: "Gonzalo L. Rodriguez" <gonzalo@x61.com.ar>
+To: ports@openbsd.org
+Subject: UPDATE: Spectrwm-2.7.2
+Message-ID: <20150529134513.GC22979@serv0.x61.com.ar>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="OKsJ4szwu71huFAO"
+Content-Disposition: inline
+X-Operating-System: OpenBSD
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <ports.openbsd.org>
+List-Owner: <mailto:owner-ports@openbsd.org>
+List-Post: <mailto:ports@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20ports>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20ports>
+X-Loop: ports@openbsd.org
+Precedence: bulk
+Sender: owner-ports@openbsd.org
+
+
+--OKsJ4szwu71huFAO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+Hi,
+
+New update for Spectrwm to 2.7.2:
+
+* Restore Num_Lock workaround.
+  If Num_Lock is mapped to a modifier, filter the modifier.
+
+
+Ok?
+
+-- 
+Sending from my toaster.
+
+--OKsJ4szwu71huFAO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename="spectrwm-2.7.2.diff"
+
+Index: Makefile
+===================================================================
+RCS file: /cvs/ports/x11/spectrwm/Makefile,v
+retrieving revision 1.18
+diff -u -p -r1.18 Makefile
+--- Makefile	27 May 2015 14:07:01 -0000	1.18
++++ Makefile	29 May 2015 13:30:02 -0000
+@@ -4,7 +4,7 @@ COMMENT=		small tiling window manager
+ 
+ SHARED_LIBS=		swmhack 1.0
+ 
+-DISTNAME=		spectrwm-2.7.1
++DISTNAME=		spectrwm-2.7.2
+ EXTRACT_SUFX=		.tgz
+ CATEGORIES=		x11
+ 
+Index: distinfo
+===================================================================
+RCS file: /cvs/ports/x11/spectrwm/distinfo,v
+retrieving revision 1.15
+diff -u -p -r1.15 distinfo
+--- distinfo	27 May 2015 14:07:01 -0000	1.15
++++ distinfo	29 May 2015 13:30:02 -0000
+@@ -1,2 +1,2 @@
+-SHA256 (spectrwm-2.7.1.tgz) = zdkLU/3cnL4IBclGqEEWAe6rNxqeBsBpNxyjJ57/2SU=
+-SIZE (spectrwm-2.7.1.tgz) = 132820
++SHA256 (spectrwm-2.7.2.tgz) = tWz/oB7ixYUVNQwb4ZQBQChv0Yd4ZZxvWtpFlTGfl8s=
++SIZE (spectrwm-2.7.2.tgz) = 132554
+
+--OKsJ4szwu71huFAO--
+

@@ -1,0 +1,69 @@
+Return-Path: <owner-tech+M42295@openbsd.org>
+Delivered-To: attila@stalphonsos.com
+Received: (qmail 20311 invoked from network); 30 May 2015 17:41:21 -0000
+Received: from unknown (HELO shear.ucar.edu) (192.43.244.163)
+  by x.stalphonsos.net with SMTP; 30 May 2015 17:41:21 -0000
+Received: from openbsd.org (localhost [127.0.0.1])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4UHf1EY025344;
+	Sat, 30 May 2015 11:41:01 -0600 (MDT)
+Received: from obiit.org (integer.obiit.org [195.168.92.92])
+	by shear.ucar.edu (8.14.7/8.14.7) with ESMTP id t4UHepwB003837
+	for <tech@openbsd.org>; Sat, 30 May 2015 11:40:52 -0600 (MDT)
+Received: by integer.obiit.org (Postfix, from userid 1001)
+	id 7E44BD85D0; Sat, 30 May 2015 19:40:50 +0200 (CEST)
+Date: Sat, 30 May 2015 19:40:50 +0200
+From: frantisek holop <minusf@obiit.org>
+To: tech@openbsd.org
+Subject: build with DRMDEBUG
+Message-ID: <20150530174050.GD11063@obiit.org>
+Mail-Followup-To: tech@openbsd.org
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="tThc/1wpZn/ma/RB"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.23 (2014-03-12)
+List-Help: <mailto:majordomo@openbsd.org?body=help>
+List-ID: <tech.openbsd.org>
+List-Owner: <mailto:owner-tech@openbsd.org>
+List-Post: <mailto:tech@openbsd.org>
+List-Subscribe: <mailto:majordomo@openbsd.org?body=sub%20tech>
+List-Unsubscribe: <mailto:majordomo@openbsd.org?body=unsub%20tech>
+X-Loop: tech@openbsd.org
+Precedence: list
+Sender: owner-tech@openbsd.org
+
+
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+this might have been a typo and i can build a kernel
+with DRMDEBUG now (failed in radeon_benchmark.c).
+
+-f
+-- 
+i got real close to seeing elvis but my shovel broke.
+
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="drmP.h.patch"
+
+Index: drmP.h
+===================================================================
+RCS file: /cvs/src/sys/dev/pci/drm/drmP.h,v
+retrieving revision 1.195
+diff -u -p -r1.195 drmP.h
+--- drmP.h	18 Apr 2015 14:47:34 -0000	1.195
++++ drmP.h	30 May 2015 17:36:29 -0000
+@@ -188,7 +188,7 @@ drm_can_sleep(void)
+ 	    curproc->p_pid, __func__ , ## arg)
+ 
+ 
+-#ifdef DRM_DEBUG
++#ifdef DRMDEBUG
+ #define DRM_INFO(fmt, arg...)  printf("drm: " fmt, ## arg)
+ #else
+ #define DRM_INFO(fmt, arg...) do { } while(/* CONSTCOND */ 0)
+
+
+--tThc/1wpZn/ma/RB--
+
