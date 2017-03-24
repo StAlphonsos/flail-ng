@@ -13,6 +13,7 @@ flail ls - list contents of Maildir folders
 
 =head1 DESCRIPTION
 
+List messages in a Maildir folder
 
 =head1 LICENSE
 
@@ -24,12 +25,14 @@ package Flail::App::Command::ls;
 use strict;
 use warnings;
 use Flail::App -command;
+use Mail::Box::Maildir;
 
 sub usage_desc { "flail ls [-options] [Maildir]" }
 
-sub opt_spec {
-	( [ "max|m=i" => "maximum number of entries to list" ],
-	  [ "sort|s=s" => "sort by given field, default is msgid" ]
+sub options {
+	( [ "max|m=i" => "maximum number of entries to list",
+	    { default => 20 } ],
+	  [ "sort|s=s" => "sort by given field, default is msgid" ],
 	);
 }
 
@@ -41,14 +44,20 @@ sub execute {
 	if ($opt->{"sort"}) {
 	}
 	$maildir ||= $self->conf("maildir");
-	$maildir = $self->path_to($maildir);
+	$maildir = join("/", $self->conf("maildir_base"), $maildir);
 	my $folder = Mail::Box::Maildir->new(folder => $maildir);
 	my @msgids = sort $by $folder->messageIds();
 	$self->emit("folder '$folder':",scalar(@msgids),"messages");
-	@msgids = @msgids[0..$max];
+	@msgids = @msgids[0..$max] if $max;
 	foreach my $msgid (@msgids) {
 		my $msg = $folder->messageId($msgid);
-		
+		my @from = $msg->from();
+		my @to = $msg->to();
+		my $date = $msg->head->date;
+		my $subj = $msg->study('subject');
+		my $from_str = shift(@from)->format(@from);
+		my $to_str = shift(@to)->format(@to);
+		$self->emit($msgid,$date,$from_str,$to_str,$subj);
 	}
 }
 

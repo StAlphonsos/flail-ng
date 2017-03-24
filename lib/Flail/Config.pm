@@ -37,7 +37,7 @@ has "defaults" => (
 	default => sub { my $r = { %DEFAULTS }; $r; });
 has "default_value" => (is => "rw", isa => "Str", default => "");
 
-sub Default { $DEFAULT_CONF ||= shift->new; $DEFAULT_CONF }
+sub Default { $DEFAULT_CONF ||= shift->new; return $DEFAULT_CONF; }
 
 sub get {
 	my($self,$name) = @_;
