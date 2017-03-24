@@ -24,14 +24,13 @@ ISC/BSD; see LICENSE file in source distribution.
 
 package Flail::Config;
 use Moose;
-use Flail::Util qw(basename dirname);
-use vars qw($DEFAULT_CONF %DEFAULTS);
+use Flail::Util qw(basename_env dirname_env);
+use vars qw($DEFAULT_CONF %DEFAULTS @MAILDIR_VARS);
+@MAILDIR_VARS = qw(FLAIL_TEST_MAILDIR MAILDIR);
 
 %DEFAULTS = (
-	"maildir" => $ENV{"MAILDIR"} ?
-		basename($ENV{"MAILDIR"}) : "Maildir",
-	"maildir_base" => $ENV{"MAILDIR"} ?
-		dirname($ENV{"MAILDIR"}) : $ENV{"HOME"},
+	"maildir" => basename_env(@MAILDIR_VARS) || "Maildir",
+	"maildir_base" => dirname_env(@MAILDIR_VARS) || $ENV{"HOME"}
 );
 
 has "attrs" => (is => "rw", isa => "HashRef", default => sub { {} });

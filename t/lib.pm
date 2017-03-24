@@ -46,7 +46,7 @@ sub setup_testing_env {
 		my $cmd = qq{sh -c '(cd t/fixtures/${SAMPLE_MAILDIR}; }.
 		    qq{${tar} -cf - .) | (cd $md; ${tar} -$xf -)'};
 		system($cmd) == 0 or die("seutp_testing_env: $cmd: $!");
-		$ENV{"MAILDIR"} = $md;
+		$ENV{"FLAIL_TEST_MAILDIR"} = $md;
 	}
 }
 
