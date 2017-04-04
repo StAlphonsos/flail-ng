@@ -9,6 +9,7 @@ lib/Flail/App/Command/ls.pm
 lib/Flail/App/Command/repl.pm
 lib/Flail/App/Command/server.pm
 lib/Flail/Config.pm
+lib/Flail/Message.pm
 lib/Flail/MessageSet.pm
 lib/Flail/MessageSet/Handler.pm
 lib/Flail/MessageSet/Maildir.pm
@@ -23,6 +24,7 @@ t/000-load-everything.t
 t/001-config.t
 t/002-sink.t
 t/003-util.t
+t/004-messageset.t
 t/fixtures/maildir_attachments/cur/1433195770_0.6750.tldr.l.stalphonsos.net,U=1258933,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433195843_0.6750.tldr.l.stalphonsos.net,U=1259117,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433195852_0.6750.tldr.l.stalphonsos.net,U=1259138,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
@@ -63,8 +65,8 @@ t/fixtures/maildir_attachments/cur/1433196295_0.6750.tldr.l.stalphonsos.net,U=12
 t/fixtures/maildir_attachments/cur/1433196295_1.6750.tldr.l.stalphonsos.net,U=1260288,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433196299_1.6750.tldr.l.stalphonsos.net,U=1260298,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433196302_1.6750.tldr.l.stalphonsos.net,U=1260306,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
-t/fixtures/maildir_simple/cur/1435599858.6310_1.tldr.l.stalphonsos.net
 t/fixtures/maildir_simple/cur/1416411736.20539_44.geronimo.l.stalphonsos.net
+t/fixtures/maildir_simple/cur/1435599858.6310_1.tldr.l.stalphonsos.net
 t/fixtures/maildir_subdirs/cur/1433285714_1.31856.tldr.l.stalphonsos.net,U=2887,FMD5=d80834254c4035d8f0106c98a027fa31:2,S
 t/fixtures/maildir_subdirs/cur/1433285715_0.31856.tldr.l.stalphonsos.net,U=2888,FMD5=d80834254c4035d8f0106c98a027fa31:2,S
 t/fixtures/maildir_subdirs/cur/1433285717_0.31856.tldr.l.stalphonsos.net,U=2895,FMD5=d80834254c4035d8f0106c98a027fa31:2,S
@@ -81,6 +83,7 @@ t/fixtures/maildir_subdirs/garbage/cur/1461705421_0.28863.tanstaafl.l.stalphonso
 t/fixtures/maildir_subdirs/garbage/cur/1464475992_0.97161.tanstaafl.l.stalphonsos.net,U=39956,FMD5=d4c63ca4c4f6b535f063b56c016b96a5:2,ST
 t/fixtures/maildir_subdirs/garbage/cur/1484922610_0.24498.lmfao.l.stalphonsos.net,U=92355,FMD5=d4c63ca4c4f6b535f063b56c016b96a5:2,ST
 t/lib.pm
+t/xxx-privsep.t
 templates/template.pl
 templates/template.pm
 templates/template.t
