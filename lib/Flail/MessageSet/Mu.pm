@@ -24,31 +24,37 @@ ISC/BSD; see LICENSE file in source distribution.
 
 package Flail::MessageSet::Mu;
 use Moose;
+use Flail::Util qw(dumpola test_warn);
 use mup;
 
 extends "Flail::MessageSet::Handler";
 
 has "query" => (is => "rw", isa => "Str", required => 1);
 has "mup" => (is => "rw", isa => "mup");
+has "results" => (is => "rw", isa => "Maybe[HashRef]");
+has "maxnum" => (is => "rw", isa => "Int", default => 100);
+has "threads" => (is => "rw", isa => "Bool", default => 0);
+has "sortfield" => (is => "rw", isa => "Str", default => "date");
+has "reverse" => (is => "rw", isa => "Bool", default => 0);
 
-# to initialize an instance after construction:
 sub BUILD {
 	my($self,$params) = @_;
+	$self->mup(mup->new(verbose => $ENV{"TEST_VERBOSE"}))
+	    unless $self->mup;
+	my $opt = sub {
+		my($name) = @_;
+		( $name => 
+		  exists($params->{$name}) ? $params->{$name} : $self->$name )
+	};
+	my %query_opts = ( map { &$opt($_) }
+			   qw(maxnum threads sortfield reverse) );
+	$query_opts{"query"} = $self->query;
+	test_warn("# query opts: ".dumpola(\%query_opts));
+	$self->results($self->mup->find(query => $self->query));
 }
 
-# to mung args on their way to the constructor:
-around BUILDARGS => sub {
-	my $orig = shift;
-	my $class = shift;
-	my $args;
-	if (@_ == 1 && ref($_[0]) eq 'HASH') {
-		$args = shift;
-	} else {
-		$args = { @_ };
-	}
-	# do something with args here
-	return $args;
-};
+sub count	{ shift->results->{"found"} }
+sub this	{ $_[0]->results->{"results"}->[$_[0]->idx + $_[1]] }
 
 __PACKAGE__->meta->make_immutable;
 

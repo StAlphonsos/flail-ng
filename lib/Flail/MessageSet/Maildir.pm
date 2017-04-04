@@ -24,7 +24,7 @@ ISC/BSD; see LICENSE file in source distribution.
 
 package Flail::MessageSet::Maildir;
 use Moose;
-use Mail::Box::Dir;
+use Mail::Box::Maildir;
 
 extends "Flail::MessageSet::Handler";
 
@@ -36,20 +36,9 @@ sub BUILD {
 	$self->boxdir(Mail::Box::Maildir->new(folder => $self->folder));
 }
 
-sub next {
-	my $self = shift(@_);
-	my $r = $self->boxdir->message($self->idx);
-	$self->idx(1+$self->idx) if $r;
-	return $r;
-}
-
-sub prev {
-	my $self = shift(@_);
-	return undef unless $self->idx > 0;
-	my $r = $self->boxdir->message($self->idx - 1);
-	$self->idx($self->idx-1);
-	return $r;
-}
+# anonians
+sub count	{ shift->boxdir->nrMessages() }
+sub this	{ $_[0]->boxdir->message($_[0]->idx + $_[1]) }
 
 __PACKAGE__->meta->make_immutable;
 

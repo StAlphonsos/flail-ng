@@ -18,15 +18,15 @@ my $ref = $str->string_ref;
 my $sink = Flail::Sink->new(stream => $str, debug => 1);
 my $s = $sink->msg_to_string("foo");
 is($s,"[flail] foo","msg_to_string('foo') looks right |$s|");
-$sink->write("bazle");
-$sink->write("!barfle");
-$sink->write("?bangle");
-$sink->write("#baffled");
+$sink->emit("bazle");
+$sink->emit("!barfle");
+$sink->emit("?bangle");
+$sink->emit("#baffled");
 my $exp = join("", <DATA>);
 is($$ref,$exp,"result of four writes as expected |$$ref| vs |$exp|");
 
 __DATA__
 [flail] bazle
-[flail NOTICE] barfle
-[flail ERROR] bangle
-[flail DEBUG] baffled
+[flail] NOTICE barfle
+[flail] ERROR bangle
+[flail] DEBUG baffled

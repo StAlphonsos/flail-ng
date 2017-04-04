@@ -12,10 +12,10 @@ use t::lib;
 
 require_ok("Flail");
 require_ok("Flail::Config");
+require_ok("Flail::Message");
 require_ok("Flail::MessageSet");
 require_ok("Flail::MessageSet::Handler");
 require_ok("Flail::MessageSet::Maildir");
-require_ok("Flail::MessageSet::Mu");
 require_ok("Flail::Sink");
 require_ok("Flail::App");
 require_ok("Flail::App::Command");

@@ -12,7 +12,6 @@ lib/Flail/Config.pm
 lib/Flail/MessageSet.pm
 lib/Flail/MessageSet/Handler.pm
 lib/Flail/MessageSet/Maildir.pm
-lib/Flail/MessageSet/Mu.pm
 lib/Flail/Sink.pm
 lib/Flail/Util.pm
 LICENSE
@@ -65,7 +64,7 @@ t/fixtures/maildir_attachments/cur/1433196295_1.6750.tldr.l.stalphonsos.net,U=12
 t/fixtures/maildir_attachments/cur/1433196299_1.6750.tldr.l.stalphonsos.net,U=1260298,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433196302_1.6750.tldr.l.stalphonsos.net,U=1260306,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_simple/cur/1435599858.6310_1.tldr.l.stalphonsos.net
-t/fixtures/maildir_simple/new/1416411736.20539_44.geronimo.l.stalphonsos.net
+t/fixtures/maildir_simple/cur/1416411736.20539_44.geronimo.l.stalphonsos.net
 t/fixtures/maildir_subdirs/cur/1433285714_1.31856.tldr.l.stalphonsos.net,U=2887,FMD5=d80834254c4035d8f0106c98a027fa31:2,S
 t/fixtures/maildir_subdirs/cur/1433285715_0.31856.tldr.l.stalphonsos.net,U=2888,FMD5=d80834254c4035d8f0106c98a027fa31:2,S
 t/fixtures/maildir_subdirs/cur/1433285717_0.31856.tldr.l.stalphonsos.net,U=2895,FMD5=d80834254c4035d8f0106c98a027fa31:2,S

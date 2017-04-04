@@ -15,6 +15,7 @@ $SAMPLE_MAILDIR ||= "maildir_simple";
 sub ts		{ POSIX::strftime("%Y-%m-%dT%H:%M:%S%Z",localtime(time)) }
 sub DD		{ Data::Dumper->new(\@_)->Terse(1)->Indent(0)->Dump; }
 sub verbose	{ $ENV{"TEST_VERBOSE"} }
+sub test_folder	{ $ENV{"FLAIL_TEST_MAILDIR"} }
 
 sub setup_testing_env {
 	my $tmpd = $ENV{"TMPDIR"} || "/tmp";
@@ -36,17 +37,19 @@ sub setup_testing_env {
 	# tests that don't want a Maildir set up must BEGIN { $NO_MAILDIR=1 }
 	# c.f. 000-load-everything.t
 	unless ($NO_MAILDIR) {
+		my $fix = "t/fixtures/${SAMPLE_MAILDIR}";
 		my $md = join("/", $tstd, "Maildir");
+		warn("# populating $md from $fix ...\n") if verbose;
 		die("setup_testing_env: $md exists!") if -d $md || -f $md;
 		make_path($md) or die("make_path($md): $!");
-		die("t/fixtures/${SAMPLE_MAILDIR} is missing")
-		    unless -d "t/fixtures/${SAMPLE_MAILDIR}";
+		die("$fix is missing") unless -d $fix;
 		my $tar = $ENV{'FLAIL_TEST_TAR'} || 'tar';
 		my $xf = verbose() ? 'xvf' : 'xf';
-		my $cmd = qq{sh -c '(cd t/fixtures/${SAMPLE_MAILDIR}; }.
+		my $cmd = qq{sh -c '(cd $fix; }.
 		    qq{${tar} -cf - .) | (cd $md; ${tar} -$xf -)'};
 		system($cmd) == 0 or die("seutp_testing_env: $cmd: $!");
 		$ENV{"FLAIL_TEST_MAILDIR"} = $md;
+		$ENV{"MAILDIR"} = $md;
 	}
 }
 

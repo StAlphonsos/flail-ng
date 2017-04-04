@@ -25,24 +25,24 @@ ISC/BSD; see LICENSE file in source distribution.
 package Flail::App::Command;
 use Moose;
 use App::Cmd::Setup -command;
-use Flail::Sink;
-use Flail::Config;
+use Flail::Util qw(dumpola);
 
-has "sink" => (
-	is => "rw", isa => "Object", default => sub { Flail::Sink->Default });
-has "configuration" => (
-	is => "rw", isa => "Object", default => sub { Flail::Config->Default});
+has "the_app" => (
+	is => "rw", isa => "Object", handles => [qw[emit more is_full conf]]);
+
+sub BUILD {
+	my($self,$params) = @_;
+	$self->the_app($params->{"app"});
+}
 
 sub opt_spec {
 	my($class,$app) = @_;
 	return ( [ "verbose|v" => "crank up verbosity in output" ],
+		 [ "maildir|m=s" => "Maildir base (def: ~/Maildir)" ],
 		 [ "config|C=s" => "use config in given file (def ~/.flailrc)",
 		   { default => join("/",$ENV{"HOME"},".flailrc") } ],
 		 $class->options($app) );
 }
-
-sub emit { shift->sink->write(@_) }
-sub conf { shift->configuration->get(@_) }
 
 1;
 

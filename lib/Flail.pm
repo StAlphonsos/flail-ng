@@ -16,8 +16,7 @@ Ipsum, meet lorem.
 =cut
 
 package Flail;
-use strict;
-use warnings;
+use Modern::Perl;
 use vars qw($VERSION);
 
 $VERSION = '1.0.0';

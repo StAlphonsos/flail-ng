@@ -22,10 +22,9 @@ ISC/BSD; see LICENSE file in source distribution.
 =cut
 
 package Flail::App::Command::ls;
-use strict;
-use warnings;
+use Modern::Perl;
 use Flail::App -command;
-use Mail::Box::Maildir;
+use Flail::MessageSet;
 
 sub usage_desc { "flail ls [-options] [Maildir]" }
 
@@ -36,34 +35,33 @@ sub options {
 	);
 }
 
+sub query_params {
+	my($self,$opt,$args) = @_;
+	my %qopts;
+	my $maildir = shift(@$args) if @$args;
+	$maildir ||= $opt->{"maildir"} || $self->conf("maildir");
+	$self->emit("# maildir: $maildir");
+	$qopts{"folder"} = $maildir;
+	$self->emit("# folder: $qopts{folder}");
+	return %qopts;
+}
+
 sub execute {
 	my($self,$opt,$args) = @_;
-	my $maildir = shift(@$args) if @$args;
-	my $max = $opt->{"max"};
-	my $by = sub { $a cmp $b };
-	if ($opt->{"sort"}) {
-	}
-	$maildir ||= $self->conf("maildir");
-	$maildir = join("/", $self->conf("maildir_base"), $maildir);
-	my $folder = Mail::Box::Maildir->new(folder => $maildir);
-	my @msgids = sort $by $folder->messageIds();
-	$self->emit("folder '$folder':",scalar(@msgids),"messages");
-	@msgids = @msgids[0..$max] if $max;
-	foreach my $msgid (@msgids) {
-		next unless defined $msgid;
-		my $msg = $folder->messageId($msgid);
-		unless ($msg) {
-			$self->emit($msgid,"does not exist - skipped");
-			next;
+	$self->emit("# ls::execute opt=",$opt,"args=",$args);
+	my %qparams = $self->query_params($opt,$args);
+	my $mset = Flail::MessageSet->Query(%qparams);
+	my $page = $self->emit(page_start => $mset);
+	my $result = $mset->first;
+	while ($result) {
+		$page->emit(row => $result);
+		if ($page->is_full && !$mset->is_exhausted) {
+			$page = $page->emit(page_end => $mset)->more();
+			last unless $page;
 		}
-		my @from = $msg->from();
-		my @to = $msg->to();
-		my $date = $msg->head->get('Date');
-		my $subj = $msg->study('subject');
-		my $from_str = shift(@from)->format(@from);
-		my $to_str = shift(@to)->format(@to);
-		$self->emit($msgid,$date,$from_str,$to_str,$subj);
+		$result = $mset->next;
 	}
+	$self->emit(page_end => $mset);
 }
 
 1;
