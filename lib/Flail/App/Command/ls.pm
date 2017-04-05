@@ -56,12 +56,12 @@ sub execute {
 	while ($result) {
 		$page->emit(row => $result);
 		if ($page->is_full && !$mset->is_exhausted) {
-			$page = $page->emit(page_end => $mset)->more();
+			$page = $page->emit(page_end => $mset)->more($mset);
 			last unless $page;
 		}
 		$result = $mset->next;
 	}
-	$self->emit(page_end => $mset);
+	$page->emit(page_end => $mset) if $page;
 }
 
 1;

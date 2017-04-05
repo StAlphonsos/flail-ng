@@ -17,3 +17,14 @@ pledge and privsep?  where are things decoded?  how do we apply
 the privsep pattern to an MUA.  This is one of the central questions
 of this project.
 
+## notes
+
+* 2017-04-04
+
+Taint checking makes local::lib not work.  Interesting dilemma.
+
+Struggling with what code should be where, have decided to take simple
+approach first and do privsep next with just what I have.
+
+Sometimes you have to not do what you want in order to figure out how
+to do what you want.  Or, even better: to figure out what it means.

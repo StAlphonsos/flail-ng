@@ -26,7 +26,7 @@ ISC/BSD; see LICENSE file in source distribution.
 package Flail::Sink;
 use Moose;
 use IO::Handle;
-use Flail::Util qw(affirmative clean msgfy);
+use Flail::Util qw(affirmative clean msgfy screen_columns);
 use vars qw($DEFAULT_SINK %LEAD_TRAIL);
 
 %LEAD_TRAIL = (
@@ -41,10 +41,29 @@ has "sep" => (is => "rw", isa => "Str", default => " ");
 has "stream" => (is => "ro", isa => "Object", required => 1);
 has "debug" => (is => "rw", isa => "Bool", default =>$ENV{"TEST_VERBOSE"}?1:0);
 has "input" => (is => "ro", isa => "Maybe[Object]");
+has "line_no" => (is => "rw", isa => "Int", default => 0);
+has "width" => (is => "rw", isa => "Int", default => 0);
+has "height" => (is => "rw", isa => "Int", default => 0);
+has "col_no" => (is => "rw", isa => "Int", default => 0);
+
+sub reset_line	{ $_[0]->line_no(0); $_[0]->col_no(0); $_[0] }
+sub is_full	{ $_[0]->height && ($_[0]->line_no >= $_[0]->height-2) }
+
+sub inc_line {
+	my($self,$chars) = @_;
+	my $inc = 1;
+	$inc += int(($chars + $self->col_no) / $self->width) if $self->width;
+	$self->line_no($inc + $self->line_no);
+	$self->col_no(0);
+	return $self;
+}
 
 sub BUILD {
 	my($self,$params) = @_;
 	$self->stream->autoflush(1);
+	my($w,$h) = screen_columns();
+	$self->width($w);
+	$self->height($h);
 }
 
 sub Default {
@@ -88,6 +107,7 @@ sub writeln {
 	return unless defined $str;
 	$str .= $self->eol if $self->eol && substr($str,-1,1) ne $self->eol;
 	$self->stream->write($str);
+	$self->inc_line(length($str)-1);
 	return $self;
 }
 
@@ -96,12 +116,14 @@ sub write {
 	return unless defined $str;
 	$str =~ s/\s*$//gs;
 	$self->stream->write($str);
+	$self->col_no(length($str) + $self->col_no);
 	return $self;
 }
 
 sub newline {
 	my($self) = @_;
 	$self->stream->write($self->eol);
+	$self->inc_line(0);
 	return $self;
 }
 
@@ -123,14 +145,14 @@ sub emit {
 
 sub more {
 	my($self,$pageable) = @_;
-	$self->write("--MORE [$pageable]--");
+	$self->write("--MORE ${pageable}--");
 	my $resp = $self->input->getline;
 	return undef unless defined $resp;
 	$resp = clean($resp);
-	return affirmative($resp) ? $self : undef;
+	$self->reset_line();
+	return affirmative($resp) ?
+	    $self->emit(page_start => $pageable) : undef;
 }
-
-sub is_full { 0; }
 
 __PACKAGE__->meta->make_immutable;
 

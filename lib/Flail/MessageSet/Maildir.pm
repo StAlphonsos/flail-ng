@@ -33,6 +33,7 @@ has "boxdir" => (is => "rw", isa => "Mail::Box::Dir");
 
 sub BUILD {
 	my($self,$params) = @_;
+	$self->name($self->folder);
 	$self->boxdir(Mail::Box::Maildir->new(folder => $self->folder));
 }
 

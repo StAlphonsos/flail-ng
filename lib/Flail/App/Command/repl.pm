@@ -27,6 +27,9 @@ use strict;
 use warnings;
 use Flail::App -command;
 use Devel::REPL;
+use Flail::Util qw(dumpola);
+
+sub options { }
 
 sub execute {
 	my($self,$opt,$args) = @_;
@@ -40,7 +43,7 @@ sub execute {
 	$repl->prompt($prompt);
 	$repl->load_plugin("History");
 	$repl->load_plugin("AppCmd");
-	$repl->app_cmd($self->app);
+	$repl->app_cmd($self->the_app);
 	$repl->run;
 	--$ENV{"FLAIL_LEVEL"};
 }

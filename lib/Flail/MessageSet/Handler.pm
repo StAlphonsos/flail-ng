@@ -24,8 +24,11 @@ ISC/BSD; see LICENSE file in source distribution.
 package Flail::MessageSet::Handler;
 use Moose;
 use Flail::Message;
-use overload '""' => sub { sprintf("<%s: %d msgs>",ref($_[0]),$_[0]->count) };
+use overload '""' => sub {
+	sprintf("<%s: %d of %d>",$_[0]->name,$_[0]->idx,$_[0]->count)
+};
 
+has "name" => (is => "rw", isa => "Str");
 has "idx" => (is => "rw", isa => "Int", default => 0);
 has "msg_class" => (is => "rw", isa => "Str", default => "Flail::Message");
 

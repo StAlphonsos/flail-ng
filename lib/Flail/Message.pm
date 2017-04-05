@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-Flail::Message - wrapper around Mail::Intenret
+Flail::Message - wrapper around Mail::Message
 
 =head1 SYNOPSIS
 
@@ -24,22 +24,34 @@ ISC/BSD; see LICENSE file in source distribution.
 
 package Flail::Message;
 use Moose;
-use Flail::Util qw(single);
-use vars qw($SUMMARY_SEP @SUMMARY_FIELDS);
+use Flail::Util qw(ts);
+use vars qw($SUMMARY_SEP @SUMMARY_FIELDS @MESSAGE_METHODS %FIELD_XFORMS);
 use overload '""' => \&to_string;
 
 $SUMMARY_SEP = "|";
 @SUMMARY_FIELDS = qw(timestamp from subject);
+%FIELD_XFORMS = (
+	"timestamp" => \&ts,
+	"from" => sub { shift->format },
+	"to" => sub { shift->format },
+	"cc" => sub { shift->format },
+    );
+@MESSAGE_METHODS = qw(subject messageId from to cc body contentType);
 
 has "real" => (
-	is => "rw", isa => "Mail::Message",
-	handles => [qw[subject messageId]]);
+	is => "rw", isa => "Mail::Message", handles => [@MESSAGE_METHODS]);
+
+sub format_field {
+	my($self,$name) = @_;
+	my $xform = $FIELD_XFORMS{$name};
+	my($val) = $self->real->$name;
+	return $xform ? &$xform($val) : $val;
+}
 
 sub to_string {
 	my($self) = @_;
 	join($SUMMARY_SEP,
-	     map { sprintf("%s:%s", ucfirst($_), single($self->real->$_)) }
-	     @SUMMARY_FIELDS);
+	     map { sprintf("%s", $self->format_field($_)) } @SUMMARY_FIELDS);
 }
 
 # to mung args on their way to the constructor:

@@ -26,7 +26,6 @@ use Moose;
 use App::Cmd::Setup -app;
 use Flail::Sink;
 use Flail::Config;
-use Flail::Util qw(dumpola);
 
 has "sink" => (
 	is => "rw", isa => "Flail::Sink", handles => [ qw[emit more] ]);

@@ -33,7 +33,7 @@ has "query" => (is => "rw", isa => "Maybe[Str]");
 has "folder" => (is => "rw", isa => "Maybe[Str]");
 has "real" => (
 	is => "rw", isa => "Flail::MessageSet::Handler",
-	handles => [ qw[count this finish first final next prev] ]);
+	handles => [qw[count this finish first final next prev is_exhausted]]);
 
 sub BUILD {
 	my($self,$params) = @_;
