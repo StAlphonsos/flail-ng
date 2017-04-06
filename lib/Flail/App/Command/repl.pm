@@ -23,8 +23,7 @@ ISC/BSD; see LICENSE file in source distribution.
 =cut
 
 package Flail::App::Command::repl;
-use strict;
-use warnings;
+use Moose;
 use Flail::App -command;
 use Devel::REPL;
 use Flail::Util qw(dumpola);
