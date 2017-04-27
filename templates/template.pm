@@ -16,11 +16,6 @@ Flail::module - brief description
 
 Describe the module with real words.
 
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
-
 =cut
 
 package Flail::module;
@@ -49,5 +44,13 @@ around BUILDARGS => sub {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=pod
+
+=head1 LICENSE
+
+ISC/BSD; see LICENSE file in source distribution.
+
+=cut
 
 __END__

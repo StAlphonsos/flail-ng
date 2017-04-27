@@ -13,11 +13,7 @@ Flail::MessageSet::Handler - base class for message set handlers
 
 =head1 DESCRIPTION
 
-I guess this is really a role...?
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
+Base class for message set implementations.
 
 =cut
 
@@ -43,7 +39,7 @@ sub msg_at {
 	my($self,$off) = @_;
 	my $raw = $self->this($off);
 	return undef unless $raw;
-	return $self->msg_class->new($raw);
+	return $self->a_msg($raw);
 }
 
 sub first {

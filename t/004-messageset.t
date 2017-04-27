@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 33;
 
 use t::lib;
 
@@ -44,4 +44,5 @@ sub test_mset {
 }
 
 test_mset("Maildir", folder => test_folder);			#   11
+test_mset("", folder => test_folder, no_privsep => 1);		# + 11
 test_mset("", folder => test_folder);				# + 11

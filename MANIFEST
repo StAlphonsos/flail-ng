@@ -8,6 +8,7 @@ lib/Flail/App/Command.pm
 lib/Flail/App/Command/ls.pm
 lib/Flail/App/Command/repl.pm
 lib/Flail/App/Command/server.pm
+lib/Flail/ChildProcess.pm
 lib/Flail/Config.pm
 lib/Flail/Message.pm
 lib/Flail/MessageSet.pm

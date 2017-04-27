@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 20;
 use vars qw($NO_MAILDIR);
 
 BEGIN { $NO_MAILDIR = 1; }
@@ -37,3 +37,12 @@ is(msgfy("foo"),"foo","msgfu('foo')");
 my($w,$h) = screen_columns();
 ok($w,"terminal width defined=$w");
 ok($h,"terminal height non-zero=$h");
+
+is(defor(undef,"default"),"default","defor works 1");
+is(defor("foo","default"),"foo","defor works 2");
+
+my $href = { "abc" => 123, "xyz" => 0, "qqq" => undef };
+is(defkey($href,"abc",999),123,"defkey 1 okay");
+is(defkey($href,"zzz",999),999,"defkey 2 okay");
+is(defkey($href,"qqq",999),undef,"defkey 3 okay");
+is(defkey($href,"xyz",999),0,"defkey 4 okay");

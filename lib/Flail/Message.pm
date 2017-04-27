@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-Flail::Message - wrapper around Mail::Message
+Flail::Message - An email message
 
 =head1 SYNOPSIS
 
@@ -15,10 +15,6 @@ Flail::Message - wrapper around Mail::Message
 =head1 DESCRIPTION
 
 Describe the module with real words.
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
 
 =cut
 
@@ -40,6 +36,16 @@ $SUMMARY_SEP = "|";
 
 has "real" => (
 	is => "rw", isa => "Mail::Message", handles => [@MESSAGE_METHODS]);
+
+# the opposite of bless: marshal for RPC result or whatever
+sub curse {
+	my($self) = @_;
+	my $cursed = {
+		class => ref($self),
+		map { $_ => $self->format_field($_) } @MESSAGE_METHODS
+	};
+	return $cursed;
+}
 
 sub format_field {
 	my($self,$name) = @_;

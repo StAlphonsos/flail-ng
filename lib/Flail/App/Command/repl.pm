@@ -10,15 +10,11 @@ Flail::App::Command::repl - read/eval/print loop
 =head1 SYNOPSIS
 
   $ flail repl
-  flail> 
+  flail> # type flail commands here
 
 =head1 DESCRIPTION
 
 Implements a read/eval/print loop via L<Devel::REPL>
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
 
 =cut
 
@@ -26,7 +22,6 @@ package Flail::App::Command::repl;
 use Moose;
 use Flail::App -command;
 use Devel::REPL;
-use Flail::Util qw(dumpola);
 
 sub options { }
 

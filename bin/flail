@@ -5,9 +5,7 @@
 #
 # See the POD at EOF for documentation and license.
 ##
-use strict;
-use warnings;
-use Pod::Usage;
+use Modern::Perl;
 use Flail::App;
 
 Flail::App->run;

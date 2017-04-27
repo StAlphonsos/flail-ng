@@ -15,27 +15,92 @@ Flail::App - top-level application object for flail
 
 Blah.
 
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
-
 =cut
 
 package Flail::App;
+use POSIX ":sys_wait_h";
 use Moose;
 use App::Cmd::Setup -app;
 use Flail::Sink;
 use Flail::Config;
+use Try::Tiny;
 
 has "sink" => (
 	is => "rw", isa => "Flail::Sink", handles => [ qw[emit more] ]);
 has "configuration" => (
 	is => "rw", isa => "Flail::Config", handles => { 'conf' => 'get' });
+has "children" => (is => "rw", isa => "HashRef", default => sub { {} });
 
 sub BUILD {
 	my($self,$params) = @_;
 	$self->sink(Flail::Sink->Default);
 	$self->configuration(Flail::Config->Default);
+}
+
+# invoked from SIGCHLD to reap dead children.  if the children are
+# known to us we invoke the finish method on their parental image
+sub reaper {
+	my($self) = @_;
+	local($!,$?);
+	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
+		my $kid = $self->children->{$pid};
+		if ($kid) {
+			try {
+				$kid->finish(
+					do_wait => 0,
+					signo => $signo,
+					coredump => $coredump,
+					xit => $xit);
+			} catch {
+				warn("error reaping pid $pid: @_\n");
+			};
+			delete($self->children->{$pid});
+		} elsif ($coredump) {
+			warn("unknown child $pid dumped core! ".
+			     "signal $signo, exit $xit\n");
+		} else {
+			warn("reaped unknown child $pid; ".
+			     "signal $signo, exit $xit\n");
+		}
+	}
+}
+
+=pod
+
+=over 4
+
+=item * register_child $child
+
+Should be called with a L<Flail::ChildProcess> instance so it can be
+reaped by the application.  The reaper will attempt to invoke the
+C<finish> method on the child like so:
+
+    $kid->finish(
+        do_wait => 0,
+        signo => $signo,
+        coredump => $coredump,
+        xit => $xit);
+
+Where the values of C<$signo>, C<$coredump> and C<$xit> are the signal
+that terminated the child, whether or not it dumped core and the exit
+status, respectively.
+
+=back
+
+=cut
+
+sub register_child {
+	my($self,$child) = @_;
+	$SIG{"CHLD"} = sub { $self->reaper }
+		unless scalar(keys(%{$self->children}));
+	if (exists($self->children->{$child->pid})) {
+		warn("tried to register already-known pid ".$child->pid.
+		     ": $child\n");
+	} else {
+		$self->children->{$child->pid} = $child;
+	}
+	return $self;
 }
 
 sub allow_any_unambiguous_abbrev { 1; }

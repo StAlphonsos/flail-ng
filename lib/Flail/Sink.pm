@@ -14,12 +14,8 @@ Flail::Sink - a place to send output
 
 =head1 DESCRIPTION
 
-Describe the module with real words.
-
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
+A sink is a place where output for the user goes, via its C<emit>
+method.
 
 =cut
 
@@ -27,14 +23,16 @@ package Flail::Sink;
 use Moose;
 use IO::Handle;
 use Flail::Util qw(affirmative clean msgfy screen_columns);
-use vars qw($DEFAULT_SINK %LEAD_TRAIL);
+use vars qw($DEFAULT_SINK %LEAD_TRAIL @STYLES);
 
 %LEAD_TRAIL = (
-	"normal" => [ "[flail] ", "" ],
-	"notice" => [ "[flail] NOTICE ", "" ],
-	"error" => [ "[flail] ERROR ", "" ],
-	"debug" => [ "[flail] DEBUG ", "" ],
+	"normal" => [ "[flail] ", "", undef ],
+	"notice" => [ "[flail] NOTICE ", "", "!" ],
+	"error"  => [ "[flail] ERROR ", "", "?" ],
+	"debug"  => [ "[flail] DEBUG ", "", "#" ],
+	"hint"   => [ "[flail] HINT ", "", "%" ],
 );
+@STYLES = grep { $_ ne "normal" } keys %LEAD_TRAIL;
 
 has "eol" => (is => "rw", isa => "Str", default => "\n");
 has "sep" => (is => "rw", isa => "Str", default => " ");
@@ -89,12 +87,17 @@ sub trailer {
 
 sub msg_to_string {
 	my($self,@msg) = @_;
-	return "" unless @msg;
-	my $c0 = substr("$msg[0]",0,1);
+	my $msg0 = "$msg[0]";
+	my $c0 = substr($msg0,0,1);
 	my $style = "normal";
-	if    ($c0 eq '!') { $style = "notice"; $msg[0]=substr($msg[0],1); }
-	elsif ($c0 eq '?') { $style = "error";  $msg[0]=substr($msg[0],1); }
-	elsif ($c0 eq '#') { $style = "debug";  $msg[0]=substr($msg[0],1); }
+	foreach my $sty (@STYLES) {
+		my $sty_c0 = $sty->[2];
+		if ($c0 eq $sty_c0) {
+			$style = $sty;
+			$msg[0] = substr($msg0,1);
+			last;
+		}
+	}
 	return undef if ($style eq "debug") && !$self->debug;
 	return $self->leader($style) .
 	    join($self->sep, map { msgfy $_ } @msg) .

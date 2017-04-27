@@ -16,10 +16,6 @@ Flail::App::Command - base class for commands
 
 Describe the module with real words.
 
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
-
 =cut
 
 package Flail::App::Command;

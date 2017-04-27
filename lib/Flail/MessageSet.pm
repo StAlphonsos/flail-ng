@@ -16,35 +16,53 @@ Flail::MessageSet - brief description
 
 Describe the module with real words.
 
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
-
 =cut
 
 package Flail::MessageSet;
 use Moose;
+use Flail::ChildProcess;
 use Flail::MessageSet::Maildir;
 use Flail::Util qw(dumpola test_warn);
-use overload '""' => sub { "" . shift->real };
+use overload '""' => \&to_string;
+
+our $RPC_METHODS = {
+	"count" => {},
+	"this" => {},
+	"finish" => {},
+	"first" => {},
+	"final" => {},
+	"next" => {},
+	"prev" => {},
+	"is_exhausted" => {},
+};
 
 has "query" => (is => "rw", isa => "Maybe[Str]");
 has "folder" => (is => "rw", isa => "Maybe[Str]");
 has "privsep_child" => (is => "rw", isa => "Maybe[Flail::ChildProcess]");
 has "real" => (is => "rw", isa => "Maybe[Flail::MessageSet::Handler]");
+# w/no privsep delegation makes this easy:
 #	handles => [qw[count this finish first final next prev is_exhausted]]);
+# w/privsep things become a little harder...
 
+sub to_string {
+	my($self) = @_;
+	return "".$self->real if $self->real;
+	return "<a folder: ".$self->folder.">";
+}
+
+# parent: make RPC request to child
+# child: invoke real method on underlying object
 sub _dispatch {
 	my($self,$name,@args) = @_;
-	# real is undef in the parent
-	return $self->real ?
-	    $self->real->$name : $self->privsep_child->req($self,$name,@args);
+	warn("$$ $self _dispatch name=$name args=@args\n");
+	return $self->privsep_child ?
+	    $self->privsep_child->req($self,$name,@args) :
+	    $self->real->$name(@args);
 }
 
-sub _handle {
-}
+sub rpc_methods { $RPC_METHODS; }
 
+# methods we would delegate to $self->real if we could
 sub count	{ shift->_dispatch("count",@_) }
 sub this	{ shift->_dispatch("this",@_) }
 sub finish	{ shift->_dispatch("finish",@_) }
@@ -54,23 +72,41 @@ sub next	{ shift->_dispatch("next",@_) }
 sub prev	{ shift->_dispatch("prev",@_) }
 sub is_exhausted{ shift->_dispatch("is_exhausted",@_) }
 
+# fork a privsep child to do actual parsing of email
 sub BUILD {
 	my($self,$params) = @_;
-	my $child = Flail::ChildProcess->new(
-		"app" => $params->{"app"},
-		"name" => "maildir reader",
-		"pledge" => "rpath",
-		"handler" => sub { $self->_handle(@_) },
-	    );
-	$self->privsep_child($child);
+	if ($params->{"no_privsep"}) {
+		# privsep turned off - load the data now
+		$self->load_data();
+	} else {
+		# privsep - fork the child
+		my $child = Flail::ChildProcess->new(
+			"app" => $params->{"app"},
+			"name" => "maildir reader",
+			"promises" => "rpath",
+		    ) unless $params->{"no_privsep"};
+		$self->privsep_child($child);
+	}
 }
 
+# parent: kill/reap the child
+sub DEMOLISH { $_[0]->privsep_child->finish() if $_[0]->privsep_child }
+
+sub load_data {
+	$_[0]->real(Flail::MessageSet::Maildir->new(folder => $_[0]->folder));
+	return $_[0];
+}
+
+# child: run the rpc loop
+# parent: return immediately
 sub run {
 	my($self) = @_;
-	return $self if $self->privsep_child->pid;
-	$self->privsep_child->loop($self);
+	return $self if $self->privsep_child;
+	$self->load_data();
+	exit($self->privsep_child->loop($self));
 }
 
+# use the Query constructor to get privsep
 sub Query { shift->new(@_)->run() }
 
 __PACKAGE__->meta->make_immutable;

@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use vars qw($NO_MAILDIR);
 
 BEGIN { $NO_MAILDIR = 1; }
@@ -11,6 +11,7 @@ BEGIN { $NO_MAILDIR = 1; }
 use t::lib;
 
 require_ok("Flail");
+require_ok("Flail::ChildProcess");
 require_ok("Flail::Config");
 require_ok("Flail::Message");
 require_ok("Flail::MessageSet");

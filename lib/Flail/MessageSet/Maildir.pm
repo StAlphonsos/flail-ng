@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-Flail::MessageSet::Maildir - brief description
+Flail::MessageSet::Maildir - A maildir message folder/query
 
 =head1 SYNOPSIS
 
@@ -15,10 +15,6 @@ Flail::MessageSet::Maildir - brief description
 =head1 DESCRIPTION
 
 Describe the module with real words.
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
 
 =cut
 
