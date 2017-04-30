@@ -180,9 +180,20 @@ Unless something.
 
 sub curse {
 	my $thing = shift;
-	return $thing unless blessed($thing);
-	return $thing->curse() if $thing->can("curse");
-	return "$thing";
+	my $rr = ref($thing);
+	my $rez;
+	if (!$rr) {
+		$rez = defined($thing) ? "$thing" : undef;
+	} elsif (blessed($thing)) {
+		$rez = $thing->can("curse") ? $thing->curse() : "$thing";
+	} elsif ($rr eq "ARRAY") {
+		$rez = [ map { curse($_) } @$thing ];
+	} elsif ($rr eq "HASH") {
+		$rez = { map { $_ => curse($thing->{$_}) } keys %$thing };
+	} else {
+		die("unhandled curse: $rr $thing");
+	}
+	return $rez;
 }
 
 1;

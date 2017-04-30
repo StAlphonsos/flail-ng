@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 # -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t -*-
 
+# test basic functions of Flail::ChildProcess
+
 use strict;
 use warnings;
 use Test::More tests => 26;

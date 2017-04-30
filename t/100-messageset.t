@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 33;
+use Test::More tests => 30;
 
 use t::lib;
 
@@ -18,14 +18,13 @@ my %EXPECT = (
 	SUBJ1 => "Re: C-state FFH on x41",
 );
 
-# 11 tests per call
+# 10 tests per call
 sub test_mset {
-	my($cname,@args) = @_;
+	my($ctor,$cname,@args) = @_;
 	my $mclass = "Flail::MessageSet";
 	$mclass .= "::${cname}" if $cname;
 	$cname ||= "generic";
-	my $mset = $mclass->new(@args);
-	ok($mset,"$cname message set created: @args");
+	my $mset = $mclass->$ctor(@args);
 	is($mset->count,$EXPECT{COUNT},
 	   "$cname count is as expected: ".$mset->count);
 	my $m0 = $mset->first;
@@ -43,6 +42,6 @@ sub test_mset {
 	ok($mset->finish,"finish won for $cname");
 }
 
-test_mset("Maildir", folder => test_folder);			#   11
-test_mset("", folder => test_folder, no_privsep => 1);		# + 11
-test_mset("", folder => test_folder);				# + 11
+test_mset("new", "Maildir", folder => test_folder);			#   10
+test_mset("new", "", folder => test_folder, no_privsep => 1);		# + 10
+test_mset("Query", "", folder => test_folder);				# + 10

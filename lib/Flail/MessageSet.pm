@@ -59,8 +59,8 @@ sub to_string {
 sub _dispatch {
 	my($self,$name,@args) = @_;
 	warn("$$ $self _dispatch name=$name args=@args\n");
-	return $self->privsep_child ?
-	    $self->privsep_child->req($self,$name,@args) :
+	return ($self->privsep_child && $self->privsep_child->pid) ?
+	    $self->privsep_child->req($name,@args) :
 	    $self->real->$name(@args);
 }
 
@@ -91,6 +91,7 @@ sub BUILD {
 			"promises" => "rpath",
 		    ) unless $params->{"no_privsep"};
 		$self->privsep_child($child);
+		warn("$$ forked privsep child $child\n");
 	}
 }
 
@@ -106,8 +107,10 @@ sub load_data {
 # parent: return immediately
 sub run {
 	my($self) = @_;
-	return $self if $self->privsep_child;
+	return $self if $self->privsep_child && $self->privsep_child->pid;
+	warn("$$ MessageSet child loading data\n");
 	$self->load_data();
+	warn("$$ MessageSet child dropping into loop\n");
 	exit($self->privsep_child->loop());
 }
 

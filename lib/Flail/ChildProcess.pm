@@ -16,12 +16,10 @@ Flail::ChildProcess - OO interface to privsep
                  obj => $obj,
                  name => "maildir reader",
                  promises => "rpath stdio");
-  if ($child->in_child) {
-    # initialize whatever in $obj in the child, then drop into loop
-    exit($child->loop());
-  }
+  # drop into the RPC service loop in the child process:
+  exit($child->loop) if $child->in_child;
 
-  # in the parent, to invoke a method in the child:
+  # in the parent, to invoke a method on $obj in the child:
   my @results = $child->req("a_method",$args...);
 
   # ... when done, kill and reap the child:
@@ -179,10 +177,10 @@ sub loop {
 	my $obj = $self->obj;
 	my $methods = $obj->rpc_methods;
 	my $exit_code = 0;
-
+	warn("$$ child RPC methods: ".join(", ", sort keys %$methods)."\n");
 	my $n = $self->stream->sysread($buf,$bufsiz);
 	while (defined($n)) {
-		my($meth,$args,$args_s,$rest,$err,$result,$result_s);
+		my($meth,$args,$args_s,$rest,$err,@results,$result_s);
 
 		if ($n == 0) {
 			warn("$$ read nothing, timeout=$self->timeout ...\n");
@@ -209,6 +207,7 @@ sub loop {
 
 		# invalid method invoked
 		if (!exists($methods->{$meth})) {
+			warn("$$ child bad method: |$meth|\n");
 			$err = RPC_ERR_BAD_METHOD;
 			$result_s = _errs("invalid method: $meth");
 			goto SEND_RESP;
@@ -218,11 +217,13 @@ sub loop {
 		try {
 			$args = decode_json($args_s);
 			if (ref($args) ne "ARRAY") {
+				warn("$$ child bad args: |$args_s|\n");
 				$err = RPC_ERR_BAD_ARGS;
 				$result_s = _errs("args not decode to array");
 				goto SEND_RESP;
 			}
 		} catch {
+			warn("$$ child unparseable args: |$args_s|\n");
 			$err = RPC_ERR_DECODE_ARGS;
 			$result_s = _errs("could not decode args as JSON: @_");
 			goto SEND_RESP;
@@ -230,8 +231,12 @@ sub loop {
 
 		# finally, do the deed
 		try {
-			$result = $obj->$meth(@$args);
+			warn("$$ child invoking $meth(@$args) on $obj\n");
+			@results = $obj->$meth(@$args);
+			warn("$$ child got ".scalar(@results).
+			     " results: @results\n");
 		} catch {
+			warn("$$ child error invoking $meth: @_\n");
 			$err = RPC_ERR_INVOKE;
 			$result_s = _errs("invoking $meth: @_");
 			goto SEND_RESP;
@@ -240,13 +245,14 @@ sub loop {
 		# if we get here there are results to encode
 		try {
 			$err = RPC_OK;
-			$result_s = encode_json([curse($result)]);
+			$result_s = encode_json(curse(\@results));
 		} catch {
 			$err = RPC_ERR_ENCODE_RESULT;
 			$result_s = _errs("could not encode JSON result: @_");
 		};
 
 	      SEND_RESP: # send $err,$result_s to other side
+		warn("$$ child sending back err=$err result_s=$result_s\n");
 		my $resp = pack("w w/a*",$err,$result_s);
 		$self->awrite($resp);
 
