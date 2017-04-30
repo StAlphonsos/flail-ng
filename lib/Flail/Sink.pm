@@ -44,6 +44,14 @@ has "width" => (is => "rw", isa => "Int", default => 0);
 has "height" => (is => "rw", isa => "Int", default => 0);
 has "col_no" => (is => "rw", isa => "Int", default => 0);
 
+sub BUILD {
+	my($self,$params) = @_;
+	$self->stream->autoflush(1);
+	my($w,$h) = screen_columns();
+	$self->width($w);
+	$self->height($h);
+}
+
 sub reset_line	{ $_[0]->line_no(0); $_[0]->col_no(0); $_[0] }
 sub is_full	{ $_[0]->height && ($_[0]->line_no >= $_[0]->height-2) }
 
@@ -54,14 +62,6 @@ sub inc_line {
 	$self->line_no($inc + $self->line_no);
 	$self->col_no(0);
 	return $self;
-}
-
-sub BUILD {
-	my($self,$params) = @_;
-	$self->stream->autoflush(1);
-	my($w,$h) = screen_columns();
-	$self->width($w);
-	$self->height($h);
 }
 
 sub Default {
@@ -91,7 +91,8 @@ sub msg_to_string {
 	my $c0 = substr($msg0,0,1);
 	my $style = "normal";
 	foreach my $sty (@STYLES) {
-		my $sty_c0 = $sty->[2];
+		my $styhash = $LEAD_TRAIL{$sty};
+		my $sty_c0 = $styhash->[2];
 		if ($c0 eq $sty_c0) {
 			$style = $sty;
 			$msg[0] = substr($msg0,1);

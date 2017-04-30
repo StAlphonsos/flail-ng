@@ -21,19 +21,23 @@ Describe the module with real words.
 package Flail::MessageSet;
 use Moose;
 use Flail::ChildProcess;
+use Flail::Message;
 use Flail::MessageSet::Maildir;
 use Flail::Util qw(dumpola test_warn);
 use overload '""' => \&to_string;
 
+# turn RPC results back into object
+sub uncurse_msg { @_ ? Flail::Message->new(@_) : undef }
+
 our $RPC_METHODS = {
-	"count" => {},
-	"this" => {},
-	"finish" => {},
-	"first" => {},
-	"final" => {},
-	"next" => {},
-	"prev" => {},
-	"is_exhausted" => {},
+	"count" => undef,
+	"this" => \&uncurse_msg,
+	"finish" => undef,
+	"first" => \&uncurse_msg,
+	"final" => \&uncurse_msg,
+	"next" => \&uncurse_msg,
+	"prev" => \&uncurse_msg,
+	"is_exhausted" => undef,
 };
 
 has "query" => (is => "rw", isa => "Maybe[Str]");
@@ -81,6 +85,7 @@ sub BUILD {
 	} else {
 		# privsep - fork the child
 		my $child = Flail::ChildProcess->new(
+			"obj" => $self,
 			"app" => $params->{"app"},
 			"name" => "maildir reader",
 			"promises" => "rpath",
@@ -103,7 +108,7 @@ sub run {
 	my($self) = @_;
 	return $self if $self->privsep_child;
 	$self->load_data();
-	exit($self->privsep_child->loop($self));
+	exit($self->privsep_child->loop());
 }
 
 # use the Query constructor to get privsep

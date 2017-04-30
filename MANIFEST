@@ -22,10 +22,10 @@ MANIFEST			This list of files
 paper.md
 README.md
 t/000-load-everything.t
-t/001-config.t
-t/002-sink.t
-t/003-util.t
-t/004-messageset.t
+t/010-config.t
+t/011-util.t
+t/012-sink.t
+t/100-messageset.t
 t/fixtures/maildir_attachments/cur/1433195770_0.6750.tldr.l.stalphonsos.net,U=1258933,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433195843_0.6750.tldr.l.stalphonsos.net,U=1259117,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433195852_0.6750.tldr.l.stalphonsos.net,U=1259138,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S

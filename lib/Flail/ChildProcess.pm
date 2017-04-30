@@ -13,11 +13,12 @@ Flail::ChildProcess - OO interface to privsep
   # which returns a hashref whose keys are allowable methods to
   # invoke via RPC:
   my $child = Flail::ChildProcess->new(
+                 obj => $obj,
                  name => "maildir reader",
                  promises => "rpath stdio");
   if ($child->in_child) {
     # initialize whatever in $obj in the child, then drop into loop
-    exit($child->loop($obj));
+    exit($child->loop());
   }
 
   # in the parent, to invoke a method in the child:
@@ -41,9 +42,9 @@ use IO::Handle;
 use Moose;
 use Try::Tiny;
 use JSON qw(encode_json decode_json);
-use OpenBSD::Pledge;
+use OpenBSD::Pledge;			# for now only one sandbox
 use Flail::App;
-use Flail::Util qw(curse defkey hexdump);
+use Flail::Util qw(curse defkey hexdump dumpola);
 use constant {
 	RPC_OK => 0,
 	RPC_ERR_BAD_METHOD => 1,
@@ -64,10 +65,13 @@ has "bufsiz" => (is => "rw", isa => "Int", default => 1024);
 has "max_bufsiz" => (is => "rw", isa => "Int", default => 10240);
 has "stream" => (is => "rw", isa => "Maybe[Object]");
 has "inbuf" => (is => "rw", isa => "Str", default => "");
+has "obj" => (is => "rw", isa => "Object");
 
 # set up plumbing, fork child, do some bookkeeping
 sub BUILD {
 	my($self,$params) = @_;
+	die "require an obj that can rpc_methods: ".$self->obj
+	    unless $self->obj->can("rpc_methods");
 	socketpair(CHILD, PARENT, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or
 	    die "socketpair: $!";
 	if (my $pid = fork()) {
@@ -125,8 +129,7 @@ sub awrite {
 	die("syswrite($resp_len) failed nw=$nw: $!") if $nw <= 0;
 	$resp_off = $nw;
 	while ($resp_off < $resp_len) {
-		$nw = $self->stream->syswrite(
-			$resp,$resp_len,$resp_off);
+		$nw = $self->stream->syswrite($resp,$resp_len,$resp_off);
 		die("syswrite($resp_len,$resp_off) failed nw=$nw: $!")
 		    if $nw <= 0;
 		$resp_off += $nw;
@@ -138,14 +141,14 @@ sub awrite {
 
 =over 4
 
-=item * loop $obj
+=item * loop
 
 Drop into a synchronous RPC service loop in the child process, based
-on the given object.  We invoke the C<rpc_methods> method on the
-object at startup, which we expect will return a hashref whose keys
-are allowable methods to invoke via RPC in the child.  If an invalid
-method is received we return an error without interpreting the
-arguments to the invocation.
+on the object given to our constructor in the C<obj> parameter.  We
+invoke the C<rpc_methods> method on the object at startup, which we
+expect will return a hashref whose keys are allowable methods to
+invoke via RPC in the child.  If an invalid method is received we
+return an error without interpreting the arguments to the invocation.
 
 RPC requests are generated for the child using the C<req> method in
 the parent process.  In the child the C<loop> method receives and
@@ -167,15 +170,17 @@ and if successful returns parsed data in a neutral form to the parent.
 =cut
 
 sub loop {
-	my($self,$obj) = @_;
+	my($self) = @_;
 	my $buf = "";
 	my $nbuf = 0;
 	my $len = 0;
 	my $bufsiz = 1024;
 	my $max_bufsiz = $self->max_bufsiz;
-	my $n = $self->stream->sysread($buf,$bufsiz);
+	my $obj = $self->obj;
 	my $methods = $obj->rpc_methods;
 	my $exit_code = 0;
+
+	my $n = $self->stream->sysread($buf,$bufsiz);
 	while (defined($n)) {
 		my($meth,$args,$args_s,$rest,$err,$result,$result_s);
 
@@ -286,20 +291,17 @@ sub req {
 	my $max_bufsiz = $self->max_bufsiz;
 	my $n = $self->stream->sysread($buf,$bufsiz,$nbuf);
 
-	my $trips = 0;
-
 	while (defined($n)) {
 		my($err,$resp_s,$rest,$result);
 
 		if ($n == 0) {
 			warn("$$ read nothing, timeout=$self->timeout ...\n");
 			sleep($self->timeout);
-			++$trips;
 			goto READ_MORE;
 		}
+
 		try {
 			($err,$resp_s,$rest) = unpack("w w/a* a*", $buf);
-			warn("$$ req $name (@args) => #$err |$resp_s|\n");
 		} catch {
 			goto READ_MORE;
 		};
@@ -320,13 +322,20 @@ sub req {
 				      "cannot decode JSON result $resp_s: @_");
 		};
 
-		return @$result;
+		# an rpc method can be assocated with a coderef to swizzle
+		# return values into something (a blessed ref, probably)
+		if (defined(my $swiz = $self->obj->rpc_methods->{$name})) {
+			my @swizzled = &$swiz(@$result);
+			$result = \@swizzled;
+		}
+
+		return @$result if wantarray;
+		return $result->[0];
 
 	      READ_MORE:
 		if ($nbuf + 16 >= $bufsiz) {
 			if ($bufsiz >= $max_bufsiz) {
-				warn("max bufsiz $max_bufsiz reached!");
-				last;
+				die("max bufsiz $max_bufsiz reached!");
 			}
 			$bufsiz = $nbuf + 128;
 			$self->bufsiz($bufsiz);
@@ -347,7 +356,18 @@ Should only be followed by C<finish>.
 =item * finish do_wait => 0|1, signo => $sig, coredump => 0|1, xit => $exit
 
 Send the child process a special message to drop out of its RPC loop
-(the C<loop> method) and die.  
+(the C<loop> method) and die.  By default C<do_wait> is true and we
+invoke L<waitpid> to reap the child process; if we are invoked in a
+context where this has already happened, e.g. a C<$SIG{CHLD}> handler,
+then C<do_wait> should be specified as zero and C<signo>, C<coredump>
+and C<xit> should be passed, since the caller is where C<$?> was
+interpreted.
+
+In the default case, where C<do_wait> is true, we first invoke
+C<shutdown> to tell the child to exit the C<loop> method and clean up.
+In the case where C<do_wait> is false we assume this has already
+happened, or that the child died for some other reason (like a
+coredump).
 
 =back
 

@@ -9,3 +9,7 @@ latex footer:       mmd-memoir-footer
 
 # Notes from the field: working on aa secure MUA
 
+2017-04-27
+need to rename curse to avoid awkwardness in e.g. ::Message::curse
+w/recursive invocations on values
+

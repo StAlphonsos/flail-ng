@@ -14,7 +14,11 @@ Flail::Message - An email message
 
 =head1 DESCRIPTION
 
-Describe the module with real words.
+A proxy for a mail message that behaves the same in the privsep child
+and the parent process even though the data it holds comes from
+different sources.
+
+This is a key object in Flail and is a work in progress.
 
 =cut
 
@@ -35,16 +39,13 @@ $SUMMARY_SEP = "|";
 @MESSAGE_METHODS = qw(subject messageId from to cc body contentType);
 
 has "real" => (
-	is => "rw", isa => "Mail::Message", handles => [@MESSAGE_METHODS]);
+	is => "rw", isa => "Maybe[Mail::Message]",
+	handles => [@MESSAGE_METHODS]);
 
 # the opposite of bless: marshal for RPC result or whatever
 sub curse {
 	my($self) = @_;
-	my $cursed = {
-		class => ref($self),
-		map { $_ => $self->format_field($_) } @MESSAGE_METHODS
-	};
-	return $cursed;
+	return { map { $_ => $self->format_field($_) } @MESSAGE_METHODS };
 }
 
 sub format_field {

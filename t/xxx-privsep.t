@@ -3,59 +3,92 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 26;
 use Try::Tiny;
+
 use Flail::ChildProcess;
 
-BEGIN { our $NO_MAILDIR = 1; }
+BEGIN { our $NO_MAILDIR = 1; }		# no test maildir for us
 
 use t::lib;
 
+package TestThing;
+use Moose;
+has "slot1" => (is => "rw", isa => "Str");
+has "slot2" => (is => "rw", isa => "Int");
+sub curse {
+	my($self) = @_;
+	return { "slot1" => $self->slot1, "slot2" => $self->slot2 };
+}
+
 package TestClass;
 use Moose;
-sub rpc_methods { { foo => {}, bar => {} } };
+use TestThing;
+use Flail::Util qw(dumpola);
+
+sub unswiz {
+	my($href) = @_;
+	my $obj = TestThing->new(%$href);
+	return $obj;
+}
+sub rpc_methods { { foo => \&unswiz, bar => \&unswiz, baz => undef } };
 sub foo {
 	my($self,$arg0) = @_;
-	return 123;
+	return TestThing->new(slot1 => "foo", slot2 => $arg0);
 }
 sub bar {
+	my($self,$arg0) = @_;
+	return TestThing->new(slot1 => "bar", slot2 => $arg0);
+}
+sub baz {
 	my($self,@args) = @_;
 	return { "ima" => "pig", "nargs" => scalar(@args) };
 }
 
+
 package main;
 
-my $obj = TestClass->new();
-ok($obj,"got a test object $obj");
-my $rr = $obj->foo(42);
-is($rr,123,"invoking foo in parent works");
-$rr = $obj->bar("a string",57,"a third arg");
-ok($rr,"bar in parent returns something");
-is(ref($rr),"HASH","bar returns right thing");
-is_deeply($rr,{ "ima" => "pig", "nargs" => 3 },"right response from bar");
+# 12 tests per call
+sub test_the_things {
+	my($obj,$invoker) = @_;
+	my $rr = &$invoker($obj,"foo",42);
+	is(ref($rr),"TestThing","right kind of ref returned");
+	is($rr->slot1,"foo","slot1 is right");
+	is($rr->slot2,42,"slot2 is right");
 
-my $child = Flail::ChildProcess->new(
+	$rr = &$invoker($obj,"bar",999);
+	is(ref($rr),"TestThing","right kind of ref from bar");
+	is($rr->slot1,"bar","slot1 is right");
+	is($rr->slot2,999,"slot2 is right");
+
+	$rr = &$invoker($obj,"baz","wow","wow","wow");
+	is(ref($rr),"HASH","right kind of ref from bar");
+	is(scalar(keys %$rr),2,"two keys in hashref");
+	ok(exists($rr->{"nargs"}),"nargs is there");
+	is($rr->{"nargs"},3,"nargs is right");
+	ok(exists($rr->{"ima"}),"ima is there");
+	is($rr->{"ima"},"pig","ima pig");
+}
+
+# single process:
+my $obj1 = TestClass->new();
+test_the_things($obj1, sub { my($o,$m,@a) = @_; $o->$m(@a) });
+
+# privsep'd
+my $obj2 = TestClass->new();
+my $proc = Flail::ChildProcess->new(
+	"obj" => $obj2,
 	"name" => "privsep test process",
 	"promises" => "stdio");
-if ($child->in_child) {
-	exit($child->loop($obj));
-}
-if (verbose()) { my $it = $child->pid; sleep(1); system("ps $it"); }
-my @rez = $child->req("foo",42);
-ok(scalar(@rez),"got a response from foo rpc: @rez");
-is(scalar(@rez),1,"right number of results from foo");
-is($rez[0],123,"got the RIGHT response from foo rpc");
-@rez = $child->req("bar","a string",57,"a third arg");
-ok(scalar(@rez),"got a response from bar rpc: @rez");
-is(scalar(@rez),1,"got right number of results from bar");
-is(ref($rez[0]),"HASH","got a hashref from bar");
-is_deeply($rez[0],{ "ima" => "pig", "nargs" => 3 },"right response from bar");
+exit($proc->loop) if $proc->in_child;
+if (verbose()) { my $it = $proc->pid; sleep(1); system("ps $it"); }
+test_the_things($proc,sub { my($o,$m,@a) = @_; $o->req($m,@a); });
 
 try {
-	@rez = $child->req("bazle",1);
+	my @rez = $proc->req("bazle",1);
 	ok(0,"invoking bazle won?");
 } catch {
 	ok("@_","invoking nonexistent method bazle failed: @_");
 };
 
-ok($child->finish(),"finish won");
+is($proc->finish(),0,"finish won");
