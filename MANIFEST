@@ -19,12 +19,14 @@ lib/Flail/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+notes.md
 paper.md
 README.md
 t/000-load-everything.t
 t/010-config.t
 t/011-util.t
 t/012-sink.t
+t/020-privsep.t
 t/100-messageset.t
 t/fixtures/maildir_attachments/cur/1433195770_0.6750.tldr.l.stalphonsos.net,U=1258933,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
 t/fixtures/maildir_attachments/cur/1433195843_0.6750.tldr.l.stalphonsos.net,U=1259117,FMD5=7e33429f656f1e6e9d79b29c3f82c57e:2,S
@@ -84,7 +86,6 @@ t/fixtures/maildir_subdirs/garbage/cur/1461705421_0.28863.tanstaafl.l.stalphonso
 t/fixtures/maildir_subdirs/garbage/cur/1464475992_0.97161.tanstaafl.l.stalphonsos.net,U=39956,FMD5=d4c63ca4c4f6b535f063b56c016b96a5:2,ST
 t/fixtures/maildir_subdirs/garbage/cur/1484922610_0.24498.lmfao.l.stalphonsos.net,U=92355,FMD5=d4c63ca4c4f6b535f063b56c016b96a5:2,ST
 t/lib.pm
-t/xxx-privsep.t
 templates/template.pl
 templates/template.pm
 templates/template.t

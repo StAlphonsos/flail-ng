@@ -172,7 +172,13 @@ sub screen_columns {
 
 =item * curse $thing
 
-Unless something.
+If C<$thing> is a blessed reference attempt to turn it into an
+unblessed reference containing data that can be used to reconstruct an
+equivalent blessed reference in another address space.  If the object
+understands a C<curse> method it will be invoked, otherwise
+stringification is used.  Unblessed arrayrefs and hashrefs are
+descended into recursively in the natural way.  Scalars and undef pass
+through unchanged.
 
 =back
 
@@ -183,7 +189,7 @@ sub curse {
 	my $rr = ref($thing);
 	my $rez;
 	if (!$rr) {
-		$rez = defined($thing) ? "$thing" : undef;
+		$rez = defined($thing) ? $thing : undef;
 	} elsif (blessed($thing)) {
 		$rez = $thing->can("curse") ? $thing->curse() : "$thing";
 	} elsif ($rr eq "ARRAY") {
@@ -191,7 +197,7 @@ sub curse {
 	} elsif ($rr eq "HASH") {
 		$rez = { map { $_ => curse($thing->{$_}) } keys %$thing };
 	} else {
-		die("unhandled curse: $rr $thing");
+		die("unhandled ref curse $rr ($thing)");
 	}
 	return $rez;
 }

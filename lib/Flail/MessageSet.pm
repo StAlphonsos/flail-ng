@@ -19,6 +19,7 @@ Describe the module with real words.
 =cut
 
 package Flail::MessageSet;
+use Modern::Perl;
 use Moose;
 use Flail::ChildProcess;
 use Flail::Message;

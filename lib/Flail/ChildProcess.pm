@@ -35,6 +35,7 @@ Perl using Moose.
 =cut
 
 package Flail::ChildProcess;
+use Modern::Perl;
 use Socket;
 use IO::Handle;
 use Moose;
@@ -106,6 +107,7 @@ Returns true in child, false in parent.
 =cut
 
 sub in_child	{ shift->pid ? 0 : 1 }
+sub in_parent	{ shift->pid ? 1 : 0 }
 
 sub _errs {
 	my($errstr) = @_;

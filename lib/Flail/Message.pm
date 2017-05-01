@@ -18,11 +18,10 @@ A proxy for a mail message that behaves the same in the privsep child
 and the parent process even though the data it holds comes from
 different sources.
 
-This is a key object in Flail and is a work in progress.
-
 =cut
 
 package Flail::Message;
+use Modern::Perl;
 use Moose;
 use Flail::Util qw(ts);
 use vars qw($SUMMARY_SEP @SUMMARY_FIELDS @MESSAGE_METHODS %FIELD_XFORMS);
@@ -32,15 +31,16 @@ $SUMMARY_SEP = "|";
 @SUMMARY_FIELDS = qw(timestamp from subject);
 %FIELD_XFORMS = (
 	"timestamp" => \&ts,
-	"from" => sub { shift->format },
-	"to" => sub { shift->format },
-	"cc" => sub { shift->format },
+	"from" => sub { $_[0] ? $_[0]->format : "?from?" },
+	"to" => sub { $_[0] ? $_[0]->format : "?to?" },
+	"cc" => sub { $_[0] ? $_[0]->format : "?cc?" },
     );
 @MESSAGE_METHODS = qw(subject messageId from to cc body contentType);
 
 has "real" => (
 	is => "rw", isa => "Maybe[Mail::Message]",
-	handles => [@MESSAGE_METHODS]);
+#	handles => [@MESSAGE_METHODS]);
+has "subject" => (is => "rw", isa => "Str", );
 
 # the opposite of bless: marshal for RPC result or whatever
 sub curse {
