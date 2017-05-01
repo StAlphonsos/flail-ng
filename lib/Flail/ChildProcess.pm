@@ -43,7 +43,7 @@ use Try::Tiny;
 use JSON qw(encode_json decode_json);
 use OpenBSD::Pledge;			# for now only one sandbox
 use Flail::App;
-use Flail::Util qw(curse defkey hexdump dumpola);
+use Flail::Util qw(curse defkey hexdump dumpola udstr);
 use constant {
 	RPC_OK => 0,
 	RPC_ERR_BAD_METHOD => 1,
@@ -60,8 +60,9 @@ has "promises" => (is => "rw", isa => "Str");
 has "pid" => (is => "rw", isa => "Maybe[Int]");
 has "run" => (is => "rw", isa => "CodeRef");
 has "timeout" => (is => "rw", isa => "Int", default => 1);
+has "buf" => (is => "rw", isa => "Maybe[Str]", default => "");
 has "bufsiz" => (is => "rw", isa => "Int", default => 1024);
-has "max_bufsiz" => (is => "rw", isa => "Int", default => 10240);
+has "max_bufsiz" => (is => "rw", isa => "Int", default => 102400);
 has "stream" => (is => "rw", isa => "Maybe[Object]");
 has "inbuf" => (is => "rw", isa => "Str", default => "");
 has "obj" => (is => "rw", isa => "Object");
@@ -79,7 +80,7 @@ sub BUILD {
 		$self->pid($pid);
 		$self->stream(IO::Handle->new_from_fd(fileno(CHILD),"r+"));
 		$self->stream->autoflush(1);
-#		$self->app->register_child($self) if $self->app;
+		$self->app->register_child($self) if $self->app;
 	} else {
 		# child process
 		$0 = "[flail] ".$self->name;
@@ -122,20 +123,105 @@ sub _rpc_errs {
 
 # atomic write
 sub awrite {
-	my($self,$resp) = @_;
-	my $resp_len = length($resp);
-	my $resp_off = 0;
-	my $nw = $self->stream->syswrite($resp,$resp_len);
-	die("syswrite($resp_len) failed nw=$nw: $!") if $nw <= 0;
-	$resp_off = $nw;
-	while ($resp_off < $resp_len) {
-		$nw = $self->stream->syswrite($resp,$resp_len,$resp_off);
-		die("syswrite($resp_len,$resp_off) failed nw=$nw: $!")
+	my($self,$buf) = @_;
+	my $buf_len = length($buf);
+	my $buf_off = 0;
+	my $nw = $self->stream->syswrite($buf,$buf_len);
+	die("syswrite($buf_len) failed nw=$nw: $!") if $nw <= 0;
+	$buf_off = $nw;
+	while ($buf_off < $buf_len) {
+		$nw = $self->stream->syswrite($buf,$buf_len,$buf_off);
+		die("syswrite($buf_len,$buf_off) failed nw=$nw: $!")
 		    if $nw <= 0;
-		$resp_off += $nw;
+		$buf_off += $nw;
 	}
 }
 
+# counted write - prefix $buf with a count and send it all via awrite()
+sub cwrite {
+	my($self,$buf) = @_;
+	my $buflen = length($buf);
+	my $head = pack("w",$buflen);
+	$self->awrite($head . $buf);
+}
+
+# counted read - read a count followed by that many bytes or die
+sub cread {
+	my($self) = @_;
+	my $tout = $self->timeout;
+	my $buf = $self->buf;
+	my $nbuf = length($buf);
+	my $bufsiz = $self->bufsiz;
+	my $max_bufsiz = $self->max_bufsiz;
+	if ($bufsiz <= $nbuf) {
+		$bufsiz *= 2;
+		$self->bufsiz($bufsiz);
+	}
+#	warn("$$ top cread bufsiz=$bufsiz nbuf=$nbuf\n");
+	my $n = $self->stream->sysread($buf,$bufsiz,$nbuf);
+	my $done = 0;
+	while (defined($n)) {
+		my $nbuf;
+
+		die("$$ sysread returned $n: $!") if $n < 0;
+
+		if ($n == 0) {
+#			warn("$$ read nothing, timeout=$tout ...\n");
+			sleep($tout);
+			goto READ_MORE;
+		}
+
+		# try to decode a count and at least that many bytes from $buf
+		try {
+#			warn("$$ trying to unpack count\n");
+			my($count,$rest) = unpack("w a*",$buf);
+#			warn("$$ after unpack count=".udstr($count).
+#			     " w/".length($rest?$rest:"")." bytes\n");
+
+			goto READ_MORE unless defined $count;
+
+			if (!$count) {
+#				warn("$$ got a zero count, dropping out\n");
+				$buf = undef;
+				$done = 1;
+			} else {
+				$nbuf = length($rest);
+				if ($nbuf >= $count) {
+#					warn("$$ cread wins! nbuf=$nbuf\n");
+					$self->buf($rest);
+					$buf = $rest;
+					$done = 1;
+				} else {
+					# else need to read more
+#					warn("$$ short cread nbuf=$nbuf ".
+#					     "count=$count\n");
+					if ($count >= $bufsiz) {
+						$bufsiz = $count + 128;
+						$self->bufsiz($bufsiz);
+					}
+				}
+			}
+		} catch {
+			warn("decode of count failed? @_\n");
+		};
+		last if $done;
+
+	      READ_MORE:
+		$nbuf = length($buf);
+		if ($nbuf + 128 >= $bufsiz) {
+			if ($bufsiz >= $max_bufsiz) {
+				warn("max bufsiz $max_bufsiz reached!");
+				last;
+			}
+			$bufsiz += 128;
+			$self->bufsiz($bufsiz);
+		}
+#		warn("$$ bot cread bufsiz=$bufsiz nbuf=$nbuf\n");
+		$n = $self->stream->sysread($buf,$bufsiz,$nbuf);
+	}
+#	warn("$$ cread => ".udstr($buf)."\n");
+	return $buf;
+}
 
 =pod
 
@@ -171,32 +257,28 @@ and if successful returns parsed data in a neutral form to the parent.
 
 sub loop {
 	my($self) = @_;
-	my $buf = "";
-	my $nbuf = 0;
-	my $len = 0;
-	my $bufsiz = 1024;
-	my $max_bufsiz = $self->max_bufsiz;
 	my $obj = $self->obj;
 	my $methods = $obj->rpc_methods;
 	my $exit_code = 0;
-	warn("$$ child RPC methods: ".join(", ", sort keys %$methods)."\n");
-	my $n = $self->stream->sysread($buf,$bufsiz);
-	while (defined($n)) {
-		my($meth,$args,$args_s,$rest,$err,@results,$result_s);
+#	warn("$$ child RPC methods: ".join(", ", sort keys %$methods)."\n");
+	while (1) {
+		my $buf = $self->cread();
+#		warn("$$ child cread returned ".length($buf)." bytes\n");
 
-		if ($n == 0) {
-			warn("$$ read nothing, timeout=$self->timeout ...\n");
-			sleep($self->timeout);
-			goto READ_MORE;
+		if (!defined($buf)) {
+#			warn("$$ cread failed, dropping out of loop\n");
+			$exit_code = 1;
+			last;
 		}
-		$nbuf += $n;
+
+		my($meth,$args,$args_s,$rest,$err,@results,$result_s);
 
 		# try unpacking the message, if it fails keep reading
 		try {
 			($meth,$args_s,$rest) = unpack("w/a* w/a* a*", $buf);
 		} catch {
-			warn("$$ unpack ".length($buf)." bytes: @_\n");
-			goto READ_MORE;
+#			warn("$$ unpack ".length($buf)." bytes: @_\n");
+			next;
 		};
 
 		# message unpacked fine, check it for sanity
@@ -204,12 +286,11 @@ sub loop {
 		# the special "quit" message:
 		last if $meth eq ".";
 
-		$buf = $rest ? $rest : "";
-		$nbuf = length($buf);
+		$self->buf($rest);
 
 		# invalid method invoked
 		if (!exists($methods->{$meth})) {
-			warn("$$ child bad method: |$meth|\n");
+#			warn("$$ child bad method: |$meth|\n");
 			$err = RPC_ERR_BAD_METHOD;
 			$result_s = _errs("invalid method: $meth");
 			goto SEND_RESP;
@@ -233,10 +314,10 @@ sub loop {
 
 		# finally, do the deed
 		try {
-			warn("$$ child invoking $meth(@$args) on $obj\n");
+#			warn("$$ child invoking $meth(@$args) on $obj\n");
 			@results = $obj->$meth(@$args);
-			warn("$$ child got ".scalar(@results).
-			     " results: @results\n");
+#			warn("$$ child got ".scalar(@results).
+#			     " results: @results\n");
 		} catch {
 			warn("$$ child error invoking $meth: @_\n");
 			$err = RPC_ERR_INVOKE;
@@ -254,21 +335,12 @@ sub loop {
 		};
 
 	      SEND_RESP: # send $err,$result_s to other side
-		warn("$$ child sending back err=$err result_s=$result_s\n");
+		my $result_sz = length($result_s);
+#		warn("$$ child sending back err=$err result_sz=$result_sz\n");
 		my $resp = pack("w w/a*",$err,$result_s);
-		$self->awrite($resp);
-
-	      READ_MORE:
-		if ($nbuf + 16 >= $bufsiz) {
-			if ($bufsiz >= $max_bufsiz) {
-				warn("max bufsiz $max_bufsiz reached!");
-				$exit_code = 1;
-				last;
-			}
-			$bufsiz = $nbuf + 128;
-		}
-		$n = $self->stream->sysread($buf,$bufsiz,$nbuf);
+		$self->cwrite($resp);
 	}
+
 	$self->stream->close();
 	return $exit_code;
 }
@@ -288,68 +360,36 @@ The method named C<$name> is invoked with C<@args> as arguments.
 
 sub req {
 	my($self,$name,@args) = @_;
-
+	my($err,$resp_s,$rest,$result);
 	my $args_s = encode_json(\@args);
 	my $req = pack("w/a* w/a*", $name, $args_s);
-	$self->awrite($req);
+	$self->cwrite($req);
+	my $buf = $self->cread();
+	($err,$resp_s,$rest) = unpack("w w/a* a*", $buf);
+	my $nbuf = length($rest);
+	warn("$nbuf leftovers remain: |".hexdump($rest)."|\n") if $nbuf;
+	$self->buf($rest);
+	die _rpc_errs($err,$resp_s) unless $err == RPC_OK;
 
-	my $buf = "";
-	my $nbuf = 0;
-	my $bufsiz = $self->bufsiz;
-	my $max_bufsiz = $self->max_bufsiz;
-	my $n = $self->stream->sysread($buf,$bufsiz,$nbuf);
+	try {
+		$result = decode_json($resp_s);
+		die _rpc_errs(RPC_ERR_DECODE_RESULT,
+			      "results not an array $resp_s: @_")
+		    if ref($result) ne "ARRAY";
+	} catch {
+		die _rpc_errs(RPC_ERR_DECODE_RESULT,
+			      "cannot decode JSON result: @_");
+	};
 
-	while (defined($n)) {
-		my($err,$resp_s,$rest,$result);
-
-		if ($n == 0) {
-			warn("$$ read nothing, timeout=$self->timeout ...\n");
-			sleep($self->timeout);
-			goto READ_MORE;
-		}
-
-		try {
-			($err,$resp_s,$rest) = unpack("w w/a* a*", $buf);
-		} catch {
-			goto READ_MORE;
-		};
-
-		$buf = $rest ? $rest : "";
-		$nbuf = length($buf);
-
-		warn("$nbuf leftovers remain: |".hexdump($buf)."|\n") if $nbuf;
-		die _rpc_errs($err,$resp_s) unless $err == RPC_OK;
-
-		try {
-			$result = decode_json($resp_s);
-			die _rpc_errs(RPC_ERR_DECODE_RESULT,
-				      "results not an array $resp_s: @_")
-			    if ref($result) ne "ARRAY";
-		} catch {
-			die _rpc_errs(RPC_ERR_DECODE_RESULT,
-				      "cannot decode JSON result $resp_s: @_");
-		};
-
-		# an rpc method can be assocated with a coderef to swizzle
-		# return values into something (a blessed ref, probably)
-		if (defined(my $swiz = $self->obj->rpc_methods->{$name})) {
-			my @swizzled = &$swiz(@$result);
-			$result = \@swizzled;
-		}
-
-		return @$result if wantarray;
-		return $result->[0];
-
-	      READ_MORE:
-		if ($nbuf + 16 >= $bufsiz) {
-			if ($bufsiz >= $max_bufsiz) {
-				die("max bufsiz $max_bufsiz reached!");
-			}
-			$bufsiz = $nbuf + 128;
-			$self->bufsiz($bufsiz);
-		}
-		$n = $self->stream->sysread($buf,$bufsiz,$nbuf);
+	# an rpc method can be assocated with a coderef to swizzle
+	# return values into something (a blessed ref, probably)
+	if (defined(my $swiz = $self->obj->rpc_methods->{$name})) {
+		my @swizzled = &$swiz(@$result);
+		$result = \@swizzled;
 	}
+
+	return @$result if wantarray;
+	return $result->[0];
 }
 
 =pod
@@ -383,7 +423,7 @@ coredump).
 
 sub shutdown {
 	my($self) = @_;
-	$self->awrite(pack("w/a* w/a*",".","[]"));
+	$self->cwrite(pack("w/a* w/a*",".","[]"));
 	$self->stream->close();
 	$self->stream(undef);
 	return $self;
@@ -405,6 +445,7 @@ sub finish {
 		$self->shutdown();
 		$pid = waitpid($pid, 0);
 		($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
+		$self->app->unregister_child($pid) if $self->app;
 	}
 
 	if ($coredump) {

@@ -30,6 +30,7 @@ has "sink" => (
 has "configuration" => (
 	is => "rw", isa => "Flail::Config", handles => { 'conf' => 'get' });
 has "children" => (is => "rw", isa => "HashRef", default => sub { {} });
+has "_orig_chld" => (is => "rw", isa => "Any");
 
 sub BUILD {
 	my($self,$params) = @_;
@@ -37,15 +38,26 @@ sub BUILD {
 	$self->configuration(Flail::Config->Default);
 }
 
+sub DEMOLISH {
+	my($self) = @_;
+	if (my $n = scalar(keys(%{$self->children}))) {
+		my $pids = join(", ", sort keys %{$self->children});
+		warn("$self: DEMOLISHing w/$n child processes regd: $pids\n");
+	}
+}
+
 # invoked from SIGCHLD to reap dead children.  if the children are
 # known to us we invoke the finish method on their parental image
 sub reaper {
 	my($self) = @_;
 	local($!,$?);
+	warn("$$ reaper invoked\n");
 	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
 		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
+		warn("$$ child $pid sig=$signo core=$coredump => $xit\n");
 		my $kid = $self->children->{$pid};
 		if ($kid) {
+			warn("$$ child $pid => $kid\n");
 			try {
 				$kid->finish(
 					do_wait => 0,
@@ -57,10 +69,10 @@ sub reaper {
 			};
 			delete($self->children->{$pid});
 		} elsif ($coredump) {
-			warn("unknown child $pid dumped core! ".
+			warn("$$ unknown child $pid dumped core! ".
 			     "signal $signo, exit $xit\n");
 		} else {
-			warn("reaped unknown child $pid; ".
+			warn("$$ reaped unknown child $pid; ".
 			     "signal $signo, exit $xit\n");
 		}
 	}
@@ -92,13 +104,43 @@ status, respectively.
 
 sub register_child {
 	my($self,$child) = @_;
-	$SIG{"CHLD"} = sub { $self->reaper }
-		unless scalar(keys(%{$self->children}));
+	unless (scalar(keys(%{$self->children}))) {
+		$self->_orig_chld($SIG{"CHLD"});
+		$SIG{"CHLD"} = sub { $self->reaper };
+	}
 	if (exists($self->children->{$child->pid})) {
-		warn("tried to register already-known pid ".$child->pid.
+		warn("$$ tried to register already-known pid ".$child->pid.
 		     ": $child\n");
 	} else {
 		$self->children->{$child->pid} = $child;
+	}
+	return $self;
+}
+
+=pod
+
+=over 4
+
+=item * unregister_child $child_or_pid
+
+Undo the effects of C<register_child>: forget we know about a child
+process, presumably because we've just reaped it.  If the last known
+child process is unregistered we restore the original C<SIGCHLD>
+signal handler as well.
+
+=back
+
+=cut
+
+sub unregister_child {
+	my($self,$child) = @_;
+	my $pid = ref($child) ? $child->pid : $child;
+	if (!exists($self->children->{$pid})) {
+		warn("$$ tried to unregister unknown pid $pid\n");
+	} else {
+		delete($self->children->{$pid});
+		$SIG{"CHLD"} = $self->_orig_chld
+		    unless scalar(keys(%{$self->children}));
 	}
 	return $self;
 }

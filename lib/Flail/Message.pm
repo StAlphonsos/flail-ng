@@ -23,7 +23,7 @@ different sources.
 package Flail::Message;
 use Modern::Perl;
 use Moose;
-use Flail::Util qw(ts);
+use Flail::Util qw(ts dumpola udstr);
 use vars qw($SUMMARY_SEP @SUMMARY_FIELDS @MESSAGE_FIELDS %FIELD_XFORMS);
 use overload '""' => \&to_string;
 
@@ -31,9 +31,9 @@ $SUMMARY_SEP = "|";
 @SUMMARY_FIELDS = qw(timestamp from subject);
 %FIELD_XFORMS = (
 	"timestamp" => \&ts,
-	"from" => sub { $_[0] ? $_[0]->format : "?from?" },
-	"to" => sub { $_[0] ? $_[0]->format : "?to?" },
-	"cc" => sub { $_[0] ? $_[0]->format : "?cc?" },
+	"from" => sub { $_[0] ? $_[0]->unfoldedBody : undef },
+	"to" => sub { $_[0] ? $_[0]->unfoldedBody : undef },
+	"cc" => sub { $_[0] ? $_[0]->unfoldedBody : undef },
     );
 @MESSAGE_FIELDS = qw(subject messageId from to cc body contentType);
 
@@ -41,44 +41,57 @@ has "real" => (
 	is => "rw", isa => "Maybe[Mail::Message]");
 #	handles => [@MESSAGE_FIELDS]);
 has "timestamp" => (is => "rw", isa => "Maybe[Int]");
-has "from" => (is => "rw", isa => "Maybe[Mail::Address]");
-has "to" => (is => "rw", isa => "Maybe[Mail::Address]");
-has "cc" => (is => "rw", isa => "Maybe[Mail::Address]");
+has "from" => (is => "rw", isa => "Maybe[Str]");
+has "to" => (is => "rw", isa => "Maybe[Str]");
+has "cc" => (is => "rw", isa => "Maybe[Str]");
 has "subject" => (is => "rw", isa => "Maybe[Str]");
 has "messageId" => (is => "rw", isa => "Maybe[Str]");
 has "contentType" => (is => "rw", isa => "Maybe[Str]");
-has "body" => (is => "rw", isa => "Maybe[Mail::Message::Body]");
+has "body" => (is => "rw", isa => "Maybe[ArrayRef[Str]]");
 
 sub BUILD {
 	my($self,$params) = @_;
 	if ($self->real) {
+		# in the child
+#		warn("$$ $self decoding the real message\n");
+
+		$self->messageId("".$self->real->messageId);
+
+		my $head = $self->real->head;
+		my $body = $self->real->decoded;
+
 		foreach my $field (@MESSAGE_FIELDS) {
-			# there's a decode step here maybe...? XXX
-			$self->$field($self->real->$field);
+			if ($field eq "body" ) {
+				my $aref = $body->lines();
+				$self->body($aref);
+			} elsif ($field eq "contentType") {
+				my $mtype = $body->mimeType;
+				$self->contentType("$mtype");
+			} elsif ($field ne "messageId") {
+				my $xf = $FIELD_XFORMS{$field};
+				my $raw = $head->get($field);
+				my $cooked = $xf ? &$xf($raw) : udstr($raw);
+				$self->$field($cooked);
+			}
 		}
 	} else {
 		my @missing = grep {!exists($params->{$_})} @MESSAGE_FIELDS;
-		warn(ref($self)." constructor invoked missing: @missing");
+		warn(ref($self)." constructor invoked missing: @missing")
+		    if @missing;
 	}
 }
 
 # the opposite of bless: marshal for RPC result or whatever
 sub curse {
 	my($self) = @_;
-	return { map { $_ => $self->format_field($_) } @MESSAGE_FIELDS };
-}
-
-sub format_field {
-	my($self,$name) = @_;
-	my $xform = $FIELD_XFORMS{$name};
-	my($val) = $self->$name;
-	return $xform ? &$xform($val) : $val;
+	my $c = { map { $_ => $self->$_ } @MESSAGE_FIELDS };
+#	warn("Flail::Message::curse => ".dumpola($c)."\n");
+	return $c;
 }
 
 sub to_string {
 	my($self) = @_;
-	join($SUMMARY_SEP,
-	     map { sprintf("%s", $self->format_field($_)) } @SUMMARY_FIELDS);
+	join($SUMMARY_SEP, map { udstr($self->$_) } @SUMMARY_FIELDS);
 }
 
 # to mung args on their way to the constructor:

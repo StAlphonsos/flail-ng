@@ -33,7 +33,6 @@ sub uncurse_msg { @_ ? Flail::Message->new(@_) : undef }
 our $RPC_METHODS = {
 	"count" => undef,
 	"this" => \&uncurse_msg,
-	"finish" => undef,
 	"first" => \&uncurse_msg,
 	"final" => \&uncurse_msg,
 	"next" => \&uncurse_msg,
@@ -55,12 +54,14 @@ sub to_string {
 	return "<a folder: ".$self->folder.">";
 }
 
+sub in_parent { $_[0]->privsep_child && $_[0]->privsep_child->pid }
+
 # parent: make RPC request to child
 # child: invoke real method on underlying object
 sub _dispatch {
 	my($self,$name,@args) = @_;
-	warn("$$ $self _dispatch name=$name args=@args\n");
-	return ($self->privsep_child && $self->privsep_child->pid) ?
+#	warn("$$ $self _dispatch name=$name args=@args\n");
+	return $self->in_parent ?
 	    $self->privsep_child->req($name,@args) :
 	    $self->real->$name(@args);
 }
@@ -70,7 +71,6 @@ sub rpc_methods { $RPC_METHODS; }
 # methods we would delegate to $self->real if we could
 sub count	{ shift->_dispatch("count",@_) }
 sub this	{ shift->_dispatch("this",@_) }
-sub finish	{ shift->_dispatch("finish",@_) }
 sub first	{ shift->_dispatch("first",@_) }
 sub final	{ shift->_dispatch("final",@_) }
 sub next	{ shift->_dispatch("next",@_) }
@@ -92,26 +92,26 @@ sub BUILD {
 			"promises" => "rpath",
 		    ) unless $params->{"no_privsep"};
 		$self->privsep_child($child);
-		warn("$$ forked privsep child $child\n");
+#		warn("$$ forked privsep child $child\n");
 	}
 }
 
 # parent: kill/reap the child
-sub DEMOLISH { $_[0]->privsep_child->finish() if $_[0]->privsep_child }
+sub finish	{ $_[0]->privsep_child->finish() if $_[0]->in_parent; 1 }
 
 sub load_data {
 	$_[0]->real(Flail::MessageSet::Maildir->new(folder => $_[0]->folder));
 	return $_[0];
 }
 
-# child: run the rpc loop
 # parent: return immediately
+# child: run the rpc loop
 sub run {
 	my($self) = @_;
-	return $self if $self->privsep_child && $self->privsep_child->pid;
-	warn("$$ MessageSet child loading data\n");
+	return $self if $self->in_parent;
+#	warn("$$ MessageSet child loading data\n");
 	$self->load_data();
-	warn("$$ MessageSet child dropping into loop\n");
+#	warn("$$ MessageSet child dropping into loop\n");
 	exit($self->privsep_child->loop());
 }
 

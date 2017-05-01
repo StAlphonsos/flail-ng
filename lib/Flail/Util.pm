@@ -30,7 +30,8 @@ use vars qw(@EXPORT_OK %EXPORT_TAGS $TIME_FMT %CURSES);
 $TIME_FMT = "%Y-%m-%d %H:%M:%S";
 @EXPORT_OK = qw(
     affirmative basename basename_env clean curse defor defkey
-    dirname dirname_env dumpola hexdump msgfy ts screen_columns test_warn);
+    dirname dirname_env dumpola hexdump msgfy ts screen_columns
+    test_warn udstr);
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 =pod
@@ -126,6 +127,7 @@ sub clean	{ my $s = shift; $s =~ s/(^\s+|\s+$)//gs; $s }
 sub affirmative { ($_[0] =~ /^(yes|t|ok|)$/i) ? 1 : 0 }
 sub defor	{ defined($_[0]) ? $_[0] : $_[1] }
 sub defkey	{ exists($_[0]->{$_[1]}) ? $_[0]->{$_[1]} : $_[2] }
+sub udstr	{ defined($_[0]) ? "$_[0]" : "undef" }
 
 =pod
 
@@ -196,6 +198,7 @@ sub curse {
 	if (!$rr) {
 		$rez = defined($thing) ? $thing : undef;
 	} elsif (blessed($thing)) {
+#		warn("cursing blessed $rr: $thing ...\n");
 		if ($thing->can("curse")) {
 			$rez = $thing->curse();
 		} elsif (exists($CURSES{$rr})) {
