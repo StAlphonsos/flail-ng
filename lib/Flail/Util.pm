@@ -25,7 +25,7 @@ use Data::Dumper;
 use POSIX;
 use Scalar::Util qw(looks_like_number blessed);
 use parent qw(Exporter);
-use vars qw(@EXPORT_OK %EXPORT_TAGS $TIME_FMT);
+use vars qw(@EXPORT_OK %EXPORT_TAGS $TIME_FMT %CURSES);
 
 $TIME_FMT = "%Y-%m-%d %H:%M:%S";
 @EXPORT_OK = qw(
@@ -184,6 +184,11 @@ through unchanged.
 
 =cut
 
+%CURSES = (
+	"Mail::Address" => sub { "".shift },
+	"Mail::Message::Body::Delayed" => sub { "-delayed-" },
+);
+
 sub curse {
 	my $thing = shift;
 	my $rr = ref($thing);
@@ -191,7 +196,14 @@ sub curse {
 	if (!$rr) {
 		$rez = defined($thing) ? $thing : undef;
 	} elsif (blessed($thing)) {
-		$rez = $thing->can("curse") ? $thing->curse() : "$thing";
+		if ($thing->can("curse")) {
+			$rez = $thing->curse();
+		} elsif (exists($CURSES{$rr})) {
+			my $curz = $CURSES{$rr};
+			$rez = &$curz($thing);
+		} else {
+			$rez = "$thing";
+		}
 	} elsif ($rr eq "ARRAY") {
 		$rez = [ map { curse($_) } @$thing ];
 	} elsif ($rr eq "HASH") {

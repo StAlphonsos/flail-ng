@@ -24,7 +24,7 @@ package Flail::Message;
 use Modern::Perl;
 use Moose;
 use Flail::Util qw(ts);
-use vars qw($SUMMARY_SEP @SUMMARY_FIELDS @MESSAGE_METHODS %FIELD_XFORMS);
+use vars qw($SUMMARY_SEP @SUMMARY_FIELDS @MESSAGE_FIELDS %FIELD_XFORMS);
 use overload '""' => \&to_string;
 
 $SUMMARY_SEP = "|";
@@ -35,23 +35,43 @@ $SUMMARY_SEP = "|";
 	"to" => sub { $_[0] ? $_[0]->format : "?to?" },
 	"cc" => sub { $_[0] ? $_[0]->format : "?cc?" },
     );
-@MESSAGE_METHODS = qw(subject messageId from to cc body contentType);
+@MESSAGE_FIELDS = qw(subject messageId from to cc body contentType);
 
 has "real" => (
-	is => "rw", isa => "Maybe[Mail::Message]",
-#	handles => [@MESSAGE_METHODS]);
-has "subject" => (is => "rw", isa => "Str", );
+	is => "rw", isa => "Maybe[Mail::Message]");
+#	handles => [@MESSAGE_FIELDS]);
+has "timestamp" => (is => "rw", isa => "Maybe[Int]");
+has "from" => (is => "rw", isa => "Maybe[Mail::Address]");
+has "to" => (is => "rw", isa => "Maybe[Mail::Address]");
+has "cc" => (is => "rw", isa => "Maybe[Mail::Address]");
+has "subject" => (is => "rw", isa => "Maybe[Str]");
+has "messageId" => (is => "rw", isa => "Maybe[Str]");
+has "contentType" => (is => "rw", isa => "Maybe[Str]");
+has "body" => (is => "rw", isa => "Maybe[Mail::Message::Body]");
+
+sub BUILD {
+	my($self,$params) = @_;
+	if ($self->real) {
+		foreach my $field (@MESSAGE_FIELDS) {
+			# there's a decode step here maybe...? XXX
+			$self->$field($self->real->$field);
+		}
+	} else {
+		my @missing = grep {!exists($params->{$_})} @MESSAGE_FIELDS;
+		warn(ref($self)." constructor invoked missing: @missing");
+	}
+}
 
 # the opposite of bless: marshal for RPC result or whatever
 sub curse {
 	my($self) = @_;
-	return { map { $_ => $self->format_field($_) } @MESSAGE_METHODS };
+	return { map { $_ => $self->format_field($_) } @MESSAGE_FIELDS };
 }
 
 sub format_field {
 	my($self,$name) = @_;
 	my $xform = $FIELD_XFORMS{$name};
-	my($val) = $self->real->$name;
+	my($val) = $self->$name;
 	return $xform ? &$xform($val) : $val;
 }
 
