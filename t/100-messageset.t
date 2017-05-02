@@ -34,17 +34,6 @@ sub test_mset {
 	ok($m0,"got first message $m0");
 	is($m0->subject,$EXPECT{SUBJ0},"subject 0 is as excected");
 	my $m0id = $m0->messageId;
-=pod
-
-=over 4
-
-=item $m0id = $m0->messageId;
-	is($m0id,$EXPEC ...
-
-=back
-
-=cut
-
 	is($m0id,$EXPECT{ID0},"message-id is right");
 	my $m_1=$mset->final;
 	ok($m_1,"got final message");

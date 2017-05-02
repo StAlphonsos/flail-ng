@@ -31,8 +31,8 @@ sub BUILD {
 	my($self,$params) = @_;
 	$self->name($self->folder);
 	$self->boxdir(Mail::Box::Maildir->new(folder => $self->folder));
-	$self->boxdir->log("DEBUG");
-	$self->boxdir->trace("DEBUG");
+#	$self->boxdir->log("DEBUG");
+#	$self->boxdir->trace("DEBUG");
 }
 
 # anonians

@@ -1,4 +1,7 @@
 bin/flail
+docs/muas.txt
+docs/notes.md
+docs/paper.md
 dot.flailrc
 eg/sample.pl
 lib/Devel/REPL/Plugin/AppCmd.pm
@@ -19,8 +22,6 @@ lib/Flail/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-notes.md
-paper.md
 README.md
 t/000-load-everything.t
 t/010-config.t

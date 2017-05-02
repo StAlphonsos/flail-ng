@@ -458,11 +458,11 @@ sub finish {
 	$self->stream(undef);
 
 	if ($coredump) {
-		warn("child $pid dumped core! signal $signo, exit $xit\n");
+		warn("$$ child $pid dumped core! signal $signo, exit $xit\n");
 	} elsif (sandbox_violation($pid,$signo,$coredump,$xit)) {
-		warn("child $pid aborted due to pledge violtaion\n");
+		warn("$$ child $pid aborted due to pledge violtaion\n");
 	} elsif ($do_wait) {
-		warn("child $pid reaped, signal $signo, exit $xit\n");
+		warn("$$ child $pid reaped, signal $signo, exit $xit\n");
 	} # else whatever called us will do something with the information
 
 	return $xit;
