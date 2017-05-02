@@ -30,8 +30,8 @@ use vars qw(@EXPORT_OK %EXPORT_TAGS $TIME_FMT %CURSES);
 $TIME_FMT = "%Y-%m-%d %H:%M:%S";
 @EXPORT_OK = qw(
     affirmative basename basename_env clean curse defor defkey
-    dirname dirname_env dumpola hexdump msgfy ts screen_columns
-    test_warn udstr);
+    dirname dirname_env dumpola hexdump msgfy ts sandbox_violation
+    screen_columns test_warn udstr);
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 =pod
@@ -215,6 +215,24 @@ sub curse {
 		die("unhandled ref curse $rr ($thing)");
 	}
 	return $rez;
+}
+
+=pod
+
+=over 4
+
+=item * sandbox_violation $pid,$signo,$coredump,$exit_code
+
+Return true if the recently-reaped process C<$pid> died due to a
+sandbox violation.  Currently only works under OpenBSD.
+
+=back
+
+=cut
+
+sub sandbox_violation {
+	my($pid,$signo,$coredump,$xit) = @_;
+	return ($^O eq "openbsd") && ($signo == 6);
 }
 
 1;

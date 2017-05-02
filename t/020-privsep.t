@@ -5,8 +5,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 38;
 use Try::Tiny;
+use POSIX qw(_exit);
 
 use Flail::ChildProcess;
 
@@ -74,23 +75,36 @@ sub test_the_things {
 
 # single process:
 my $obj1 = TestClass->new();
-test_the_things($obj1, sub { my($o,$m,@a) = @_; $o->$m(@a) });
+test_the_things($obj1, sub { my($o,$m,@a) = @_; $o->$m(@a) });		# +12
 
 # privsep'd
 my $obj2 = TestClass->new();
-my $proc = Flail::ChildProcess->new(
+my $proc;
+#$SIG{CHLD} = sub {
+#	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+#		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
+#		warn("reaped $pid, sig $signo core $coredump xit $xit\n");
+#		$proc->finish(
+#			do_wait => 0,
+#			signo => $signo,
+#			coredump => $coredump,
+#			xit => $xit) if $proc && $proc->pid == $pid;
+#	}
+#};
+$proc = Flail::ChildProcess->new(
 	"obj" => $obj2,
 	"name" => "privsep test process",
 	"promises" => "stdio");
-exit($proc->loop) if $proc->in_child;
+_exit($proc->loop) if $proc->in_child;
 if (verbose()) { my $it = $proc->pid; sleep(1); system("ps $it"); }
-test_the_things($proc,sub { my($o,$m,@a) = @_; $o->req($m,@a); });
+test_the_things($proc,sub { my($o,$m,@a) = @_; $o->req($m,@a); });	# +12
 
 try {
 	my @rez = $proc->req("bazle",1);
-	ok(0,"invoking bazle won?");
+	ok(0,"invoking bazle won?");					# +1
 } catch {
 	ok("@_","invoking nonexistent method bazle failed: @_");
 };
+test_the_things($proc,sub { my($o,$m,@a) = @_; $o->req($m,@a); });	# +12
 
-is($proc->finish(),0,"finish won");
+is($proc->finish(),0,"finish won");					# +1

@@ -38,6 +38,7 @@ sub is_exhausted{ 1+$_[0]->idx >= $_[0]->count }
 sub msg_at {
 	my($self,$off) = @_;
 	my $raw = $self->this($off);
+	warn("$$ msg_at($off) => $raw\n");
 	return undef unless $raw;
 	return $self->a_msg($raw);
 }

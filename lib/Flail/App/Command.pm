@@ -34,6 +34,7 @@ sub BUILD {
 sub opt_spec {
 	my($class,$app) = @_;
 	return ( [ "verbose|v" => "crank up verbosity in output" ],
+		 [ "debug|d" => "turn on debugging" ],
 		 [ "maildir|m=s" => "Maildir base (def: ~/Maildir)" ],
 		 [ "config|C=s" => "use config in given file (def ~/.flailrc)",
 		   { default => join("/",$ENV{"HOME"},".flailrc") } ],

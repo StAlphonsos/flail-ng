@@ -1,0 +1,23 @@
+# MUAs in OpenBSD ports under mail/ -*- indent-tabs-mode:nil; tab-width:8 -*-
+# name			# type              # loc # testloc # tests # vuls
+alpine			# textmode
+asmail			# gui (afterstep)
+claws-mail		# gui (gtk2)
+cue			# textmode
+elm			# textmode
+evolution		# gui (gnome)
+exmh2			# gui (x11)
+geary			# gui (gnome)
+lumail			# textmode
+mew			# textmode (emacs)
+mozilla-thunderbird	# gui (xul)
+mu			# textmode (emacs)
+mutt			# textmode
+neomutt			# textmode
+nmh			# textmode
+roundcubemail		# webmail
+s-nail			# textmode
+sylpheed		# gui (gtk2)
+thunderbird-i18n	# gui (xul)
+trojita			# gui (qt)
+wmmail			# gui (WindowMaker)

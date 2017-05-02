@@ -9,6 +9,8 @@ Flail::ChildProcess - OO interface to privsep
 
 =head1 SYNOPSIS
 
+  use POSIX qw(_exit);
+
   # given some $obj that implements a method called "rpc_methods"
   # which returns a hashref whose keys are allowable methods to
   # invoke via RPC:
@@ -17,7 +19,7 @@ Flail::ChildProcess - OO interface to privsep
                  name => "maildir reader",
                  promises => "rpath stdio");
   # drop into the RPC service loop in the child process:
-  exit($child->loop) if $child->in_child;
+  _exit($child->loop) if $child->in_child;
 
   # in the parent, to invoke a method on $obj in the child:
   my @results = $child->req("a_method",$args...);
@@ -43,7 +45,7 @@ use Try::Tiny;
 use JSON qw(encode_json decode_json);
 use OpenBSD::Pledge;			# for now only one sandbox
 use Flail::App;
-use Flail::Util qw(curse defkey hexdump dumpola udstr);
+use Flail::Util qw(curse defkey hexdump dumpola udstr sandbox_violation);
 use constant {
 	RPC_OK => 0,
 	RPC_ERR_BAD_METHOD => 1,
@@ -52,6 +54,9 @@ use constant {
 	RPC_ERR_INVOKE => 4,
 	RPC_ERR_ENCODE_RESULT => 5,
 	RPC_ERR_DECODE_RESULT => 6,
+};
+use overload '""' => sub {
+	sprintf("<ChildProcess pid %s>",$_[0]->pid?$_[0]->pid:"$$");
 };
 
 has "app" => (is => "rw", isa => "Maybe[Flail::App]");
@@ -157,7 +162,7 @@ sub cread {
 		$bufsiz *= 2;
 		$self->bufsiz($bufsiz);
 	}
-#	warn("$$ top cread bufsiz=$bufsiz nbuf=$nbuf\n");
+	warn("$$ top cread bufsiz=$bufsiz nbuf=$nbuf\n");
 	my $n = $self->stream->sysread($buf,$bufsiz,$nbuf);
 	my $done = 0;
 	while (defined($n)) {
@@ -166,35 +171,35 @@ sub cread {
 		die("$$ sysread returned $n: $!") if $n < 0;
 
 		if ($n == 0) {
-#			warn("$$ read nothing, timeout=$tout ...\n");
+			warn("$$ read nothing, timeout=$tout ...\n");
 			sleep($tout);
 			goto READ_MORE;
 		}
 
 		# try to decode a count and at least that many bytes from $buf
 		try {
-#			warn("$$ trying to unpack count\n");
+			warn("$$ trying to unpack count\n");
 			my($count,$rest) = unpack("w a*",$buf);
-#			warn("$$ after unpack count=".udstr($count).
-#			     " w/".length($rest?$rest:"")." bytes\n");
+			warn("$$ after unpack count=".udstr($count).
+			     " w/".length($rest?$rest:"")." bytes\n");
 
 			goto READ_MORE unless defined $count;
 
 			if (!$count) {
-#				warn("$$ got a zero count, dropping out\n");
+				warn("$$ got a zero count, dropping out\n");
 				$buf = undef;
 				$done = 1;
 			} else {
 				$nbuf = length($rest);
 				if ($nbuf >= $count) {
-#					warn("$$ cread wins! nbuf=$nbuf\n");
+					warn("$$ cread wins! nbuf=$nbuf\n");
 					$self->buf($rest);
 					$buf = $rest;
 					$done = 1;
 				} else {
 					# else need to read more
-#					warn("$$ short cread nbuf=$nbuf ".
-#					     "count=$count\n");
+					warn("$$ short cread nbuf=$nbuf ".
+					     "count=$count\n");
 					if ($count >= $bufsiz) {
 						$bufsiz = $count + 128;
 						$self->bufsiz($bufsiz);
@@ -216,10 +221,10 @@ sub cread {
 			$bufsiz += 128;
 			$self->bufsiz($bufsiz);
 		}
-#		warn("$$ bot cread bufsiz=$bufsiz nbuf=$nbuf\n");
+		warn("$$ bot cread bufsiz=$bufsiz nbuf=$nbuf\n");
 		$n = $self->stream->sysread($buf,$bufsiz,$nbuf);
 	}
-#	warn("$$ cread => ".udstr($buf)."\n");
+	warn("$$ cread => ".length($buf)." bytes\n");
 	return $buf;
 }
 
@@ -260,13 +265,13 @@ sub loop {
 	my $obj = $self->obj;
 	my $methods = $obj->rpc_methods;
 	my $exit_code = 0;
-#	warn("$$ child RPC methods: ".join(", ", sort keys %$methods)."\n");
+	warn("$$ child RPC methods: ".join(", ", sort keys %$methods)."\n");
 	while (1) {
 		my $buf = $self->cread();
-#		warn("$$ child cread returned ".length($buf)." bytes\n");
+		warn("$$ child cread returned ".length($buf)." bytes\n");
 
 		if (!defined($buf)) {
-#			warn("$$ cread failed, dropping out of loop\n");
+			warn("$$ cread failed, dropping out of loop\n");
 			$exit_code = 1;
 			last;
 		}
@@ -277,11 +282,12 @@ sub loop {
 		try {
 			($meth,$args_s,$rest) = unpack("w/a* w/a* a*", $buf);
 		} catch {
-#			warn("$$ unpack ".length($buf)." bytes: @_\n");
+			warn("$$ unpack ".length($buf)." bytes: @_\n");
 			next;
 		};
 
 		# message unpacked fine, check it for sanity
+		warn("$$ child got method |$meth| args_s=|$args_s|\n");
 
 		# the special "quit" message:
 		last if $meth eq ".";
@@ -290,7 +296,7 @@ sub loop {
 
 		# invalid method invoked
 		if (!exists($methods->{$meth})) {
-#			warn("$$ child bad method: |$meth|\n");
+			warn("$$ child bad method: |$meth|\n");
 			$err = RPC_ERR_BAD_METHOD;
 			$result_s = _errs("invalid method: $meth");
 			goto SEND_RESP;
@@ -314,10 +320,10 @@ sub loop {
 
 		# finally, do the deed
 		try {
-#			warn("$$ child invoking $meth(@$args) on $obj\n");
+			warn("$$ child invoking $meth(@$args) on $obj\n");
 			@results = $obj->$meth(@$args);
-#			warn("$$ child got ".scalar(@results).
-#			     " results: @results\n");
+			warn("$$ child got ".scalar(@results).
+			     " results: @results\n");
 		} catch {
 			warn("$$ child error invoking $meth: @_\n");
 			$err = RPC_ERR_INVOKE;
@@ -336,12 +342,14 @@ sub loop {
 
 	      SEND_RESP: # send $err,$result_s to other side
 		my $result_sz = length($result_s);
-#		warn("$$ child sending back err=$err result_sz=$result_sz\n");
+		warn("$$ child sending back err=$err result_sz=$result_sz\n");
 		my $resp = pack("w w/a*",$err,$result_s);
 		$self->cwrite($resp);
 	}
 
 	$self->stream->close();
+
+	warn("$$ child dropped out of loop, returning exit code $exit_code\n");
 	return $exit_code;
 }
 
@@ -424,8 +432,6 @@ coredump).
 sub shutdown {
 	my($self) = @_;
 	$self->cwrite(pack("w/a* w/a*",".","[]"));
-	$self->stream->close();
-	$self->stream(undef);
 	return $self;
 }
 
@@ -448,8 +454,13 @@ sub finish {
 		$self->app->unregister_child($pid) if $self->app;
 	}
 
+	$self->stream->close();
+	$self->stream(undef);
+
 	if ($coredump) {
 		warn("child $pid dumped core! signal $signo, exit $xit\n");
+	} elsif (sandbox_violation($pid,$signo,$coredump,$xit)) {
+		warn("child $pid aborted due to pledge violtaion\n");
 	} elsif ($do_wait) {
 		warn("child $pid reaped, signal $signo, exit $xit\n");
 	} # else whatever called us will do something with the information

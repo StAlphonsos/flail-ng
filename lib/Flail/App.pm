@@ -106,7 +106,7 @@ sub register_child {
 	my($self,$child) = @_;
 	unless (scalar(keys(%{$self->children}))) {
 		$self->_orig_chld($SIG{"CHLD"});
-		$SIG{"CHLD"} = sub { $self->reaper };
+		$SIG{"CHLD"} = sub { warn("$$ REAPER!\n"); $self->reaper };
 	}
 	if (exists($self->children->{$child->pid})) {
 		warn("$$ tried to register already-known pid ".$child->pid.

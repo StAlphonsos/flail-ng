@@ -42,15 +42,18 @@ sub query_params {
 	$maildir ||= $opt->{"maildir"} || $self->conf("maildir");
 	$self->emit("# maildir: $maildir");
 	$qopts{"folder"} = $maildir;
+	$qopts{"app"} = $self->the_app;
 	$self->emit("# folder: $qopts{folder}");
 	return %qopts;
 }
 
 sub execute {
 	my($self,$opt,$args) = @_;
+	$self->the_app->sink->debug($opt->{"debug"});
 	$self->emit("# ls::execute opt=",$opt,"args=",$args);
 	my %qparams = $self->query_params($opt,$args);
 	my $mset = Flail::MessageSet->Query(%qparams);
+	$self->emit("# got back mset $mset");
 	my $page = $self->emit(page_start => $mset);
 	my $result = $mset->first;
 	while ($result) {

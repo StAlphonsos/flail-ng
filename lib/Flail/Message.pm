@@ -53,7 +53,7 @@ sub BUILD {
 	my($self,$params) = @_;
 	if ($self->real) {
 		# in the child
-#		warn("$$ $self decoding the real message\n");
+		warn("$$ $self decoding the real message: ".$self->real."\n");
 
 		$self->messageId("".$self->real->messageId);
 
@@ -64,9 +64,12 @@ sub BUILD {
 			if ($field eq "body" ) {
 				my $aref = $body->lines();
 				$self->body($aref);
+				warn("$$ decoded body w/".
+				     scalar(@$aref)." lines\n");
 			} elsif ($field eq "contentType") {
 				my $mtype = $body->mimeType;
 				$self->contentType("$mtype");
+				warn("$$ decoded contentType = $mtype\n");
 			} elsif ($field ne "messageId") {
 				my $xf = $FIELD_XFORMS{$field};
 				my $raw = $head->get($field);

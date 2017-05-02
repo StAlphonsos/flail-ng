@@ -21,10 +21,12 @@ Describe the module with real words.
 package Flail::MessageSet;
 use Modern::Perl;
 use Moose;
+use POSIX qw(_exit);
 use Flail::ChildProcess;
 use Flail::Message;
 use Flail::MessageSet::Maildir;
 use Flail::Util qw(dumpola test_warn);
+use Try::Tiny;
 use overload '""' => \&to_string;
 
 # turn RPC results back into object
@@ -32,6 +34,7 @@ sub uncurse_msg { @_ ? Flail::Message->new(@_) : undef }
 
 our $RPC_METHODS = {
 	"count" => undef,
+	"idx" => undef,
 	"this" => \&uncurse_msg,
 	"first" => \&uncurse_msg,
 	"final" => \&uncurse_msg,
@@ -51,7 +54,7 @@ has "real" => (is => "rw", isa => "Maybe[Flail::MessageSet::Handler]");
 sub to_string {
 	my($self) = @_;
 	return "".$self->real if $self->real;
-	return "<a folder: ".$self->folder.">";
+	return sprintf("<%s: %d of %d>",$self->folder,$self->idx,$self->count);
 }
 
 sub in_parent { $_[0]->privsep_child && $_[0]->privsep_child->pid }
@@ -60,15 +63,23 @@ sub in_parent { $_[0]->privsep_child && $_[0]->privsep_child->pid }
 # child: invoke real method on underlying object
 sub _dispatch {
 	my($self,$name,@args) = @_;
-#	warn("$$ $self _dispatch name=$name args=@args\n");
-	return $self->in_parent ?
-	    $self->privsep_child->req($name,@args) :
-	    $self->real->$name(@args);
+	warn("$$ _dispatch name=$name args=@args child=".
+	     $self->privsep_child."\n");
+	if ($self->in_parent) {
+		return $self->privsep_child->req($name,@args);
+	}
+	try {
+		warn("$$ _dispatch $name using real=".$self->real."\n");
+		return $self->real->$name(@args);
+	} catch {
+		warn ("$$ dispatch $name got error: @_\n");
+	};
 }
 
 sub rpc_methods { $RPC_METHODS; }
 
 # methods we would delegate to $self->real if we could
+sub idx		{ shift->_dispatch("idx",@_) }
 sub count	{ shift->_dispatch("count",@_) }
 sub this	{ shift->_dispatch("this",@_) }
 sub first	{ shift->_dispatch("first",@_) }
@@ -89,10 +100,10 @@ sub BUILD {
 			"obj" => $self,
 			"app" => $params->{"app"},
 			"name" => "maildir reader",
-			"promises" => "rpath",
+			"promises" => "stdio rpath",
 		    ) unless $params->{"no_privsep"};
 		$self->privsep_child($child);
-#		warn("$$ forked privsep child $child\n");
+		warn("$$ forked privsep child $child\n");
 	}
 }
 
@@ -109,10 +120,10 @@ sub load_data {
 sub run {
 	my($self) = @_;
 	return $self if $self->in_parent;
-#	warn("$$ MessageSet child loading data\n");
+	warn("$$ MessageSet child loading data\n");
 	$self->load_data();
-#	warn("$$ MessageSet child dropping into loop\n");
-	exit($self->privsep_child->loop());
+	warn("$$ MessageSet child dropping into loop\n");
+	_exit($self->privsep_child->loop());
 }
 
 # use the Query constructor to get privsep

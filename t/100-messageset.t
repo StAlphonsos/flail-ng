@@ -4,6 +4,7 @@
 use strict;
 use warnings;
 use Test::More tests => 30;
+#use Try::Tiny;
 
 use t::lib;
 
@@ -19,18 +20,31 @@ my %EXPECT = (
 );
 
 # 10 tests per call
+#my $proc;
 sub test_mset {
 	my($ctor,$cname,@args) = @_;
 	my $mclass = "Flail::MessageSet";
 	$mclass .= "::${cname}" if $cname;
 	$cname ||= "generic";
 	my $mset = $mclass->$ctor(@args);
+#	try { $proc = $mset->privsep_child; } catch {};
 	is($mset->count,$EXPECT{COUNT},
 	   "$cname count is as expected: ".$mset->count);
 	my $m0 = $mset->first;
 	ok($m0,"got first message $m0");
 	is($m0->subject,$EXPECT{SUBJ0},"subject 0 is as excected");
 	my $m0id = $m0->messageId;
+=pod
+
+=over 4
+
+=item $m0id = $m0->messageId;
+	is($m0id,$EXPEC ...
+
+=back
+
+=cut
+
 	is($m0id,$EXPECT{ID0},"message-id is right");
 	my $m_1=$mset->final;
 	ok($m_1,"got final message");
@@ -44,4 +58,15 @@ sub test_mset {
 
 test_mset("new", "Maildir", folder => test_folder);			#   10
 test_mset("new", "", folder => test_folder, no_privsep => 1);		# + 10
+#$SIG{CHLD} = sub {
+#	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+#		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
+#		warn("reaped $pid, sig $signo core $coredump xit $xit\n");
+#		$proc->finish(
+#			do_wait => 0,
+#			signo => $signo,
+#			coredump => $coredump,
+#			xit => $xit) if $proc && $proc->pid == $pid;
+#	}
+#};
 test_mset("Query", "", folder => test_folder);				# + 10
