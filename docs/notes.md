@@ -13,3 +13,10 @@ latex footer:       mmd-memoir-footer
 need to rename curse to avoid awkwardness in e.g. ::Message::curse
 w/recursive invocations on values
 
+2017-05-02
+alpine might be abandonware and has no tests.
+
+claws-mail bugtracker does not let you just browse bugs in time.
+
+2017-05-03
+started on muas.txt in earnest

@@ -1,23 +1,50 @@
 # MUAs in OpenBSD ports under mail/ -*- indent-tabs-mode:nil; tab-width:8 -*-
-# name			# type              # loc # testloc # tests # vuls
-alpine			# textmode
-asmail			# gui (afterstep)
-claws-mail		# gui (gtk2)
-cue			# textmode
-elm			# textmode
-evolution		# gui (gnome)
-exmh2			# gui (x11)
-geary			# gui (gnome)
-lumail			# textmode
-mew			# textmode (emacs)
-mozilla-thunderbird	# gui (xul)
-mu			# textmode (emacs)
-mutt			# textmode
-neomutt			# textmode
-nmh			# textmode
-roundcubemail		# webmail
-s-nail			# textmode
-sylpheed		# gui (gtk2)
-thunderbird-i18n	# gui (xul)
-trojita			# gui (qt)
-wmmail			# gui (WindowMaker)
+
+2017-05-03
+
+My ongoing effort to collect metadata about F/OSS MUAs, starting with
+those in the OpenBSD ports tree.
+
+First cut at basic infos about how well MUAs are tested and if they
+use any app-level security patterns like privsep.
+
+# name		# type          # loc  # tloc # tests # vuls # privsep
+alpine  	# textmode      #  90k # 0    # 0     # ?    # no
+claws-mail	# gui (gtk2)    # 300k # 0    # 0     # ?    # no
+cue		# textmode      #  26k # 0    # 0     # ?    # no
+elm		# textmode      #  57k # 0[1] # 0[1]  # ?    # no
+evolution	# gui (gnome)   # 490k # 682? # 0?    # ?    # no
+exmh2		# gui (x11)     #  50k # 0?   # 0?    # ?    # no
+geary		# gui (gnome)   #  70k # 0    # 0     # ?    # no
+lumail		# textmode      #   8k # 0    # 0     # ?    # no
+mew		# textmode      #  46k # 0    # 0     # ?    # no
+thunderbird[2]  # gui (xul)     # 1.5m # 
+mu		# textmode      #  28k # 4k   # 14/108 # ?   # yes[3]
+mutt		# textmode      # 127k # 0?   # 0     # ?    # no
+neomutt		# textmode      # 139k # 0    # 0     # 0    # no
+nmh		# textmode      #  68k # 10k  # 
+roundcubemail	# webmail
+s-nail		# textmode
+sylpheed	# gui (gtk2)
+trojita		# gui (qt)
+
+Columns:
+  loc: lines of application code
+  tloc: lines of test code
+  tests: number of tests (however the project defines that)
+  vuls: public vuls reported
+  privsep: uses privsep/sandboxing/any app security features
+
+N.B. All "lines of code" measurements from cloc (textproc/cloc).  Some
+twiddling required to not double-count tests, etc.
+
+Notes:
+
+[1]elm has #ifdef _TEST at the bottom of some files, not sure if
+   there's an easy way to run them, some (all?) of them are
+   interactive, not automatic.
+
+[2]the name of the port is really mail/mozilla-thunderbird
+
+[3]mu4e, the MUA that comes with mu, does talk to a separate mu
+   server process where mail is parsed.  it is not sandboxed.

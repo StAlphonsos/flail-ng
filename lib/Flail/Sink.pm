@@ -101,7 +101,7 @@ sub msg_to_string {
 	}
 	return undef if ($style eq "debug") && !$self->debug;
 	return $self->leader($style) .
-	    join($self->sep, map { msgfy $_ } @msg) .
+	    join($self->sep, map { msgfy($_) } @msg) .
 	    $self->trailer($style);
 }
 
