@@ -6,27 +6,28 @@ My ongoing effort to collect metadata about F/OSS MUAs, starting with
 those in the OpenBSD ports tree.
 
 First cut at basic infos about how well MUAs are tested and if they
-use any app-level security patterns like privsep.
+use any app-level security patterns like privsep.  Some kind of date
+info is really needed (last update? first release? latest vul?).
 
 # name		# type          # loc  # tloc # tests # vuls # privsep
 alpine  	# textmode      #  90k # 0    # 0     # ?    # no
 claws-mail	# gui (gtk2)    # 300k # 0    # 0     # ?    # no
 cue		# textmode      #  26k # 0    # 0     # ?    # no
-elm		# textmode      #  57k # 0[1] # 0[1]  # ?    # no
-evolution	# gui (gnome)   # 490k # 682? # 0?    # ?    # no
+elm		# textmode      #  57k # 0[1] # 0     # ?    # no
+evolution[2]	# gui (gnome)   # 490k # 682  # 0?    # ?    # no
 exmh2		# gui (x11)     #  50k # 0?   # 0?    # ?    # no
 geary		# gui (gnome)   #  70k # 0    # 0     # ?    # no
 lumail		# textmode      #   8k # 0    # 0     # ?    # no
 mew		# textmode      #  46k # 0    # 0     # ?    # no
-thunderbird[2]  # gui (xul)     # 1.5m # 
-mu		# textmode      #  28k # 4k   # 14/108 # ?   # yes[3]
+thunderbird[3]  # gui (xul)     #  15m # 1.8m # lots? # ?    # ?
+mu		# textmode      #  28k # 4k   # 108   # ?    # no[4]
 mutt		# textmode      # 127k # 0?   # 0     # ?    # no
-neomutt		# textmode      # 139k # 0    # 0     # 0    # no
-nmh		# textmode      #  68k # 10k  # 
+neomutt		# textmode      # 139k # 0    # 0     # ?    # no
+nmh		# textmode      #  68k # 10k  # 88    # ?    # no
 roundcubemail	# webmail
-s-nail		# textmode
-sylpheed	# gui (gtk2)
-trojita		# gui (qt)
+s-nail		# textmode      #  48k # 1.2k # 25    # ?    # yes[5]
+sylpheed	# gui (gtk2)    # 179k # 0    # 0     # ?    # no
+trojita		# gui (qt)      #  56k #  14k # ?[6]  # ?    # no
 
 Columns:
   loc: lines of application code
@@ -44,7 +45,26 @@ Notes:
    there's an easy way to run them, some (all?) of them are
    interactive, not automatic.
 
-[2]the name of the port is really mail/mozilla-thunderbird
+[2]there may be some over-arching gnome test suite thing that I
+   have not found yet, still investgiating this.
 
-[3]mu4e, the MUA that comes with mu, does talk to a separate mu
-   server process where mail is parsed.  it is not sandboxed.
+[3]the name of the port is really mail/mozilla-thunderbird. the line
+   counts are not fair b/c they include the browser.  for comparison
+   several other MUAs link against some version of WebKit, which is
+   immense and does not count on their linecount.  I have still not
+   gotten the tbird tests to run under OpenBSD, not sure to say how
+   many there are.
+
+[4]mu4e, the MUA that comes with mu, does talk to a separate mu server
+   process where mail is parsed.  it is not sandboxed nor does it run
+   with reduced privs - performance feature, not security.
+
+[5]s-nail does have a privsep helper program for creating lock files
+   safely as an arbitrary user.  by "privsep" in this file we mean
+   more that techniques like sandboxing are used when e.g. parsing email,
+   talking to the network, etc, but the s-nail privsep dotlock is also
+   valid and deals with a real-world issue.
+
+[6]trojita's tests require a live X server connection and this is
+   difficult for me at the moment, since i've been working on this
+   remotely for the most part, due to my crappy network connection.
