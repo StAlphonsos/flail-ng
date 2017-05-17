@@ -33,6 +33,8 @@ use vars qw($DEFAULT_CONF %DEFAULTS @MAILDIR_VARS);
 	"maildir_base" => dirname_env(@MAILDIR_VARS) || $ENV{"HOME"}
 );
 
+extends "Flail::Reporter";
+
 has "attrs" => (is => "rw", isa => "HashRef", default => sub { {} });
 has "defaults" => (
 	is => "rw", isa => "HashRef",

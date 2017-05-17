@@ -31,7 +31,7 @@ is(clean("  abc  \n "),"abc","clean works");
 is(affirmative("yes"),1,"affirmative('yes')");
 is(affirmative("no"),0,"affirmative('no')");
 
-is(msgfy(undef),"-UNDEF-","msgfy(undef)");
+is(msgfy(undef),"undef","msgfy(undef)");
 is(msgfy("foo"),"foo","msgfu('foo')");
 
 my($w,$h) = screen_columns();

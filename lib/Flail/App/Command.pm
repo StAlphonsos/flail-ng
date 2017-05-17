@@ -23,6 +23,8 @@ use Moose;
 use App::Cmd::Setup -command;
 use Flail::Util qw(dumpola);
 
+extends "Flail::Reporter";
+
 has "the_app" => (
 	is => "rw", isa => "Object", handles => [qw[emit more is_full conf]]);
 

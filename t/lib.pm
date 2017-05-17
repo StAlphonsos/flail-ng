@@ -7,10 +7,12 @@ use warnings;
 use File::Path qw(make_path remove_tree);
 use Data::Dumper;
 use POSIX;
-use vars qw($NO_MAILDIR $SAMPLE_MAILDIR);
+use vars qw($NO_MAILDIR $NO_LOGFILE $SAMPLE_MAILDIR $DEBUG_LOGFILE);
 
 $NO_MAILDIR ||= 0;
+$NO_LOGFILE ||= 0;
 $SAMPLE_MAILDIR ||= "maildir_simple";
+$DEBUG_LOGFILE  ||= "flail-debug.log";
 
 sub ts		{ POSIX::strftime("%Y-%m-%dT%H:%M:%S%Z",localtime(time)) }
 sub DD		{ Data::Dumper->new(\@_)->Terse(1)->Indent(0)->Dump; }
@@ -39,7 +41,7 @@ sub setup_testing_env {
 	unless ($NO_MAILDIR) {
 		my $fix = "t/fixtures/${SAMPLE_MAILDIR}";
 		my $md = join("/", $tstd, "Maildir");
-		warn("# populating $md from $fix ...\n") if verbose;
+		warn("# populating $md from $fix ...\n") if verbose();
 		die("setup_testing_env: $md exists!") if -d $md || -f $md;
 		make_path($md) or die("make_path($md): $!");
 		die("$fix is missing") unless -d $fix;
@@ -50,6 +52,11 @@ sub setup_testing_env {
 		system($cmd) == 0 or die("seutp_testing_env: $cmd: $!");
 		$ENV{"FLAIL_TEST_MAILDIR"} = $md;
 		$ENV{"MAILDIR"} = $md;
+	}
+	unless ($NO_LOGFILE) {
+		use Flail::Reporter;
+		Flail::Reporter->log_level("debug");
+		Flail::Reporter->log_to($DEBUG_LOGFILE);
 	}
 }
 

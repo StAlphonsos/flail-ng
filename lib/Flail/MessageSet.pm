@@ -25,9 +25,10 @@ use POSIX qw(_exit);
 use Flail::ChildProcess;
 use Flail::Message;
 use Flail::MessageSet::Maildir;
-use Flail::Util qw(dumpola test_warn);
 use Try::Tiny;
 use overload '""' => \&to_string;
+
+extends "Flail::Reporter";
 
 # turn RPC results back into object
 sub uncurse_msg { @_ ? Flail::Message->new(@_) : undef }
@@ -63,16 +64,15 @@ sub in_parent { $_[0]->privsep_child && $_[0]->privsep_child->pid }
 # child: invoke real method on underlying object
 sub _dispatch {
 	my($self,$name,@args) = @_;
-	warn("$$ _dispatch name=$name args=@args child=".
-	     $self->privsep_child."\n");
+	$self->log("#$$ _dispatch name=$name args=",\@args);
 	if ($self->in_parent) {
 		return $self->privsep_child->req($name,@args);
 	}
 	try {
-		warn("$$ _dispatch $name using real=".$self->real."\n");
+		$self->log("#$$ _dispatch $name using real=".$self->real."\n");
 		return $self->real->$name(@args);
 	} catch {
-		warn ("$$ dispatch $name got error: @_\n");
+		$self->log("#$$ dispatch $name got error: @_\n");
 	};
 }
 
@@ -101,9 +101,9 @@ sub BUILD {
 			"app" => $params->{"app"},
 			"name" => "maildir reader",
 			"promises" => "stdio rpath",
-		    ) unless $params->{"no_privsep"};
+		    );
 		$self->privsep_child($child);
-		warn("$$ forked privsep child $child\n");
+		$self->log("#$$ forked privsep child $child");
 	}
 }
 
@@ -120,9 +120,9 @@ sub load_data {
 sub run {
 	my($self) = @_;
 	return $self if $self->in_parent;
-	warn("$$ MessageSet child loading data\n");
+	$self->log("#$$ MessageSet child loading data\n");
 	$self->load_data();
-	warn("$$ MessageSet child dropping into loop\n");
+	$self->log("#$$ MessageSet child dropping into loop\n");
 	_exit($self->privsep_child->loop());
 }
 

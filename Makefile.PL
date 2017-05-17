@@ -3,10 +3,14 @@
 ## flail, A command-line MUA in Perl
 
 use ExtUtils::MakeMaker;
+use IO::All;
 do "./lib/Flail.pm";
 
-sub SRC { "lib/@_" }
-sub DST { '$(INST_LIBDIR)/'."@_" }
+#sub SRC { "lib/@_" }
+#sub DST { '$(INST_LIBDIR)/'."@_" }
+#sub PAIR { ( SRC(@_) => DST(@_) ) }
+sub SRC { "@_" }
+sub DST { my $d = "@_"; $d =~ s,^lib/,,; '$(INST_LIBDIR)/'.$d }
 sub PAIR { ( SRC(@_) => DST(@_) ) }
 
 print STDERR "Welcome to flail v.$Flail::VERSION\n\n";
@@ -27,23 +31,7 @@ WriteMakefile(
 		'Net::SMTP' => 0,
 		'Try::Tiny' => 0,
 	},
-	PM => {
-		PAIR('Flail.pm'),
-		PAIR('Flail/App.pm'),
-		PAIR('Flail/App/Command.pm'),
-		PAIR('Flail/App/Command/ls.pm'),
-		PAIR('Flail/App/Command/repl.pm'),
-		PAIR('Flail/App/Command/server.pm'),
-		PAIR('Flail/ChildProcess.pm'),
-		PAIR('Flail/Config.pm'),
-		PAIR('Flail/Message.pm'),
-		PAIR('Flail/MessageSet.pm'),
-		PAIR('Flail/MessageSet/Handler.pm'),
-		PAIR('Flail/MessageSet/Maildir.pm'),
-		PAIR('Flail/Sink.pm'),
-		PAIR('Flail/Util.pm'),
-		PAIR('Devel/REPL/Plugin/AppCmd.pm'),
-	}
+	PM => { map { PAIR($_) } grep {/^lib/} @{io("MANIFEST")} },
 );
 sub MY::postamble {
     return <<__MyTaRgEt__;
@@ -66,7 +54,7 @@ EXAMPLES?=eg
 MKDIR_P?=mkdir -p
 
 clean::
-	\$(RM) -f *.flc *.bak *~ .tec*
+	\$(RM) -f *.flc *.bak *~ .tec* flail*.log
 
 force-releasefiles: cleanrelease releasefiles
 

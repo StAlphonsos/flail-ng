@@ -1,0 +1,8 @@
+.*\.log
+blib/.*
+MYMETA\..*
+pm_to_blib
+.*\.bak$
+Makefile$
+\.git/.*
+\.git.*

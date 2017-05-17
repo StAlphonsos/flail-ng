@@ -34,6 +34,8 @@ use vars qw($DEFAULT_SINK %LEAD_TRAIL @STYLES);
 );
 @STYLES = grep { $_ ne "normal" } keys %LEAD_TRAIL;
 
+extends "Flail::Reporter";
+
 has "eol" => (is => "rw", isa => "Str", default => "\n");
 has "sep" => (is => "rw", isa => "Str", default => " ");
 has "stream" => (is => "ro", isa => "Object", required => 1);

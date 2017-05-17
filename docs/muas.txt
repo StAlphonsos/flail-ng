@@ -19,12 +19,12 @@ exmh2		# gui (x11)     #  50k # 0?   # 0?    # ?    # no
 geary		# gui (gnome)   #  70k # 0    # 0     # ?    # no
 lumail		# textmode      #   8k # 0    # 0     # ?    # no
 mew		# textmode      #  46k # 0    # 0     # ?    # no
-thunderbird[3]  # gui (xul)     #  15m # 1.8m # lots? # ?    # ?
+thunderbird[3]  # gui (xul)     #  15m # 1.8m # lots? # ?    # no?
 mu		# textmode      #  28k # 4k   # 108   # ?    # no[4]
 mutt		# textmode      # 127k # 0?   # 0     # ?    # no
 neomutt		# textmode      # 139k # 0    # 0     # ?    # no
 nmh		# textmode      #  68k # 10k  # 88    # ?    # no
-roundcubemail	# webmail
+roundcubemail	# webmail       # 190k # 0    # 0     # ?    # no
 s-nail		# textmode      #  48k # 1.2k # 25    # ?    # yes[5]
 sylpheed	# gui (gtk2)    # 179k # 0    # 0     # ?    # no
 trojita		# gui (qt)      #  56k #  14k # ?[6]  # ?    # no

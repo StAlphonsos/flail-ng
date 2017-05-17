@@ -24,6 +24,8 @@ use overload '""' => sub {
 	sprintf("<%s: %d of %d>",$_[0]->name,$_[0]->idx,$_[0]->count)
 };
 
+extends "Flail::Reporter";
+
 has "name" => (is => "rw", isa => "Str");
 has "idx" => (is => "rw", isa => "Int", default => 0);
 has "msg_class" => (is => "rw", isa => "Str", default => "Flail::Message");
@@ -38,7 +40,7 @@ sub is_exhausted{ 1+$_[0]->idx >= $_[0]->count }
 sub msg_at {
 	my($self,$off) = @_;
 	my $raw = $self->this($off);
-	warn("$$ msg_at($off) => $raw\n");
+	$self->log("#$$ msg_at($off) => $raw\n");
 	return undef unless $raw;
 	return $self->a_msg($raw);
 }

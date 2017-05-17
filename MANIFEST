@@ -17,13 +17,16 @@ lib/Flail/Message.pm
 lib/Flail/MessageSet.pm
 lib/Flail/MessageSet/Handler.pm
 lib/Flail/MessageSet/Maildir.pm
+lib/Flail/Reporter.pm
 lib/Flail/Sink.pm
 lib/Flail/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/000-load-everything.t
+t/001-reporter.t
 t/010-config.t
 t/011-util.t
 t/012-sink.t

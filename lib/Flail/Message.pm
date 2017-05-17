@@ -37,6 +37,8 @@ $SUMMARY_SEP = "|";
     );
 @MESSAGE_FIELDS = qw(subject messageId from to cc body contentType);
 
+extends "Flail::Reporter";
+
 has "real" => (
 	is => "rw", isa => "Maybe[Mail::Message]");
 #	handles => [@MESSAGE_FIELDS]);
@@ -53,7 +55,7 @@ sub BUILD {
 	my($self,$params) = @_;
 	if ($self->real) {
 		# in the child
-		warn("$$ $self decoding the real message: ".$self->real."\n");
+		$self->log("#$$ $self decoding real message: ".$self->real);
 
 		$self->messageId("".$self->real->messageId);
 
@@ -64,12 +66,12 @@ sub BUILD {
 			if ($field eq "body" ) {
 				my $aref = $body->lines();
 				$self->body($aref);
-				warn("$$ decoded body w/".
-				     scalar(@$aref)." lines\n");
+				$self->log("#$$ decoded body w/".
+				     scalar(@$aref)." lines");
 			} elsif ($field eq "contentType") {
 				my $mtype = $body->mimeType;
 				$self->contentType("$mtype");
-				warn("$$ decoded contentType = $mtype\n");
+				$self->log("#$$ decoded contentType = $mtype");
 			} elsif ($field ne "messageId") {
 				my $xf = $FIELD_XFORMS{$field};
 				my $raw = $head->get($field);
@@ -79,7 +81,8 @@ sub BUILD {
 		}
 	} else {
 		my @missing = grep {!exists($params->{$_})} @MESSAGE_FIELDS;
-		warn(ref($self)." constructor invoked missing: @missing")
+		$self->log("!".ref($self).
+			   " constructor invoked missing: @missing")
 		    if @missing;
 	}
 }
@@ -88,7 +91,7 @@ sub BUILD {
 sub curse {
 	my($self) = @_;
 	my $c = { map { $_ => $self->$_ } @MESSAGE_FIELDS };
-#	warn("Flail::Message::curse => ".dumpola($c)."\n");
+#	$self->log("#Flail::Message::curse => ".dumpola($c)."\n");
 	return $c;
 }
 

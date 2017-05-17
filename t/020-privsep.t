@@ -7,7 +7,6 @@ use strict;
 use warnings;
 use Test::More tests => 38;
 use Try::Tiny;
-use POSIX qw(_exit);
 
 use Flail::ChildProcess;
 
@@ -91,11 +90,10 @@ my $proc;
 #			xit => $xit) if $proc && $proc->pid == $pid;
 #	}
 #};
-$proc = Flail::ChildProcess->new(
+$proc = Flail::ChildProcess->Spawn(
 	"obj" => $obj2,
 	"name" => "privsep test process",
 	"promises" => "stdio");
-_exit($proc->loop) if $proc->in_child;
 if (verbose()) { my $it = $proc->pid; sleep(1); system("ps $it"); }
 test_the_things($proc,sub { my($o,$m,@a) = @_; $o->req($m,@a); });	# +12
 

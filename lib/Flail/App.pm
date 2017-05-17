@@ -25,6 +25,8 @@ use Flail::Sink;
 use Flail::Config;
 use Try::Tiny;
 
+extends "Flail::Reporter";
+
 has "sink" => (
 	is => "rw", isa => "Flail::Sink", handles => [ qw[emit more] ]);
 has "configuration" => (
@@ -42,7 +44,7 @@ sub DEMOLISH {
 	my($self) = @_;
 	if (my $n = scalar(keys(%{$self->children}))) {
 		my $pids = join(", ", sort keys %{$self->children});
-		warn("$self: DEMOLISHing w/$n child processes regd: $pids\n");
+		$self->log("#DEMOLISHing w/$n child processes regd: $pids\n");
 	}
 }
 
@@ -51,13 +53,13 @@ sub DEMOLISH {
 sub reaper {
 	my($self) = @_;
 	local($!,$?);
-	warn("$$ reaper invoked\n");
+	$self->log("#$$ reaper invoked");
 	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
 		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
-		warn("$$ child $pid sig=$signo core=$coredump => $xit\n");
+		$self->log("#$$ child $pid sig=$signo core=$coredump => $xit");
 		my $kid = $self->children->{$pid};
 		if ($kid) {
-			warn("$$ child $pid => $kid\n");
+			$self->log("#$$ child $pid => $kid");
 			try {
 				$kid->finish(
 					do_wait => 0,
@@ -65,15 +67,15 @@ sub reaper {
 					coredump => $coredump,
 					xit => $xit);
 			} catch {
-				warn("error reaping pid $pid: @_\n");
+				$self->log("!reaping pid $pid: @_");
 			};
 			delete($self->children->{$pid});
 		} elsif ($coredump) {
-			warn("$$ unknown child $pid dumped core! ".
-			     "signal $signo, exit $xit\n");
+			$self->log("!$$ unknown child $pid dumped core! ".
+				   "signal $signo, exit $xit");
 		} else {
-			warn("$$ reaped unknown child $pid; ".
-			     "signal $signo, exit $xit\n");
+			$self->log("!$$ reaped unknown child $pid; ".
+				   "signal $signo, exit $xit");
 		}
 	}
 }
@@ -106,11 +108,11 @@ sub register_child {
 	my($self,$child) = @_;
 	unless (scalar(keys(%{$self->children}))) {
 		$self->_orig_chld($SIG{"CHLD"});
-		$SIG{"CHLD"} = sub { warn("$$ REAPER!\n"); $self->reaper };
+		$SIG{"CHLD"} = sub { $self->reaper() };
 	}
 	if (exists($self->children->{$child->pid})) {
-		warn("$$ tried to register already-known pid ".$child->pid.
-		     ": $child\n");
+		$self->log("!$$ tried to register known pid ".$child->pid.
+		     ": $child");
 	} else {
 		$self->children->{$child->pid} = $child;
 	}
@@ -136,7 +138,7 @@ sub unregister_child {
 	my($self,$child) = @_;
 	my $pid = ref($child) ? $child->pid : $child;
 	if (!exists($self->children->{$pid})) {
-		warn("$$ tried to unregister unknown pid $pid\n");
+		$self->log("!$$ tried to unregister unknown pid $pid");
 	} else {
 		delete($self->children->{$pid});
 		$SIG{"CHLD"} = $self->_orig_chld

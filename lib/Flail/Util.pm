@@ -31,7 +31,7 @@ $TIME_FMT = "%Y-%m-%d %H:%M:%S";
 @EXPORT_OK = qw(
     affirmative basename basename_env clean curse defor defkey
     dirname dirname_env dumpola hexdump msgfy ts sandbox_violation
-    screen_columns test_warn udstr);
+    screen_columns test_warn udstr under_test_harness);
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 =pod
@@ -140,10 +140,13 @@ sub udstr	{ defined($_[0]) ? "$_[0]" : "undef" }
 =cut
 
 sub msgfy {
-	my($what) = @_;
-	return "-UNDEF-"	unless defined $what;
-	return "$what"		unless     ref $what;
-	return dumpola($what);
+	return "" unless @_;
+	return "[".join(" ",
+	     map {
+		     return "undef" unless defined $_;
+		     return "$_"    unless     ref $_;
+		     return dumpola($_);
+	     } @_) ."]";
 }
 
 =pod
@@ -202,8 +205,7 @@ sub curse {
 		if ($thing->can("curse")) {
 			$rez = $thing->curse();
 		} elsif (exists($CURSES{$rr})) {
-			my $curz = $CURSES{$rr};
-			$rez = &$curz($thing);
+			$rez = &{$CURSES{$rr}}($thing);
 		} else {
 			$rez = "$thing";
 		}
@@ -233,6 +235,22 @@ sandbox violation.  Currently only works under OpenBSD.
 sub sandbox_violation {
 	my($pid,$signo,$coredump,$xit) = @_;
 	return ($^O eq "openbsd") && ($signo == 6);
+}
+
+=pod
+
+=over 4
+
+=item * under_test_harness
+
+Return true if we are running under a test harness.
+
+=back
+
+=cut
+
+sub under_test_harness {
+	exists($ENV{"FLAIL_TEST_TESTDIR"}) ? ($ENV{"TEST_VERBOSE"}? 2 : 1) : 0;
 }
 
 1;

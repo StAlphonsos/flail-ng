@@ -1,27 +1,21 @@
 #!/usr/bin/perl
 # -*- mode:perl;tab-width:8;perl-indent-level:8;indent-tabs-mode:t -*-
 
-use strict;
-use warnings;
-use Test::More tests => 15;
+use Modern::Perl;
+use Test::More;
 use vars qw($NO_MAILDIR);
 
 BEGIN { $NO_MAILDIR = 1; }
 
+# programmatically get the list of modules and require_ok them all
+# that way we don't have to constantly edit this test
+
+open(MAN,"MANIFEST") or die "MANIFEST: $!";
+our @LIST =(map { $_ =~ s,^lib/,,; $_ =~ s,/,::,g; $_ =~ s/\.pm$//; $_; }
+	    grep {/^lib/} <MAN>);
+close(MAN);
+
 use t::lib;
 
-require_ok("Flail");
-require_ok("Flail::ChildProcess");
-require_ok("Flail::Config");
-require_ok("Flail::Message");
-require_ok("Flail::MessageSet");
-require_ok("Flail::MessageSet::Handler");
-require_ok("Flail::MessageSet::Maildir");
-require_ok("Flail::Sink");
-require_ok("Flail::App");
-require_ok("Flail::App::Command");
-require_ok("Flail::App::Command::ls");
-require_ok("Flail::App::Command::repl");
-require_ok("Flail::App::Command::server");
-require_ok("Flail::Util");
-require_ok("Devel::REPL::Plugin::AppCmd");
+require_ok($_) foreach (@LIST);
+done_testing(scalar(@LIST));
