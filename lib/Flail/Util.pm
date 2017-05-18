@@ -243,7 +243,8 @@ sub sandbox_violation {
 
 =item * under_test_harness
 
-Return true if we are running under a test harness.
+Return true if we are running under a test harness.  If TEST_VERBOSE
+is set in the environment we return greater than one.
 
 =back
 

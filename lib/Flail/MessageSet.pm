@@ -69,10 +69,10 @@ sub _dispatch {
 		return $self->privsep_child->req($name,@args);
 	}
 	try {
-		$self->log("#$$ _dispatch $name using real=".$self->real."\n");
+		$self->log("#$$ _dispatch $name using real=".$self->real);
 		return $self->real->$name(@args);
 	} catch {
-		$self->log("#$$ dispatch $name got error: @_\n");
+		$self->log("#$$ dispatch $name got error: @_");
 	};
 }
 
@@ -120,9 +120,9 @@ sub load_data {
 sub run {
 	my($self) = @_;
 	return $self if $self->in_parent;
-	$self->log("#$$ MessageSet child loading data\n");
+	$self->log("#$$ MessageSet child loading data");
 	$self->load_data();
-	$self->log("#$$ MessageSet child dropping into loop\n");
+	$self->log("#$$ MessageSet child dropping into loop");
 	_exit($self->privsep_child->loop());
 }
 

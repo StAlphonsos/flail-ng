@@ -126,7 +126,8 @@ sub log_level {
 
 sub _shut_log {
 	return unless $LOG_STREAM;
-	$LOG_STREAM->write("[".ts()."] <*> LOG STREAM TERMINATED\n")
+	my $test = under_test_harness () ? " ($0 @ARGV)" : "";
+	$LOG_STREAM->write("[".ts()."] <*> LOG STREAM TERMINATED${test}\n")
 	    unless $LOG_OPTS{"nomarks"};
 	$LOG_STREAM->close();
 	$LOG_STREAM = undef;
@@ -148,7 +149,8 @@ sub log_to {
 	$LOG_STREAM = ref($fn) ? $fn : IO::File->new(">> $fn");
 	$LOG_STREAM->autoflush(1);
 	if (!ref($fn)) {
-		$LOG_STREAM->write("[".ts()."] <*> LOG STREAM STARTED: $fn\n")
+		my $test = under_test_harness () ? " ($0 @ARGV)" : "";
+		$LOG_STREAM->write("[".ts()."] <*> LOG => ${fn}${test}\n")
 		    unless $LOG_OPTS{"nomarks"};
 	}
 }
