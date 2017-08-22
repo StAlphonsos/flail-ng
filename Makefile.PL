@@ -90,7 +90,7 @@ asc: \$(RELEASETARBALL)
 
 # e.g. $ make search key=some_method
 search ::
-	\@find . \\( -perm -1 -a ! -type d \\) -o -name '*.pm' -o -name '*.t' -o -name '*.pl' | xargs grep -n \${grep_opts} \${key}
+	\@find lib \\( -perm -1 -a ! -type d \\) -o -name '*.pm' -o -name '*.t' -o -name '*.pl' | xargs grep -n \${grep_opts} \${key}
 
 reconf ::
 	\@make distclean; perl Makefile.PL

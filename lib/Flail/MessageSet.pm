@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-Flail::MessageSet - brief description
+Flail::MessageSet - A container for a set of messages
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,6 @@ Describe the module with real words.
 =cut
 
 package Flail::MessageSet;
-use Modern::Perl;
 use Moose;
 use POSIX qw(_exit);
 use Flail::ChildProcess;
@@ -88,6 +87,112 @@ sub next	{ shift->_dispatch("next",@_) }
 sub prev	{ shift->_dispatch("prev",@_) }
 sub is_exhausted{ shift->_dispatch("is_exhausted",@_) }
 
+# initialize the sandbox in a child process by doing whatever it is
+# that must be done pre-pledge.
+sub _sandbox_init {
+	$_[0]->log("#$$ initializing sandbox");
+	# had to use unshift @INC, sub { warn } to suss this out, thx afresh1@
+	use App::Cmd::Command::commands;
+	use App::Cmd::Command::help;
+	use App::Cmd::Command::version;
+	use AutoLoader;
+	use B::Hooks::EndOfScope::XS;
+	use B::Hooks::EndOfScope;
+	use Carp::Heavy;
+	use Date::Format;
+	use Date::Parse;
+	use Devel::REPL::Error;
+	use Devel::REPL;
+	use Encode::Alias;
+	use Encode::Config;
+#	use Encode::ConfigLocal;	# XXX not sure about this
+	use Encode::Encoding;
+	use Encode;
+	use Errno;
+	use File::Copy;
+	use File::Glob;
+	use File::Path;
+	use File::Remove;
+	use File::Temp;
+	use Flail::App::Command::ls;
+	use Flail::App::Command::repl;
+	use Flail::App::Command::server;
+	use Flail::ChildProcess;
+	use Flail::Message;
+	use Flail::MessageSet::Handler;
+	use Flail::MessageSet::Maildir;
+	use Flail::MessageSet;
+	use Getopt::Long::Descriptive::Opts;
+	use Getopt::Long::Descriptive::Usage;
+	use Getopt::Long::Descriptive;
+	use Getopt::Long;
+	use IO::Lines;
+	use IO::ScalarArray;
+	use IO::WrapTie;
+	use JSON::XS;
+	use JSON;
+	use MIME::Base64;
+	use MIME::QuotedPrint;
+	use MIME::Type;
+	use MIME::Types;
+	use Mail::Address;
+	use Mail::Box::Dir::Message;
+	use Mail::Box::Dir;
+	use Mail::Box::FastScalar;
+	use Mail::Box::Locker;
+	use Mail::Box::Maildir::Message;
+	use Mail::Box::Maildir;
+	use Mail::Box::Message;
+	use Mail::Box::Parser::C;	# dynloaded .so file
+	use Mail::Box::Parser;
+	use Mail::Box;
+	use Mail::Message::Body::Delayed;
+	use Mail::Message::Body::Encode;
+	use Mail::Message::Body::File;
+	use Mail::Message::Body::Lines;
+	use Mail::Message::Body::Multipart;
+	use Mail::Message::Body::Nested;
+	use Mail::Message::Body;
+	use Mail::Message::Construct;
+	use Mail::Message::Field::Fast;
+	use Mail::Message::Field::Full;
+	use Mail::Message::Field;
+	use Mail::Message::Head::Complete;
+	use Mail::Message::Head::Delayed;
+	use Mail::Message::Head::Partial;
+	use Mail::Message::Head;
+	use Mail::Message::Part;
+	use Mail::Message;
+	use Mail::Reporter;
+	use MooseX::Object::Pluggable;
+#	use Object::Realize::Later;	# no point in doing this, read the POD
+	use OpenBSD::Pledge;
+	use Params::Validate::Constants;
+	use Params::Validate::XS;
+	use Params::Validate;
+	use PerlIO::encoding;
+	use PerlIO;
+	use Socket;
+	use Sub::Exporter::Util;
+	use Sys::Hostname;
+	use Term::ReadLine::Gnu::XS;
+	use Term::ReadLine::Gnu;
+	use Term::ReadLine;
+	use Text::Abbrev;
+	use Time::Local;
+	use Time::Zone;
+	use Types::Serialiser;
+	use Variable::Magic;
+	use common::sense;
+	use filetest 'access';
+	use integer;
+#	use namespace::autoclean;	# also counter-productive
+#	use namespace::clean::_Util;	# ...
+#	use namespace::clean;		# ......
+	use utf8;
+	$_[0]->log("#$$ sandbox initialized");
+}
+
 # fork a privsep child to do actual parsing of email
 sub BUILD {
 	my($self,$params) = @_;
@@ -97,10 +202,11 @@ sub BUILD {
 	} else {
 		# privsep - fork the child
 		my $child = Flail::ChildProcess->new(
-			"obj" => $self,
-			"app" => $params->{"app"},
-			"name" => "maildir reader",
-			"promises" => "stdio rpath",
+			obj => $self,
+			app => $params->{"app"},
+			name => "maildir reader",
+			promises => "stdio rpath",
+			sandbox_init => \&_sandbox_init,
 		    );
 		$self->privsep_child($child);
 		$self->log("#$$ forked privsep child $child");

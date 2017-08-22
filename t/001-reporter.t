@@ -9,7 +9,6 @@ BEGIN { $NO_MAILDIR = 1; $NO_LOGFILE = 1; }
 
 use t::lib;
 
-use Flail::Reporter;
 Flail::Reporter->log_options(ts => 0,nomarks => 1);
 
 package Whatsit;

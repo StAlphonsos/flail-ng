@@ -3,7 +3,7 @@
 
 use Modern::Perl;
 use Test::More tests => 30;
-#use Try::Tiny;
+use Try::Tiny;
 
 use t::lib;
 
@@ -19,14 +19,14 @@ my %EXPECT = (
 );
 
 # 10 tests per call
-#my $proc;
+my $proc;
 sub test_mset {
 	my($ctor,$cname,@args) = @_;
 	my $mclass = "Flail::MessageSet";
 	$mclass .= "::${cname}" if $cname;
 	$cname ||= "generic";
 	my $mset = $mclass->$ctor(@args);
-#	try { $proc = $mset->privsep_child; } catch {};
+	try { $proc = $mset->privsep_child } catch { $proc = undef; };
 	is($mset->count,$EXPECT{COUNT},
 	   "$cname count is as expected: ".$mset->count);
 	my $m0 = $mset->first;
@@ -44,8 +44,6 @@ sub test_mset {
 	ok($mset->finish,"finish won for $cname");
 }
 
-test_mset("new", "Maildir", folder => test_folder);			#   10
-test_mset("new", "", folder => test_folder, no_privsep => 1);		# + 10
 #$SIG{CHLD} = sub {
 #	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
 #		my($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
@@ -57,4 +55,6 @@ test_mset("new", "", folder => test_folder, no_privsep => 1);		# + 10
 #			xit => $xit) if $proc && $proc->pid == $pid;
 #	}
 #};
+test_mset("new", "Maildir", folder => test_folder);			# + 10
+test_mset("new", "", folder => test_folder, no_privsep => 1);		# + 10
 test_mset("Query", "", folder => test_folder);				# + 10

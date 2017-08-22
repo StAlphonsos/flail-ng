@@ -5,9 +5,23 @@
 #
 # See the POD at EOF for documentation and license.
 ##
+#open(THE_INCS, "> incs.pm") or die "incs.pm: $!";
+#THE_INCS->autoflush(1);
+#sub increc {
+#	my $x = shift;
+#	$x =~ s/\//::/gs;
+#	$x =~ s/\.pm$//;
+#	return "\tuse $x;\n";
+#}
+#END { close(THE_INCS); }
+#unshift @INC, sub { shift; print THE_INCS increc(@_); undef; };
 use Modern::Perl;
+use Flail::Reporter;
 use Flail::App;
 
+Flail::Reporter->log_level("debug");
+Flail::Reporter->log_to("flail-debug.log");
+Flail::Reporter->log("running app");
 Flail::App->run;
 
 __END__

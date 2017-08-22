@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use File::Path qw(make_path remove_tree);
 use Data::Dumper;
+use Flail::Reporter;
 use POSIX;
 use vars qw($NO_MAILDIR $NO_LOGFILE $SAMPLE_MAILDIR $DEBUG_LOGFILE);
 
@@ -54,7 +55,6 @@ sub setup_testing_env {
 		$ENV{"MAILDIR"} = $md;
 	}
 	unless ($NO_LOGFILE) {
-		use Flail::Reporter;
 		Flail::Reporter->log_level("debug");
 		Flail::Reporter->log_to($DEBUG_LOGFILE);
 	}

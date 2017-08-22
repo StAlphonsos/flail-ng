@@ -18,14 +18,15 @@ Blah.
 =cut
 
 package Flail::App;
-use POSIX ":sys_wait_h";
 use Moose;
+use MooseX::NonMoose;
 use App::Cmd::Setup -app;
 use Flail::Sink;
 use Flail::Config;
 use Try::Tiny;
+use POSIX ":sys_wait_h";
 
-extends "Flail::Reporter";
+with "Flail::Reporter::Role";
 
 has "sink" => (
 	is => "rw", isa => "Flail::Sink", handles => [ qw[emit more] ]);

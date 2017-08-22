@@ -15,14 +15,10 @@ Flail::Config - configuration data for flail
 
 Describe the module with real words.
 
-
-=head1 LICENSE
-
-ISC/BSD; see LICENSE file in source distribution.
-
 =cut
 
 package Flail::Config;
+use Modern::Perl;
 use Moose;
 use Flail::Util qw(basename_env dirname_env);
 use vars qw($DEFAULT_CONF %DEFAULTS @MAILDIR_VARS);

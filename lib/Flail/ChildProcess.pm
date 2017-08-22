@@ -36,15 +36,13 @@ Perl.
 =cut
 
 package Flail::ChildProcess;
-use Modern::Perl;
+use Moose;
 use POSIX qw(_exit);
 use Socket;
 use IO::Handle;
-use Moose;
 use Try::Tiny;
 use JSON qw(encode_json decode_json);
 use OpenBSD::Pledge;			# for now only one sandbox
-use Flail::App;
 use Flail::Util qw(curse defkey hexdump dumpola udstr sandbox_violation);
 use constant {
 	RPC_OK => 0,
@@ -72,6 +70,7 @@ has "max_bufsiz" => (is => "rw", isa => "Int", default => 102400);
 has "stream" => (is => "rw", isa => "Maybe[Object]");
 has "inbuf" => (is => "rw", isa => "Str", default => "");
 has "obj" => (is => "rw", isa => "Object");
+has "sandbox_init" => (is => "rw", isa => "Maybe[CodeRef]");
 
 # set up plumbing, fork child, do some bookkeeping
 sub BUILD {
@@ -93,6 +92,8 @@ sub BUILD {
 		close(CHILD);
 		$self->stream(IO::Handle->new_from_fd(fileno(PARENT),"r+"));
 		$self->stream->autoflush(1);
+#		push @INC, sub { shift; $self->log("#$$ INC: @_"); undef; };
+		&{$self->sandbox_init}($self,$params) if $self->sandbox_init;
 		# XXX stderr
 		# XXX drop privs
 		# XXX chroot if poss
@@ -474,10 +475,10 @@ sub finish {
 	my $pid = $self->pid;
 
 	if ($do_wait) {
+		$self->app->unregister_child($pid) if $self->app;
 		$self->shutdown();
 		$pid = waitpid($pid, 0);
 		($signo,$coredump,$xit) = ($? & 127,$? & 128,$? >> 8);
-		$self->app->unregister_child($pid) if $self->app;
 	}
 
 	$self->stream->close();

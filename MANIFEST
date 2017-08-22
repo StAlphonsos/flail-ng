@@ -18,6 +18,7 @@ lib/Flail/MessageSet.pm
 lib/Flail/MessageSet/Handler.pm
 lib/Flail/MessageSet/Maildir.pm
 lib/Flail/Reporter.pm
+lib/Flail/Reporter/Role.pm
 lib/Flail/Sink.pm
 lib/Flail/Util.pm
 LICENSE

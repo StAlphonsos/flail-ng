@@ -20,10 +20,12 @@ Describe the module with real words.
 
 package Flail::App::Command;
 use Moose;
+use MooseX::NonMoose;
 use App::Cmd::Setup -command;
 use Flail::Util qw(dumpola);
+use Flail::Reporter;
 
-extends "Flail::Reporter";
+with "Flail::Reporter::Role";
 
 has "the_app" => (
 	is => "rw", isa => "Object", handles => [qw[emit more is_full conf]]);
